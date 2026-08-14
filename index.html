@@ -1508,8 +1508,8 @@
             const sheetVal = document.getElementById('inputSheet').value;
             const statusVal = document.getElementById('inputStatus').value;
 
-            if (!nameVal || !sheetVal || !statusVal) {
-                showAlert("Campos Incompletos", "Por favor completa el nombre, la Pestaña y el Estatus antes de continuar.", "warning");
+            if (!nameVal || !emailVal || !rawPhone.trim() || rawPhone.trim() === '+503' || !sheetVal || !statusVal) {
+                showAlert("Campos Incompletos", "Por favor completa el nombre, <strong>correo</strong>, <strong>número de teléfono</strong>, la Pestaña y el Estatus antes de continuar.", "warning");
                 return;
             }
 
