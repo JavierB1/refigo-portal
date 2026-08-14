@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RefiGo Portal - Gestión Avanzada de Candidatos</title>
+    <title>RefiGo Portal - Sistema de Gestión</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Iconos -->
@@ -15,31 +15,93 @@
         body { font-family: 'Inter', sans-serif; }
         .dropdown-menu { display: none; }
         .dropdown-menu.active { display: block; }
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- Header / Navbar -->
-    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-indigo-600 p-2 rounded-lg text-white font-bold text-xl">
-                    <i class="fa-solid fa-users-viewfinder"></i>
+    <!-- Overlay oscuro para cerrar sidebar al hacer clic fuera -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Sidebar Lateral Desplegable -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-800 border-r border-slate-700 z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-5 shadow-2xl">
+        <div class="space-y-6">
+            <!-- Header Sidebar -->
+            <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white font-bold text-lg">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-white text-base">RefiGo Portal</h2>
+                        <span class="text-xs text-slate-400">Categorías & Flujos</span>
+                    </div>
                 </div>
+                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Menú de Categorías (Pestañas) -->
+            <div class="space-y-1">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-2">Segmentación</span>
+                
+                <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-400 bg-indigo-600/10 border border-indigo-500/20 active" data-sheet="ALL">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Todas las Categorías</span>
+                    <span id="sideCountAll" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+
+                <button onclick="selectCategory('Referred')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="Referred">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-400"></i> Referred</span>
+                    <span id="sideCountReferred" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+
+                <button onclick="selectCategory('Cold')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="Cold">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-sky-400"></i> Cold</span>
+                    <span id="sideCountCold" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+
+                <button onclick="selectCategory('Rejected by CONCENTRIX')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="Rejected by CONCENTRIX">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-user-xmark text-rose-400"></i> Rejected</span>
+                    <span id="sideCountRejected" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+
+                <button onclick="selectCategory('No Referred')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="No Referred">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder-open text-amber-400"></i> No Referred</span>
+                    <span id="sideCountNoRef" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-700 pt-4 text-xs text-slate-500 text-center">
+            RefiGo Cloud DB • Sincronizado
+        </div>
+    </aside>
+
+    <!-- Header / Navbar Principal -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <!-- Botón Desplegar Sidebar -->
+                <button onclick="toggleSidebar()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-bars text-indigo-400"></i>
+                    <span>Categorías</span>
+                </button>
+
                 <div>
-                    <h1 class="text-lg font-bold tracking-wide">RefiGo Portal</h1>
-                    <p class="text-xs text-slate-400">Control de Candidatos y Filtros Tipo Excel</p>
+                    <h1 class="text-base font-bold tracking-wide text-white">RefiGo Portal</h1>
+                    <p class="text-xs text-slate-400" id="currentCategoryLabel">Mostrando: Todas las Categorías</p>
                 </div>
             </div>
             
             <div class="flex items-center space-x-3">
-                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-lg shadow-emerald-600/30">
+                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold px-3 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-lg shadow-emerald-600/30">
                     <i class="fa-solid fa-user-plus"></i>
-                    <span>+ Nuevo Candidato</span>
+                    <span class="hidden sm:inline">+ Nuevo Candidato</span>
                 </button>
-                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-lg shadow-indigo-600/30">
+                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold px-3 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-lg shadow-indigo-600/30">
                     <i class="fa-solid fa-file-import"></i>
-                    <span>Cargar Excel</span>
+                    <span class="hidden sm:inline">Cargar Excel</span>
                     <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden">
                 </label>
             </div>
@@ -68,20 +130,11 @@
             </div>
         </div>
 
-        <!-- Pestañas de Navegación Segmentadas -->
-        <div class="border-b border-slate-700 flex space-x-2">
-            <button class="tab-btn py-2.5 px-4 text-sm font-medium text-indigo-400 border-b-2 border-indigo-500 active" data-sheet="ALL">Todas las Categorías</button>
-            <button class="tab-btn py-2.5 px-4 text-sm font-medium text-slate-400 hover:text-slate-200" data-sheet="Referred">Referred</button>
-            <button class="tab-btn py-2.5 px-4 text-sm font-medium text-slate-400 hover:text-slate-200" data-sheet="Cold">Cold</button>
-            <button class="tab-btn py-2.5 px-4 text-sm font-medium text-slate-400 hover:text-slate-200" data-sheet="Rejected by CONCENTRIX">Rejected</button>
-            <button class="tab-btn py-2.5 px-4 text-sm font-medium text-slate-400 hover:text-slate-200" data-sheet="No Referred">No Referred</button>
-        </div>
-
         <!-- Barra de Búsqueda y Limpieza -->
         <div class="flex items-center justify-between gap-4">
             <div class="relative w-full md:w-96">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                <input type="text" id="globalSearch" placeholder="Buscar texto general..." 
+                <input type="text" id="globalSearch" placeholder="Buscar por nombre, correo, número..." 
                        class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-100 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition">
             </div>
             <button id="clearAllFiltersBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-2">
@@ -90,7 +143,7 @@
             </button>
         </div>
 
-        <!-- Tabla Principal con Filtros y Menú de Opciones -->
+        <!-- Tabla Principal con Filtros Tipo Excel -->
         <div class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative">
             <div class="overflow-x-auto min-h-[400px]">
                 <table class="w-full text-left border-collapse text-sm">
@@ -99,7 +152,7 @@
                             <th class="py-3 px-4">Nombre / Referido</th>
                             <th class="py-3 px-4">Contacto</th>
 
-                            <!-- Pestaña -->
+                            <!-- Pestaña / Categoría -->
                             <th class="py-3 px-4 relative">
                                 <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('sheetFilter')">
                                     <span>Pestaña</span>
@@ -245,6 +298,49 @@
 
         let columnFilters = { sheet: [], status: [], followUp: [] };
 
+        // Abrir/Cerrar Sidebar
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        // Seleccionar categoría desde Sidebar
+        window.selectCategory = function(sheet) {
+            activeTabSheet = sheet;
+            
+            document.querySelectorAll('.sidebar-cat-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-400', 'bg-indigo-600/10', 'border', 'border-indigo-500/20', 'active');
+                btn.classList.add('text-slate-300');
+            });
+
+            const activeBtn = document.querySelector(`.sidebar-cat-btn[data-sheet="${sheet}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('text-indigo-400', 'bg-indigo-600/10', 'border', 'border-indigo-500/20', 'active');
+                activeBtn.classList.remove('text-slate-300');
+            }
+
+            const labelMap = {
+                'ALL': 'Todas las Categorías',
+                'Referred': 'Referred',
+                'Cold': 'Cold',
+                'Rejected by CONCENTRIX': 'Rejected',
+                'No Referred': 'No Referred'
+            };
+            document.getElementById('currentCategoryLabel').textContent = `Mostrando: ${labelMap[sheet] || sheet}`;
+
+            toggleSidebar();
+            applyAllFilters();
+        };
+
         // Escuchar Firebase en Vivo
         onSnapshot(candidatesCol, (snapshot) => {
             allCandidates = [];
@@ -269,7 +365,6 @@
             applyAllFilters();
         });
 
-        // Manejo de Desplegables de Filtro
         window.toggleDropdown = function(id) {
             document.querySelectorAll('.dropdown-menu').forEach(el => {
                 if(el.id !== id) el.classList.remove('active');
@@ -277,7 +372,6 @@
             document.getElementById(id).classList.toggle('active');
         };
 
-        // Cerrar menús flotantes al hacer clic afuera
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.dropdown-menu') && !e.target.closest('.fa-filter') && !e.target.closest('.action-dots-btn')) {
                 document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
@@ -338,22 +432,6 @@
             applyAllFilters();
         };
 
-        // Botones de Pestañas
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.tab-btn').forEach(b => {
-                    b.classList.remove('text-indigo-400', 'border-b-2', 'border-indigo-500', 'active');
-                    b.classList.add('text-slate-400');
-                });
-                btn.classList.add('text-indigo-400', 'border-b-2', 'border-indigo-500', 'active');
-                btn.classList.remove('text-slate-400');
-                
-                activeTabSheet = btn.dataset.sheet;
-                applyAllFilters();
-            });
-        });
-
-        // Búsqueda General
         document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
         document.getElementById('clearAllFiltersBtn').addEventListener('click', () => {
             document.getElementById('globalSearch').value = '';
@@ -430,17 +508,14 @@
                     </td>
                     <td class="py-3 px-4 text-xs text-slate-300 max-w-xs truncate" title="${c.notes}">${c.notes}</td>
                     <td class="py-3 px-4 text-center space-x-2 relative">
-                        <!-- WhatsApp Directo -->
                         <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Enviar WhatsApp">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </a>
 
-                        <!-- Botón 3 Puntos para Menú de Detalles y Acciones -->
                         <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white transition" title="Ver opciones">
                             <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                         </button>
 
-                        <!-- Menú Flotante de Opciones e Historial -->
                         <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
                             <div class="border-b border-slate-700 pb-2 mb-2">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
@@ -470,10 +545,23 @@
         }
 
         function updateMetrics() {
-            document.getElementById('metricTotal').textContent = allCandidates.length;
-            document.getElementById('metricReferred').textContent = allCandidates.filter(c => c.sheet === 'Referred').length;
-            document.getElementById('metricCold').textContent = allCandidates.filter(c => c.sheet === 'Cold').length;
-            document.getElementById('metricOther').textContent = allCandidates.filter(c => ['Rejected by CONCENTRIX', 'No Referred'].includes(c.sheet)).length;
+            const total = allCandidates.length;
+            const refCount = allCandidates.filter(c => c.sheet === 'Referred').length;
+            const coldCount = allCandidates.filter(c => c.sheet === 'Cold').length;
+            const rejCount = allCandidates.filter(c => c.sheet === 'Rejected by CONCENTRIX').length;
+            const noRefCount = allCandidates.filter(c => c.sheet === 'No Referred').length;
+
+            document.getElementById('metricTotal').textContent = total;
+            document.getElementById('metricReferred').textContent = refCount;
+            document.getElementById('metricCold').textContent = coldCount;
+            document.getElementById('metricOther').textContent = rejCount + noRefCount;
+
+            // Badges en el Sidebar
+            document.getElementById('sideCountAll').textContent = total;
+            document.getElementById('sideCountReferred').textContent = refCount;
+            document.getElementById('sideCountCold').textContent = coldCount;
+            document.getElementById('sideCountRejected').textContent = rejCount;
+            document.getElementById('sideCountNoRef').textContent = noRefCount;
         }
 
         function cleanPhone(phone) {
@@ -522,7 +610,7 @@
                 });
 
                 await batch.commit();
-                alert("¡Excel cargado con éxito con fecha de creación!");
+                alert("¡Excel cargado con éxito en Firebase!");
             };
             reader.readAsArrayBuffer(file);
         });
