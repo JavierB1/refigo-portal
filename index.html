@@ -59,7 +59,7 @@
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-2">Segmentación</span>
                 
                 <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-400 bg-indigo-600/10 border border-indigo-500/20 active" data-sheet="ALL">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Todas las Categorías</span>
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Dashboard General</span>
                     <span id="sideCountAll" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
                 </button>
                 <div id="dynamicSidebarCategories" class="space-y-1"></div>
@@ -88,7 +88,7 @@
 
                 <div>
                     <h1 class="text-base font-bold tracking-wide text-white">RefiGo Portal</h1>
-                    <p class="text-xs text-slate-400" id="currentCategoryLabel">Mostrando: Todas las Categorías</p>
+                    <p class="text-xs text-slate-400" id="currentCategoryLabel">Vista: Dashboard General (Demostración)</p>
                 </div>
             </div>
             
@@ -132,7 +132,7 @@
         <div class="flex items-center justify-between gap-4">
             <div class="relative w-full md:w-96">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                <input type="text" id="globalSearch" placeholder="Buscar por nombre, correo, número..." 
+                <input type="text" id="globalSearch" placeholder="Buscar en esta sección..." 
                        class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-100 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition">
             </div>
             <button id="clearAllFiltersBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-2">
@@ -141,29 +141,44 @@
             </button>
         </div>
 
-        <!-- Tabla Principal -->
-        <div class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative">
+        <!-- VISTA 1: DASHBOARD GENERAL (Carrusel Demostración) -->
+        <div id="dashboardView" class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/40">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
+                <span class="text-xs text-slate-400">Para gestionar registros, selecciona una categoría en el menú lateral.</span>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-900/80 text-slate-300 font-semibold border-b border-slate-700 text-xs uppercase">
                             <th class="py-3 px-4">Nombre / Referido</th>
                             <th class="py-3 px-4">Contacto</th>
+                            <th class="py-3 px-4">Pestaña</th>
+                            <th class="py-3 px-4">Estatus</th>
+                            <th class="py-3 px-4">Notas / Seguimiento</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="carouselContainer" class="carousel-viewport overflow-x-auto" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
+                <table class="w-full text-left border-collapse text-sm">
+                    <tbody id="demoTableBody" class="divide-y divide-slate-700/50 text-slate-200">
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-4 py-3 bg-slate-900/40 border-t border-slate-700 text-xs text-slate-400 flex justify-between items-center">
+                <span>Total en base de datos: <strong id="demoTotalCount" class="text-slate-200">0</strong></span>
+            </div>
+        </div>
 
-                            <th class="py-3 px-4 relative">
-                                <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('sheetFilter')">
-                                    <span>Pestaña</span>
-                                    <i class="fa-solid fa-filter text-slate-500 hover:text-white"></i>
-                                </div>
-                                <div id="sheetFilter" class="dropdown-menu absolute left-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-3 w-56 z-50 normal-case">
-                                    <button onclick="sortData('sheet', 'asc')" class="w-full text-left text-xs py-1 hover:text-indigo-400 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Sort A to Z</button>
-                                    <button onclick="sortData('sheet', 'desc')" class="w-full text-left text-xs py-1 hover:text-indigo-400 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Sort Z to A</button>
-                                    <hr class="border-slate-700 my-2">
-                                    <input type="text" onkeyup="filterMenuOptions('sheetFilter', this.value)" placeholder="Search..." class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs mb-2">
-                                    <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="sheetOptions"></div>
-                                    <button onclick="applyColumnFilter('sheet')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
-                                </div>
-                            </th>
+        <!-- VISTA 2: TABLA DEDICADA PARA CATEGORÍAS (Gestión Independiente) -->
+        <div id="categoryView" class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative hidden">
+            <div class="overflow-x-auto min-h-[350px]">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-900/80 text-slate-300 font-semibold border-b border-slate-700 text-xs uppercase">
+                            <th class="py-3 px-4">Nombre / Referido</th>
+                            <th class="py-3 px-4">Contacto</th>
 
                             <th class="py-3 px-4 relative">
                                 <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
@@ -184,19 +199,13 @@
                             <th class="py-3 px-4 text-center">Acciones</th>
                         </tr>
                     </thead>
-                </table>
-            </div>
-
-            <!-- Viewport Carrusel -->
-            <div id="carouselContainer" class="carousel-viewport overflow-x-auto" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
-                <table class="w-full text-left border-collapse text-sm">
-                    <tbody id="tableBody" class="divide-y divide-slate-700/50 text-slate-200">
+                    <tbody id="categoryTableBody" class="divide-y divide-slate-700/50 text-slate-200">
                     </tbody>
                 </table>
             </div>
 
             <div class="px-4 py-3 bg-slate-900/40 border-t border-slate-700 text-xs text-slate-400 flex justify-between items-center">
-                <span>Mostrando <strong id="visibleCount" class="text-slate-200">0</strong> registros de <strong id="totalCount" class="text-slate-200">0</strong></span>
+                <span>Mostrando <strong id="visibleCount" class="text-slate-200">0</strong> registros de <strong id="totalCategoryCount" class="text-slate-200">0</strong> en esta categoría</span>
             </div>
         </div>
 
@@ -250,7 +259,7 @@
         </div>
     </div>
 
-    <!-- Modal Configuración de Categorías y Subcategorías -->
+    <!-- Modal Configuración de Categorías -->
     <div id="configModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -309,7 +318,7 @@
         let allCandidates = [];
         let activeTabSheet = 'ALL';
         let currentEditingDocId = null;
-        let columnFilters = { sheet: [], status: [] };
+        let columnFilters = { status: [] };
 
         let pipelineConfig = {
             'Referred': ['Submitted', 'In Review', 'Scheduled', 'Hired'],
@@ -372,7 +381,19 @@
                 activeBtn.classList.remove('text-slate-300');
             }
 
-            document.getElementById('currentCategoryLabel').textContent = `Mostrando: ${sheet === 'ALL' ? 'Todas las Categorías' : sheet}`;
+            const dashboardView = document.getElementById('dashboardView');
+            const categoryView = document.getElementById('categoryView');
+
+            if (sheet === 'ALL') {
+                document.getElementById('currentCategoryLabel').textContent = `Vista: Dashboard General (Demostración)`;
+                dashboardView.classList.remove('hidden');
+                categoryView.classList.add('hidden');
+            } else {
+                document.getElementById('currentCategoryLabel').textContent = `Categoría Activa: ${sheet}`;
+                dashboardView.classList.add('hidden');
+                categoryView.classList.remove('hidden');
+            }
+
             toggleSidebar();
             applyAllFilters();
         };
@@ -421,12 +442,12 @@
         };
 
         function buildFilterMenus() {
-            buildMenuOptions('sheetOptions', 'sheet');
             buildMenuOptions('statusOptions', 'status');
         }
 
         function buildMenuOptions(containerId, colKey) {
-            const uniqueVals = [...new Set(allCandidates.map(c => c[colKey]))].filter(Boolean).sort();
+            const categoryCandidates = activeTabSheet === 'ALL' ? allCandidates : allCandidates.filter(c => c.sheet === activeTabSheet);
+            const uniqueVals = [...new Set(categoryCandidates.map(c => c[colKey]))].filter(Boolean).sort();
             const container = document.getElementById(containerId);
             
             container.innerHTML = `
@@ -469,28 +490,34 @@
         document.getElementById('clearAllFiltersBtn').addEventListener('click', () => {
             document.getElementById('globalSearch').value = '';
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
-            columnFilters = { sheet: [], status: [] };
+            columnFilters = { status: [] };
             applyAllFilters();
         });
 
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
 
-            const filtered = allCandidates.filter(c => {
-                const matchesTab = activeTabSheet === 'ALL' || c.sheet === activeTabSheet;
-                const matchesSheetCol = columnFilters.sheet.length === 0 || columnFilters.sheet.includes(c.sheet);
-                const matchesStatusCol = columnFilters.status.length === 0 || columnFilters.status.includes(c.status);
+            if (activeTabSheet === 'ALL') {
+                renderDemoDashboard(allCandidates.filter(c => 
+                    c.name.toLowerCase().includes(search) || 
+                    c.email.toLowerCase().includes(search) || 
+                    c.phone.toLowerCase().includes(search)
+                ));
+                restartCarouselLoop();
+            } else {
+                const filtered = allCandidates.filter(c => {
+                    const matchesCategory = c.sheet === activeTabSheet;
+                    const matchesStatusCol = columnFilters.status.length === 0 || columnFilters.status.includes(c.status);
+                    const matchesSearch = c.name.toLowerCase().includes(search) || 
+                                          c.email.toLowerCase().includes(search) || 
+                                          c.phone.toLowerCase().includes(search) ||
+                                          c.notes.toLowerCase().includes(search);
 
-                const matchesSearch = c.name.toLowerCase().includes(search) || 
-                                      c.email.toLowerCase().includes(search) || 
-                                      c.phone.toLowerCase().includes(search) ||
-                                      c.notes.toLowerCase().includes(search);
+                    return matchesCategory && matchesStatusCol && matchesSearch;
+                });
 
-                return matchesTab && matchesSheetCol && matchesStatusCol && matchesSearch;
-            });
-
-            renderTable(filtered);
-            restartCarouselLoop();
+                renderCategoryTable(filtered);
+            }
         }
 
         function formatDate(isoString) {
@@ -502,24 +529,22 @@
             });
         }
 
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            document.getElementById('visibleCount').textContent = data.length;
-            document.getElementById('totalCount').textContent = allCandidates.length;
+        // RENDER VISTA DEMOSTRACIÓN (Dashboard Carrusel)
+        function renderDemoDashboard(data) {
+            const tbody = document.getElementById('demoTableBody');
+            document.getElementById('demoTotalCount').textContent = data.length;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">No hay registros que coincidan con la selección.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">No hay candidatos en la base.</td></tr>`;
                 return;
             }
-
-            const isDemoAll = activeTabSheet === 'ALL';
 
             tbody.innerHTML = data.map(c => `
                 <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40 h-[58px]">
                     <td class="py-3 px-4 font-medium text-white w-1/4 truncate">${c.name}</td>
                     <td class="py-3 px-4 text-xs space-y-0.5 w-1/4 truncate">
-                        <div class="text-slate-300"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
-                        <div class="text-slate-400"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
+                        <div class="text-slate-300">${c.email}</div>
+                        <div class="text-slate-400">${c.phone}</div>
                     </td>
                     <td class="py-3 px-4 w-1/6">
                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
@@ -531,41 +556,69 @@
                             ${c.status}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-xs text-slate-300 max-w-xs truncate" title="${c.notes}">${c.notes}</td>
-                    <td class="py-3 px-4 text-center space-x-2 relative w-24">
-                        ${isDemoAll ? `<span class="text-xs text-slate-500 italic">—</span>` : `
-                            <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="WhatsApp">
-                                <i class="fa-brands fa-whatsapp text-sm"></i>
-                            </a>
+                    <td class="py-3 px-4 text-xs text-slate-300 truncate" title="${c.notes}">${c.notes}</td>
+                </tr>
+            `).join('');
+        }
 
-                            <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white transition" title="Opciones">
-                                <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
-                            </button>
+        // RENDER VISTA CATEGORÍA DEDICADA (Gestión con Acciones Completas)
+        function renderCategoryTable(data) {
+            const tbody = document.getElementById('categoryTableBody');
+            const totalInCat = allCandidates.filter(c => c.sheet === activeTabSheet).length;
+            
+            document.getElementById('visibleCount').textContent = data.length;
+            document.getElementById('totalCategoryCount').textContent = totalInCat;
 
-                            <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
-                                <div class="border-b border-slate-700 pb-2 mb-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
-                                    <div class="text-xs text-slate-300 mt-1">
-                                        <i class="fa-regular fa-clock text-indigo-400 mr-1"></i> <strong>Creado:</strong> ${formatDate(c.createdAt)}
-                                    </div>
-                                    ${c.updatedAt ? `
-                                    <div class="text-[11px] text-slate-400 mt-0.5">
-                                        <i class="fa-solid fa-rotate-right text-slate-500 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
-                                    </div>` : ''}
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(c => `
+                <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40">
+                    <td class="py-3.5 px-4 font-medium text-white">${c.name}</td>
+                    <td class="py-3.5 px-4 text-xs space-y-0.5">
+                        <div class="text-slate-300"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
+                        <div class="text-slate-400"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded-md font-medium">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-xs text-slate-300 max-w-xs truncate" title="${c.notes}">${c.notes}</td>
+                    <td class="py-3.5 px-4 text-center space-x-2 relative">
+                        <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Enviar WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </a>
+
+                        <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white transition" title="Opciones">
+                            <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+                        </button>
+
+                        <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-2 top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
+                            <div class="border-b border-slate-700 pb-2 mb-2">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
+                                <div class="text-xs text-slate-300 mt-1">
+                                    <i class="fa-regular fa-clock text-indigo-400 mr-1"></i> <strong>Creado:</strong> ${formatDate(c.createdAt)}
                                 </div>
-
-                                <div class="space-y-1">
-                                    <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                        <span>Editar Candidato</span>
-                                    </button>
-                                    <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-400 flex items-center gap-2 transition">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                        <span>Eliminar Candidato</span>
-                                    </button>
-                                </div>
+                                ${c.updatedAt ? `
+                                <div class="text-[11px] text-slate-400 mt-0.5">
+                                    <i class="fa-solid fa-rotate-right text-slate-500 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
+                                </div>` : ''}
                             </div>
-                        `}
+
+                            <div class="space-y-1">
+                                <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    <span>Editar Candidato</span>
+                                </button>
+                                <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-400 flex items-center gap-2 transition">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    <span>Eliminar Candidato</span>
+                                </button>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             `).join('');
@@ -573,6 +626,8 @@
 
         function restartCarouselLoop() {
             if (carouselTimer) clearInterval(carouselTimer);
+            if (activeTabSheet !== 'ALL') return;
+
             const container = document.getElementById('carouselContainer');
             container.scrollTop = 0;
 
