@@ -17,13 +17,11 @@
         .dropdown-menu.active { display: block; }
         .sidebar-transition { transition: transform 0.3s ease-in-out; }
         
-        /* Estilos del Carrusel Vertical Fijo (Exactamente 5 filas visibles) */
         .carousel-viewport {
-            max-height: 295px; /* Altura calculada para exactamente 5 filas */
+            max-height: 295px;
             overflow-y: auto;
             scroll-behavior: smooth;
         }
-        /* Ocultar barra de scroll para un acabado súper limpio */
         .carousel-viewport::-webkit-scrollbar {
             width: 4px;
         }
@@ -35,13 +33,12 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- Overlay oscuro para cerrar sidebar al hacer clic fuera -->
+    <!-- Overlay oscuro para sidebar -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-sm transition-opacity"></div>
 
     <!-- Sidebar Lateral Desplegable -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-800 border-r border-slate-700 z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-5 shadow-2xl">
         <div class="space-y-6">
-            <!-- Header Sidebar -->
             <div class="flex items-center justify-between border-b border-slate-700 pb-4">
                 <div class="flex items-center space-x-3">
                     <div class="bg-indigo-600 p-2 rounded-lg text-white font-bold text-lg">
@@ -57,39 +54,26 @@
                 </button>
             </div>
 
-            <!-- Menú de Categorías (Pestañas) -->
-            <div class="space-y-1">
+            <!-- Menú de Categorías -->
+            <div class="space-y-1" id="sidebarCategoriesContainer">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-2">Segmentación</span>
                 
                 <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-400 bg-indigo-600/10 border border-indigo-500/20 active" data-sheet="ALL">
                     <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Todas las Categorías</span>
                     <span id="sideCountAll" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
                 </button>
-
-                <button onclick="selectCategory('Referred')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="Referred">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-circle-check text-emerald-400"></i> Referred</span>
-                    <span id="sideCountReferred" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
-                </button>
-
-                <button onclick="selectCategory('Cold')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="Cold">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-sky-400"></i> Cold</span>
-                    <span id="sideCountCold" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
-                </button>
-
-                <button onclick="selectCategory('Rejected by CONCENTRIX')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="Rejected by CONCENTRIX">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-user-xmark text-rose-400"></i> Rejected</span>
-                    <span id="sideCountRejected" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
-                </button>
-
-                <button onclick="selectCategory('No Referred')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="No Referred">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder-open text-amber-400"></i> No Referred</span>
-                    <span id="sideCountNoRef" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
-                </button>
+                <div id="dynamicSidebarCategories" class="space-y-1"></div>
             </div>
         </div>
 
-        <div class="border-t border-slate-700 pt-4 text-xs text-slate-500 text-center">
-            RefiGo Cloud DB • Sincronizado
+        <div class="space-y-3">
+            <button onclick="openConfigModal()" class="w-full bg-slate-700/60 hover:bg-slate-700 text-slate-200 text-xs py-2.5 px-3 rounded-lg border border-slate-600/60 flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-sliders text-indigo-400"></i>
+                <span>⚙️ Gestionar Flujos & Estatus</span>
+            </button>
+            <div class="border-t border-slate-700 pt-3 text-[11px] text-slate-500 text-center">
+                RefiGo Cloud DB • Sincronizado
+            </div>
         </div>
     </aside>
 
@@ -161,7 +145,7 @@
             </button>
         </div>
 
-        <!-- Tabla Principal con Carrusel Vertical (5 visibles) -->
+        <!-- Tabla Principal -->
         <div class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
@@ -170,7 +154,6 @@
                             <th class="py-3 px-4">Nombre / Referido</th>
                             <th class="py-3 px-4">Contacto</th>
 
-                            <!-- Pestaña / Categoría -->
                             <th class="py-3 px-4 relative">
                                 <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('sheetFilter')">
                                     <span>Pestaña</span>
@@ -186,7 +169,6 @@
                                 </div>
                             </th>
 
-                            <!-- Estatus -->
                             <th class="py-3 px-4 relative">
                                 <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                                     <span>Estatus</span>
@@ -202,22 +184,6 @@
                                 </div>
                             </th>
 
-                            <!-- Follow up? -->
-                            <th class="py-3 px-4 relative">
-                                <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('followUpFilter')">
-                                    <span>Follow up?</span>
-                                    <i class="fa-solid fa-filter text-slate-500 hover:text-white"></i>
-                                </div>
-                                <div id="followUpFilter" class="dropdown-menu absolute left-0 top-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-3 w-60 z-50 normal-case">
-                                    <button onclick="sortData('followUp', 'asc')" class="w-full text-left text-xs py-1 hover:text-indigo-400 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Sort A to Z</button>
-                                    <button onclick="sortData('followUp', 'desc')" class="w-full text-left text-xs py-1 hover:text-indigo-400 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Sort Z to A</button>
-                                    <hr class="border-slate-700 my-2">
-                                    <input type="text" onkeyup="filterMenuOptions('followUpFilter', this.value)" placeholder="Search..." class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs mb-2">
-                                    <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="followUpOptions"></div>
-                                    <button onclick="applyColumnFilter('followUp')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
-                                </div>
-                            </th>
-
                             <th class="py-3 px-4">Notas / Seguimiento</th>
                             <th class="py-3 px-4 text-center">Acciones</th>
                         </tr>
@@ -225,11 +191,10 @@
                 </table>
             </div>
 
-            <!-- Viewport con scroll automático limitado a 5 filas -->
+            <!-- Viewport Carrusel -->
             <div id="carouselContainer" class="carousel-viewport overflow-x-auto" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
                 <table class="w-full text-left border-collapse text-sm">
                     <tbody id="tableBody" class="divide-y divide-slate-700/50 text-slate-200">
-                        <!-- Carga dinámica -->
                     </tbody>
                 </table>
             </div>
@@ -264,23 +229,16 @@
                         <input type="text" id="inputPhone" placeholder="+503 " class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Pestaña</label>
-                        <select id="inputSheet" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                            <option value="Referred">Referred</option>
-                            <option value="Cold">Cold</option>
-                            <option value="Rejected by CONCENTRIX">Rejected</option>
-                            <option value="No Referred">No Referred</option>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Pestaña (Categoría)</label>
+                        <select id="inputSheet" onchange="updateModalStatusDropdown()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-indigo-500">
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estatus</label>
-                        <input type="text" id="inputStatus" placeholder="Ej: Submitted" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Follow up?</label>
-                        <input type="text" id="inputFollowUp" placeholder="Ej: Callback" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estatus (Subcategoría)</label>
+                        <select id="inputStatus" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-indigo-500">
+                        </select>
                     </div>
                 </div>
                 <div>
@@ -297,11 +255,48 @@
         </div>
     </div>
 
+    <!-- Modal Configuración de Categorías y Subcategorías -->
+    <div id="configModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>Gestionar Categorías y Estatus</h3>
+                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+                <!-- Agregar Nueva Categoría -->
+                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-400 uppercase">1. Agregar Nueva Pestaña / Categoría</span>
+                    <div class="flex gap-2">
+                        <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white w-full">
+                        <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Crear</button>
+                    </div>
+                </div>
+
+                <!-- Agregar Subcategoría a Pestaña -->
+                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-400 uppercase">2. Agregar Estatus (Subcategoría)</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="configCategorySelect" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white"></select>
+                        <input type="text" id="newStatusName" placeholder="Nombre estatus (ej. Submitted)" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+                    </div>
+                    <button onclick="addStatusConfig()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2 rounded-lg transition">+ Agregar Estatus a Categoría</button>
+                </div>
+
+                <!-- Lista de Estructura Actual -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Estructura Actual Configurada</span>
+                    <div id="configPipelineTree" class="space-y-2 text-xs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
-            getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, writeBatch 
+            getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, addDoc, deleteDoc, writeBatch 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -317,24 +312,39 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const candidatesCol = collection(db, "candidates");
+        const configDocRef = doc(db, "pipeline_config", "structure");
 
         let allCandidates = [];
         let activeTabSheet = 'ALL';
         let currentEditingDocId = null;
+        let columnFilters = { sheet: [], status: [] };
 
-        let columnFilters = { sheet: [], status: [], followUp: [] };
+        let pipelineConfig = {
+            'Referred': ['Submitted', 'In Review', 'Scheduled', 'Hired'],
+            'Cold': ['Callback', 'No respond', 'Hold'],
+            'Rejected by CONCENTRIX': ['Rejected', 'Failed Assessment'],
+            'No Referred': ['Pending Audit']
+        };
 
-        // Variables de Control del Carrusel
         let carouselTimer = null;
         let isCarouselPaused = false;
-        const ROW_HEIGHT = 58; // Altura aproximada de cada fila
+        const ROW_HEIGHT = 58;
 
-        // Abrir/Cerrar Sidebar
+        // Cargar Configuración de Flujos desde Firebase
+        onSnapshot(configDocRef, (snap) => {
+            if (snap.exists()) {
+                pipelineConfig = snap.data();
+            } else {
+                setDoc(configDocRef, pipelineConfig);
+            }
+            renderSidebarCategories();
+            renderConfigTree();
+        });
+
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const isHidden = sidebar.classList.contains('-translate-x-full');
-
             if (isHidden) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -344,10 +354,22 @@
             }
         };
 
-        // Seleccionar categoría desde Sidebar
+        function renderSidebarCategories() {
+            const container = document.getElementById('dynamicSidebarCategories');
+            const keys = Object.keys(pipelineConfig);
+            
+            container.innerHTML = keys.map(cat => `
+                <button onclick="selectCategory('${cat}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="${cat}">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-400"></i> ${cat}</span>
+                    <span id="sideCount_${cleanId(cat)}" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+            `).join('');
+
+            updateMetrics();
+        }
+
         window.selectCategory = function(sheet) {
             activeTabSheet = sheet;
-            
             document.querySelectorAll('.sidebar-cat-btn').forEach(btn => {
                 btn.classList.remove('text-indigo-400', 'bg-indigo-600/10', 'border', 'border-indigo-500/20', 'active');
                 btn.classList.add('text-slate-300');
@@ -359,20 +381,12 @@
                 activeBtn.classList.remove('text-slate-300');
             }
 
-            const labelMap = {
-                'ALL': 'Todas las Categorías',
-                'Referred': 'Referred',
-                'Cold': 'Cold',
-                'Rejected by CONCENTRIX': 'Rejected',
-                'No Referred': 'No Referred'
-            };
-            document.getElementById('currentCategoryLabel').textContent = `Mostrando: ${labelMap[sheet] || sheet}`;
-
+            document.getElementById('currentCategoryLabel').textContent = `Mostrando: ${sheet === 'ALL' ? 'Todas las Categorías' : sheet}`;
             toggleSidebar();
             applyAllFilters();
         };
 
-        // Escuchar Firebase en Vivo
+        // Escuchar candidatos en vivo
         onSnapshot(candidatesCol, (snapshot) => {
             allCandidates = [];
             snapshot.forEach(docSnap => {
@@ -384,7 +398,6 @@
                     email: data.email || '-',
                     phone: data.phone || '-',
                     status: data.status || '-',
-                    followUp: data.followUp || data['Follow up?'] || '-',
                     notes: data.notes || '-',
                     createdAt: data.createdAt || data.updatedAt || null,
                     updatedAt: data.updatedAt || null
@@ -396,7 +409,6 @@
             applyAllFilters();
         });
 
-        // Controles de Menús Flotantes
         window.toggleDropdown = function(id) {
             document.querySelectorAll('.dropdown-menu').forEach(el => {
                 if(el.id !== id) el.classList.remove('active');
@@ -421,7 +433,6 @@
         function buildFilterMenus() {
             buildMenuOptions('sheetOptions', 'sheet');
             buildMenuOptions('statusOptions', 'status');
-            buildMenuOptions('followUpOptions', 'followUp');
         }
 
         function buildMenuOptions(containerId, colKey) {
@@ -468,7 +479,7 @@
         document.getElementById('clearAllFiltersBtn').addEventListener('click', () => {
             document.getElementById('globalSearch').value = '';
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
-            columnFilters = { sheet: [], status: [], followUp: [] };
+            columnFilters = { sheet: [], status: [] };
             applyAllFilters();
         });
 
@@ -479,14 +490,13 @@
                 const matchesTab = activeTabSheet === 'ALL' || c.sheet === activeTabSheet;
                 const matchesSheetCol = columnFilters.sheet.length === 0 || columnFilters.sheet.includes(c.sheet);
                 const matchesStatusCol = columnFilters.status.length === 0 || columnFilters.status.includes(c.status);
-                const matchesFollowUpCol = columnFilters.followUp.length === 0 || columnFilters.followUp.includes(c.followUp);
 
                 const matchesSearch = c.name.toLowerCase().includes(search) || 
                                       c.email.toLowerCase().includes(search) || 
                                       c.phone.toLowerCase().includes(search) ||
                                       c.notes.toLowerCase().includes(search);
 
-                return matchesTab && matchesSheetCol && matchesStatusCol && matchesFollowUpCol && matchesSearch;
+                return matchesTab && matchesSheetCol && matchesStatusCol && matchesSearch;
             });
 
             renderTable(filtered);
@@ -498,12 +508,7 @@
             const date = new Date(isoString);
             if (isNaN(date.getTime())) return 'Sin registro';
             return date.toLocaleString('es-SV', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
+                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
             });
         }
 
@@ -513,14 +518,14 @@
             document.getElementById('totalCount').textContent = allCandidates.length;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">No hay registros que coincidan con la selección.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">No hay registros que coincidan con la selección.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = data.map(c => `
                 <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40 h-[58px]">
-                    <td class="py-3 px-4 font-medium text-white w-1/5 truncate">${c.name}</td>
-                    <td class="py-3 px-4 text-xs space-y-0.5 w-1/5 truncate">
+                    <td class="py-3 px-4 font-medium text-white w-1/4 truncate">${c.name}</td>
+                    <td class="py-3 px-4 text-xs space-y-0.5 w-1/4 truncate">
                         <div class="text-slate-300"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
                         <div class="text-slate-400"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
                     </td>
@@ -534,18 +539,13 @@
                             ${c.status}
                         </span>
                     </td>
-                    <td class="py-3 px-4 w-1/6">
-                        <span class="bg-slate-800 text-slate-300 border border-slate-700 text-xs px-2.5 py-1 rounded-md">
-                            ${c.followUp}
-                        </span>
-                    </td>
                     <td class="py-3 px-4 text-xs text-slate-300 max-w-xs truncate" title="${c.notes}">${c.notes}</td>
                     <td class="py-3 px-4 text-center space-x-2 relative w-24">
-                        <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Enviar WhatsApp">
+                        <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="WhatsApp">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </a>
 
-                        <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white transition" title="Ver opciones">
+                        <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white transition" title="Opciones">
                             <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                         </button>
 
@@ -577,7 +577,6 @@
             `).join('');
         }
 
-        // LÓGICA DEL CARRUSEL INFINTIO VERTICAL
         function restartCarouselLoop() {
             if (carouselTimer) clearInterval(carouselTimer);
             const container = document.getElementById('carouselContainer');
@@ -588,20 +587,15 @@
 
                 const maxScroll = container.scrollHeight - container.clientHeight;
                 if (container.scrollTop >= maxScroll - 10) {
-                    container.scrollTop = 0; // Reiniciar al tope si llega al final
+                    container.scrollTop = 0;
                 } else {
-                    container.scrollTop += ROW_HEIGHT; // Desplazar una fila hacia arriba
+                    container.scrollTop += ROW_HEIGHT;
                 }
-            }, 3000); // Avanza cada 3 segundos
+            }, 3000);
         }
 
-        window.pauseCarousel = function() {
-            isCarouselPaused = true;
-        };
-
-        window.resumeCarousel = function() {
-            isCarouselPaused = false;
-        };
+        window.pauseCarousel = function() { isCarouselPaused = true; };
+        window.resumeCarousel = function() { isCarouselPaused = false; };
 
         window.toggleAutoCarousel = function() {
             isCarouselPaused = !isCarouselPaused;
@@ -630,10 +624,17 @@
             document.getElementById('metricOther').textContent = rejCount + noRefCount;
 
             document.getElementById('sideCountAll').textContent = total;
-            document.getElementById('sideCountReferred').textContent = refCount;
-            document.getElementById('sideCountCold').textContent = coldCount;
-            document.getElementById('sideCountRejected').textContent = rejCount;
-            document.getElementById('sideCountNoRef').textContent = noRefCount;
+            
+            Object.keys(pipelineConfig).forEach(cat => {
+                const el = document.getElementById(`sideCount_${cleanId(cat)}`);
+                if (el) {
+                    el.textContent = allCandidates.filter(c => c.sheet === cat).length;
+                }
+            });
+        }
+
+        function cleanId(str) {
+            return str.replace(/[^a-zA-Z0-9]/g, '');
         }
 
         function cleanPhone(phone) {
@@ -663,7 +664,6 @@
                         const email = row['Correo'] || '-';
                         const phone = row['Número'] || row['Numero'] || '-';
                         const status = row['Estatus'] || '-';
-                        const followUp = row['Follow up?'] || '-';
                         const notes = row['Nota'] || row['Notas'] || '-';
 
                         const newRef = doc(candidatesCol);
@@ -673,7 +673,6 @@
                             email: String(email).trim(),
                             phone: String(phone).trim(),
                             status: String(status).trim(),
-                            followUp: String(followUp).trim(),
                             notes: String(notes).trim(),
                             createdAt: nowIso,
                             updatedAt: nowIso
@@ -687,17 +686,46 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // Modal Formulario
+        // MODAL FORMULARIO INDIVIDUAL
         window.openAddModal = function() {
             currentEditingDocId = null;
             document.getElementById('modalTitle').textContent = 'Nuevo Candidato';
             document.getElementById('inputName').value = '';
             document.getElementById('inputEmail').value = '';
             document.getElementById('inputPhone').value = '+503 ';
-            document.getElementById('inputStatus').value = '';
-            document.getElementById('inputFollowUp').value = '';
             document.getElementById('inputNotes').value = '';
+
+            populateModalCategories();
             document.getElementById('candidateModal').classList.remove('hidden');
+        };
+
+        function populateModalCategories(selectedSheet = null, selectedStatus = null) {
+            const sheetSelect = document.getElementById('inputSheet');
+            const categories = Object.keys(pipelineConfig);
+            
+            sheetSelect.innerHTML = categories.map(cat => `
+                <option value="${cat}">${cat}</option>
+            `).join('');
+
+            if (selectedSheet && categories.includes(selectedSheet)) {
+                sheetSelect.value = selectedSheet;
+            }
+
+            updateModalStatusDropdown(selectedStatus);
+        }
+
+        window.updateModalStatusDropdown = function(selectedStatus = null) {
+            const currentSheet = document.getElementById('inputSheet').value;
+            const statusSelect = document.getElementById('inputStatus');
+            const statuses = pipelineConfig[currentSheet] || ['General'];
+
+            statusSelect.innerHTML = statuses.map(st => `
+                <option value="${st}">${st}</option>
+            `).join('');
+
+            if (selectedStatus && statuses.includes(selectedStatus)) {
+                statusSelect.value = selectedStatus;
+            }
         };
 
         window.openEditModal = function(docId) {
@@ -708,10 +736,9 @@
             document.getElementById('inputName').value = cand.name;
             document.getElementById('inputEmail').value = cand.email;
             document.getElementById('inputPhone').value = cand.phone;
-            document.getElementById('inputSheet').value = cand.sheet;
-            document.getElementById('inputStatus').value = cand.status;
-            document.getElementById('inputFollowUp').value = cand.followUp;
             document.getElementById('inputNotes').value = cand.notes;
+
+            populateModalCategories(cand.sheet, cand.status);
             document.getElementById('candidateModal').classList.remove('hidden');
         };
 
@@ -721,30 +748,21 @@
 
         window.saveCandidate = async function() {
             const nowIso = new Date().toISOString();
-            
+            const dataPayload = {
+                name: document.getElementById('inputName').value,
+                email: document.getElementById('inputEmail').value,
+                phone: document.getElementById('inputPhone').value,
+                sheet: document.getElementById('inputSheet').value,
+                status: document.getElementById('inputStatus').value,
+                notes: document.getElementById('inputNotes').value,
+                updatedAt: nowIso
+            };
+
             if (currentEditingDocId) {
-                await updateDoc(doc(db, "candidates", currentEditingDocId), {
-                    name: document.getElementById('inputName').value,
-                    email: document.getElementById('inputEmail').value,
-                    phone: document.getElementById('inputPhone').value,
-                    sheet: document.getElementById('inputSheet').value,
-                    status: document.getElementById('inputStatus').value,
-                    followUp: document.getElementById('inputFollowUp').value,
-                    notes: document.getElementById('inputNotes').value,
-                    updatedAt: nowIso
-                });
+                await updateDoc(doc(db, "candidates", currentEditingDocId), dataPayload);
             } else {
-                await addDoc(candidatesCol, {
-                    name: document.getElementById('inputName').value,
-                    email: document.getElementById('inputEmail').value,
-                    phone: document.getElementById('inputPhone').value,
-                    sheet: document.getElementById('inputSheet').value,
-                    status: document.getElementById('inputStatus').value,
-                    followUp: document.getElementById('inputFollowUp').value,
-                    notes: document.getElementById('inputNotes').value,
-                    createdAt: nowIso,
-                    updatedAt: nowIso
-                });
+                dataPayload.createdAt = nowIso;
+                await addDoc(candidatesCol, dataPayload);
             }
 
             closeModal();
@@ -754,6 +772,79 @@
             if (confirm(`¿Estás seguro de que deseas eliminar a ${name}?`)) {
                 await deleteDoc(doc(db, "candidates", docId));
             }
+        };
+
+        // MODAL DE CONFIGURACIÓN DE ESTRUCTURA (GESTOR DE CATEGORÍAS)
+        window.openConfigModal = function() {
+            renderConfigTree();
+            document.getElementById('configModal').classList.remove('hidden');
+        };
+
+        window.closeConfigModal = function() {
+            document.getElementById('configModal').classList.add('hidden');
+        };
+
+        function renderConfigTree() {
+            const categorySelect = document.getElementById('configCategorySelect');
+            const treeContainer = document.getElementById('configPipelineTree');
+            const categories = Object.keys(pipelineConfig);
+
+            categorySelect.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+            treeContainer.innerHTML = categories.map(cat => `
+                <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${cat}</span>
+                        <button onclick="removeCategoryConfig('${cat}')" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar Pestaña</button>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-1">
+                        ${pipelineConfig[cat].map(st => `
+                            <span class="inline-flex items-center gap-1.5 bg-slate-800 text-slate-200 border border-slate-700 px-2 py-1 rounded text-[11px]">
+                                ${st}
+                                <i onclick="removeStatusConfig('${cat}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-400 cursor-pointer"></i>
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.addCategoryConfig = async function() {
+            const input = document.getElementById('newCategoryName');
+            const catName = input.value.trim();
+            if (!catName) return;
+
+            if (!pipelineConfig[catName]) {
+                pipelineConfig[catName] = ['General'];
+                await setDoc(configDocRef, pipelineConfig);
+                input.value = '';
+            }
+        };
+
+        window.removeCategoryConfig = async function(catName) {
+            if (confirm(`¿Eliminar la categoría "${catName}" y todos sus estatus asociadas?`)) {
+                delete pipelineConfig[catName];
+                await setDoc(configDocRef, pipelineConfig);
+            }
+        };
+
+        window.addStatusConfig = async function() {
+            const catSelect = document.getElementById('configCategorySelect').value;
+            const statusInput = document.getElementById('newStatusName');
+            const stName = statusInput.value.trim();
+
+            if (!catSelect || !stName) return;
+
+            if (!pipelineConfig[catSelect].includes(stName)) {
+                pipelineConfig[catSelect].push(stName);
+                await setDoc(configDocRef, pipelineConfig);
+                statusInput.value = '';
+            }
+        };
+
+        window.removeStatusConfig = async function(catName, stName) {
+            pipelineConfig[catName] = pipelineConfig[catName].filter(s => s !== stName);
+            await setDoc(configDocRef, pipelineConfig);
         };
     </script>
 </body>
