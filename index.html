@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Referidos & Reclutamiento</title>
+    <!-- Tailwind CSS (Estilo Pro) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS para leer y exportar Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white font-bold text-xl">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">RefiGo Portal</h1>
+                    <p class="text-xs text-slate-400">Sistema de Control y Seguimiento de Candidatos</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span>Subir Excel (.xlsx)</span>
+                    <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden">
+                </label>
+                <button id="exportBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-lg shadow-emerald-600/30">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Descargar Selección</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+
+        <!-- Métricas / Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Candidatos</span>
+                    <i class="fa-solid fa-user-group text-indigo-400 text-lg"></i>
+                </div>
+                <div id="metricTotal" class="text-3xl font-bold text-white mt-2">0</div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Referred</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                </div>
+                <div id="metricReferred" class="text-3xl font-bold text-emerald-400 mt-2">0</div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Cold</span>
+                    <i class="fa-solid fa-snowflake text-sky-400 text-lg"></i>
+                </div>
+                <div id="metricCold" class="text-3xl font-bold text-sky-400 mt-2">0</div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Rejected / No Ref.</span>
+                    <i class="fa-solid fa-user-xmark text-rose-400 text-lg"></i>
+                </div>
+                <div id="metricOther" class="text-3xl font-bold text-rose-400 mt-2">0</div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="relative w-full md:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre, correo o número..." 
+                       class="w-full bg-slate-900 border border-slate-700 text-sm text-slate-100 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 transition">
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <div>
+                    <select id="filterCategory" class="bg-slate-900 border border-slate-700 text-sm text-slate-100 rounded-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition">
+                        <option value="ALL">Todas las Pestañas</option>
+                        <option value="Referred">Referred</option>
+                        <option value="Cold">Cold</option>
+                        <option value="Rejected by CONCENTRIX">Rejected by CONCENTRIX</option>
+                        <option value="No Referred">No Referred</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="filterStatus" class="bg-slate-900 border border-slate-700 text-sm text-slate-100 rounded-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition">
+                        <option value="ALL">Todos los Estatus</option>
+                    </select>
+                </div>
+                <button id="resetFilters" class="text-xs text-slate-400 hover:text-white underline px-2 py-1">Limpiar Filtros</button>
+            </div>
+        </div>
+
+        <!-- Tabla Principales de Datos -->
+        <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-900/60 text-slate-400 font-semibold border-b border-slate-700/80 text-xs uppercase tracking-wider">
+                            <th class="py-3.5 px-4">Nombre / Referido</th>
+                            <th class="py-3.5 px-4">Contacto</th>
+                            <th class="py-3.5 px-4">Pestaña</th>
+                            <th class="py-3.5 px-4">Estatus</th>
+                            <th class="py-3.5 px-4">Notas / Seguimiento</th>
+                            <th class="py-3.5 px-4 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-700/50 text-slate-200">
+                        <tr>
+                            <td colspan="6" class="text-center py-12 text-slate-500">
+                                <i class="fa-solid fa-file-excel text-4xl mb-3 block"></i>
+                                Sube tu archivo <span class="text-indigo-400 font-semibold">Refe.xlsx</span> para cargar la lista de candidatos.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-4 py-3 bg-slate-900/40 border-t border-slate-700/60 text-xs text-slate-400 flex justify-between items-center">
+                <span>Mostrando <strong id="visibleCount" class="text-slate-200">0</strong> registros de <strong id="totalCount" class="text-slate-200">0</strong></span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Editar Candidato -->
+    <div id="editModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-lg text-white" id="modalName">Editar Candidato</h3>
+                <button id="closeModal" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Estatus</label>
+                    <input type="text" id="modalStatus" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Notas / Detalle de llamada</label>
+                    <textarea id="modalNotes" rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 border-t border-slate-700 pt-3">
+                <button id="saveModal" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-4 py-2 rounded-lg">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Lógica -->
+    <script>
+        let allCandidates = [];
+        let filteredCandidates = [];
+        let currentEditId = null;
+
+        document.getElementById('excelInput').addEventListener('change', handleExcelUpload);
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('filterCategory').addEventListener('change', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterCategory').value = 'ALL';
+            document.getElementById('filterStatus').value = 'ALL';
+            applyFilters();
+        });
+        document.getElementById('exportBtn').addEventListener('click', exportFilteredToExcel);
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('editModal').classList.add('hidden');
+        });
+        document.getElementById('saveModal').addEventListener('click', saveCandidateEdit);
+
+        function handleExcelUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                allCandidates = [];
+                let idCounter = 1;
+
+                workbook.SheetNames.forEach(sheetName => {
+                    if (['Hoja1', 'Warn'].includes(sheetName)) return; // Ignorar vacías
+
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    jsonData.forEach(row => {
+                        const name = row['<'] || row['Referidos'] || row['Nombre'] || 'Sin Nombre';
+                        const email = row['Correo'] || '-';
+                        const phone = row['Número'] || row['Numero'] || '-';
+                        const status = row['Estatus'] || row['Follow up?'] || 'Pendiente';
+                        const notes = row['Nota'] || row['Notas'] || '-';
+
+                        allCandidates.push({
+                            id: idCounter++,
+                            sheet: sheetName,
+                            name: String(name).trim(),
+                            email: String(email).trim(),
+                            phone: String(phone).trim(),
+                            status: String(status).trim(),
+                            notes: String(notes).trim()
+                        });
+                    });
+                });
+
+                populateStatusDropdown();
+                updateMetrics();
+                applyFilters();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function populateStatusDropdown() {
+            const statusSelect = document.getElementById('filterStatus');
+            const statuses = [...new Set(allCandidates.map(c => c.status))].filter(Boolean);
+            
+            statusSelect.innerHTML = '<option value="ALL">Todos los Estatus</option>';
+            statuses.forEach(st => {
+                const opt = document.createElement('option');
+                opt.value = st;
+                opt.textContent = st;
+                statusSelect.appendChild(opt);
+            });
+        }
+
+        function updateMetrics() {
+            document.getElementById('metricTotal').textContent = allCandidates.length;
+            document.getElementById('metricReferred').textContent = allCandidates.filter(c => c.sheet === 'Referred').length;
+            document.getElementById('metricCold').textContent = allCandidates.filter(c => c.sheet === 'Cold').length;
+            document.getElementById('metricOther').textContent = allCandidates.filter(c => ['Rejected by CONCENTRIX', 'No Referred'].includes(c.sheet)).length;
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('filterCategory').value;
+            const status = document.getElementById('filterStatus').value;
+
+            filteredCandidates = allCandidates.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(search) || 
+                                      c.email.toLowerCase().includes(search) || 
+                                      c.phone.toLowerCase().includes(search);
+                const matchesCategory = category === 'ALL' || c.sheet === category;
+                const matchesStatus = status === 'ALL' || c.status === status;
+
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            document.getElementById('visibleCount').textContent = filteredCandidates.length;
+            document.getElementById('totalCount').textContent = allCandidates.length;
+
+            if (filteredCandidates.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-slate-500">
+                            No se encontraron candidatos con los filtros aplicados.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredCandidates.map(c => `
+                <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40">
+                    <td class="py-3 px-4 font-medium text-white">${c.name}</td>
+                    <td class="py-3 px-4 text-xs space-y-0.5">
+                        <div class="text-slate-300"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
+                        <div class="text-slate-400"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${getSheetBadge(c.sheet)}">
+                            ${c.sheet}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded-md font-medium">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-xs text-slate-300 max-w-xs truncate" title="${c.notes}">${c.notes}</td>
+                    <td class="py-3 px-4 text-center space-x-2">
+                        <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Enviar WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </a>
+                        <button onclick="openEditModal(${c.id})" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white transition" title="Editar">
+                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getSheetBadge(sheet) {
+            switch(sheet) {
+                case 'Referred': return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                case 'Cold': return 'bg-sky-500/20 text-sky-400 border border-sky-500/30';
+                case 'Rejected by CONCENTRIX': return 'bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                default: return 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            }
+        }
+
+        function cleanPhone(phone) {
+            return phone.replace(/[^0-09]/g, '');
+        }
+
+        function openEditModal(id) {
+            const cand = allCandidates.find(c => c.id === id);
+            if (!cand) return;
+            currentEditId = id;
+            document.getElementById('modalName').textContent = cand.name;
+            document.getElementById('modalStatus').value = cand.status;
+            document.getElementById('modalNotes').value = cand.notes;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function saveCandidateEdit() {
+            if (!currentEditId) return;
+            const cand = allCandidates.find(c => c.id === currentEditId);
+            if (cand) {
+                cand.status = document.getElementById('modalStatus').value;
+                cand.notes = document.getElementById('modalNotes').value;
+                applyFilters();
+            }
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function exportFilteredToExcel() {
+            if (filteredCandidates.length === 0) {
+                alert("No hay registros filtrados para exportar.");
+                return;
+            }
+
+            const exportData = filteredCandidates.map(c => ({
+                'Pestaña': c.sheet,
+                'Nombre / Referido': c.name,
+                'Correo': c.email,
+                'Número': c.phone,
+                'Estatus': c.status,
+                'Notas': c.notes
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Filtrados");
+
+            XLSX.writeFile(workbook, `Referidos_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+    </script>
+</body>
+</html>
