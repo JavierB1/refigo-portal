@@ -259,7 +259,7 @@
         </div>
     </div>
 
-    <!-- Modal Configuración de Categorías con Reordenamiento y Renombrado -->
+    <!-- Modal Configuración de Categorías -->
     <div id="configModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -293,6 +293,22 @@
         </div>
     </div>
 
+    <!-- Modal de Alertas Personalizadas de Sistema -->
+    <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[60] p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
+            <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
+                <i id="alertIcon" class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 id="alertTitle" class="font-bold text-lg text-white">Atención</h3>
+                <p id="alertMessage" class="text-xs text-slate-300 mt-2 leading-relaxed"></p>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2.5 rounded-lg transition">Entendido</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK Modular -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -320,23 +336,50 @@
         let currentEditingDocId = null;
         let columnFilters = { status: [] };
 
-        let pipelineConfig = {
-            'Referred': ['Submitted', 'In Review', 'Scheduled', 'Hired'],
-            'Cold': ['Callback', 'No respond', 'Hold'],
-            'Rejected by CONCENTRIX': ['Rejected', 'Failed Assessment'],
-            'No Referred': ['Pending Audit']
-        };
+        // Estructura como Arreglo para asegurar ORDEN PERMANENTE
+        let pipelineList = [
+            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'] },
+            { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'] },
+            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'] },
+            { name: 'No Referred', statuses: ['Pending Audit'] }
+        ];
 
         let carouselTimer = null;
         let isCarouselPaused = false;
         const ROW_HEIGHT = 58;
 
-        // Cargar/Sincronizar estructura desde Firebase
-        onSnapshot(configDocRef, (snap) => {
-            if (snap.exists()) {
-                pipelineConfig = snap.data();
+        // Modal de Alerta
+        window.showAlert = function(title, message, iconType = 'warning') {
+            document.getElementById('alertTitle').textContent = title;
+            document.getElementById('alertMessage').innerHTML = message;
+
+            const iconBox = document.getElementById('alertIconBox');
+            const iconEl = document.getElementById('alertIcon');
+
+            if (iconType === 'danger') {
+                iconBox.className = 'w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-2xl border border-rose-500/30';
+                iconEl.className = 'fa-solid fa-circle-xmark';
+            } else if (iconType === 'success') {
+                iconBox.className = 'w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl border border-emerald-500/30';
+                iconEl.className = 'fa-solid fa-circle-check';
             } else {
-                setDoc(configDocRef, pipelineConfig);
+                iconBox.className = 'w-14 h-14 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-2xl border border-amber-500/30';
+                iconEl.className = 'fa-solid fa-triangle-exclamation';
+            }
+
+            document.getElementById('alertModal').classList.remove('hidden');
+        };
+
+        window.closeAlertModal = function() {
+            document.getElementById('alertModal').classList.add('hidden');
+        };
+
+        // Escuchar la estructura de categorías en tiempo real
+        onSnapshot(configDocRef, (snap) => {
+            if (snap.exists() && snap.data().items) {
+                pipelineList = snap.data().items;
+            } else {
+                setDoc(configDocRef, { items: pipelineList });
             }
             renderSidebarCategories();
             renderConfigTree();
@@ -359,12 +402,11 @@
 
         function renderSidebarCategories() {
             const container = document.getElementById('dynamicSidebarCategories');
-            const keys = Object.keys(pipelineConfig);
             
-            container.innerHTML = keys.map(cat => `
-                <button onclick="selectCategory('${cat}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="${cat}">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-400"></i> ${cat}</span>
-                    <span id="sideCount_${cleanId(cat)}" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
+            container.innerHTML = pipelineList.map(item => `
+                <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition" data-sheet="${item.name}">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-400"></i> ${item.name}</span>
+                    <span id="sideCount_${cleanId(item.name)}" class="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full">0</span>
                 </button>
             `).join('');
 
@@ -404,6 +446,7 @@
             applyAllFilters();
         };
 
+        // Escuchar candidatos en tiempo real
         onSnapshot(candidatesCol, (snapshot) => {
             allCandidates = [];
             snapshot.forEach(docSnap => {
@@ -452,8 +495,9 @@
             if (!container) return;
 
             let allowedStatuses = [];
-            if (activeTabSheet !== 'ALL' && pipelineConfig[activeTabSheet]) {
-                allowedStatuses = pipelineConfig[activeTabSheet];
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            if (activeTabSheet !== 'ALL' && catObj) {
+                allowedStatuses = catObj.statuses;
             } else {
                 allowedStatuses = [...new Set(allCandidates.map(c => c.status))].filter(Boolean).sort();
             }
@@ -666,10 +710,10 @@
 
             document.getElementById('sideCountAll').textContent = total;
             
-            Object.keys(pipelineConfig).forEach(cat => {
-                const el = document.getElementById(`sideCount_${cleanId(cat)}`);
+            pipelineList.forEach(item => {
+                const el = document.getElementById(`sideCount_${cleanId(item.name)}`);
                 if (el) {
-                    el.textContent = allCandidates.filter(c => c.sheet === cat).length;
+                    el.textContent = allCandidates.filter(c => c.sheet === item.name).length;
                 }
             });
         }
@@ -722,7 +766,7 @@
                 });
 
                 await batch.commit();
-                alert("¡Excel cargado con éxito!");
+                showAlert("¡Éxito!", "Excel cargado correctamente en Firebase.", "success");
             };
             reader.readAsArrayBuffer(file);
         });
@@ -742,12 +786,11 @@
 
         function populateModalCategories(selectedSheet = null, selectedStatus = null) {
             const sheetSelect = document.getElementById('inputSheet');
-            const categories = Object.keys(pipelineConfig);
             
             sheetSelect.innerHTML = `<option value="" disabled selected>-- Seleccionar Pestaña --</option>` + 
-                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+                pipelineList.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
 
-            if (selectedSheet && categories.includes(selectedSheet)) {
+            if (selectedSheet && pipelineList.some(i => i.name === selectedSheet)) {
                 sheetSelect.value = selectedSheet;
                 updateModalStatusDropdown(selectedStatus);
             } else {
@@ -767,7 +810,9 @@
                 return;
             }
 
-            const statuses = pipelineConfig[currentSheet] || ['General'];
+            const catObj = pipelineList.find(i => i.name === currentSheet);
+            const statuses = catObj ? catObj.statuses : ['General'];
+
             statusSelect.disabled = false;
             statusSelect.innerHTML = `<option value="" disabled selected>-- Seleccionar Estatus --</option>` + 
                 statuses.map(st => `<option value="${st}">${st}</option>`).join('');
@@ -796,22 +841,44 @@
         };
 
         window.saveCandidate = async function() {
+            const nameVal = document.getElementById('inputName').value.trim();
+            const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
+            const rawPhone = document.getElementById('inputPhone').value;
+            const phoneVal = cleanPhone(rawPhone);
             const sheetVal = document.getElementById('inputSheet').value;
             const statusVal = document.getElementById('inputStatus').value;
 
-            if (!sheetVal || !statusVal) {
-                alert("Por favor selecciona una Pestaña y un Estatus válidos.");
+            if (!nameVal || !sheetVal || !statusVal) {
+                showAlert("Campos Incompletos", "Por favor completa el nombre, la Pestaña y el Estatus antes de continuar.", "warning");
                 return;
+            }
+
+            // DETECCION DE DUPLICADOS EN TIEMPO REAL
+            const existingDuplicate = allCandidates.find(c => {
+                if (currentEditingDocId && c.docId === currentEditingDocId) return false;
+                
+                const matchEmail = emailVal !== '' && c.email.trim().toLowerCase() === emailVal;
+                const matchPhone = phoneVal !== '' && cleanPhone(c.phone) === phoneVal && phoneVal !== '503';
+                return matchEmail || matchPhone;
+            });
+
+            if (existingDuplicate) {
+                showAlert(
+                    "¡Candidato Ya Registrado!",
+                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente se encuentra registrado en la categoría <span class="text-indigo-400 font-bold">${existingDuplicate.sheet}</span> con el estatus <strong>${existingDuplicate.status}</strong>.`,
+                    "danger"
+                );
+                return; // Bloquea la creación
             }
 
             const nowIso = new Date().toISOString();
             const dataPayload = {
-                name: document.getElementById('inputName').value,
-                email: document.getElementById('inputEmail').value,
-                phone: document.getElementById('inputPhone').value,
+                name: nameVal,
+                email: document.getElementById('inputEmail').value.trim(),
+                phone: rawPhone.trim(),
                 sheet: sheetVal,
                 status: statusVal,
-                notes: document.getElementById('inputNotes').value,
+                notes: document.getElementById('inputNotes').value.trim(),
                 updatedAt: nowIso
             };
 
@@ -823,6 +890,7 @@
             }
 
             closeModal();
+            showAlert("¡Guardado!", "Candidato registrado exitosamente.", "success");
         };
 
         window.deleteCandidate = async function(docId, name) {
@@ -831,7 +899,7 @@
             }
         };
 
-        // GESTOR DE ESTRUCTURA Y REORDENAMIENTO
+        // GESTOR DE ESTRUCTURA Y REORDENAMIENTO REAL
         window.openConfigModal = function() {
             renderConfigTree();
             document.getElementById('configModal').classList.remove('hidden');
@@ -844,31 +912,29 @@
         function renderConfigTree() {
             const categorySelect = document.getElementById('configCategorySelect');
             const treeContainer = document.getElementById('configPipelineTree');
-            const categories = Object.keys(pipelineConfig);
 
-            categorySelect.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            categorySelect.innerHTML = pipelineList.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
 
-            treeContainer.innerHTML = categories.map((cat, index) => `
+            treeContainer.innerHTML = pipelineList.map((item, index) => `
                 <div class="bg-slate-900 border border-slate-700/80 rounded-lg p-3 space-y-2">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <!-- Botones Mover Arriba / Abajo -->
                             <div class="flex flex-col gap-0.5">
                                 <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-400 text-[10px]"'} title="Subir orden">▲</button>
-                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === categories.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-400 text-[10px]"'} title="Bajar orden">▼</button>
+                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === pipelineList.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-400 text-[10px]"'} title="Bajar orden">▼</button>
                             </div>
-                            <span class="font-bold text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${cat}</span>
+                            <span class="font-bold text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${item.name}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editCategoryName('${cat}')" class="text-indigo-400 hover:text-indigo-300 text-xs px-2 py-1 rounded bg-indigo-500/10" title="Renombrar Pestaña"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
-                            <button onclick="removeCategoryConfig('${cat}')" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10" title="Eliminar Pestaña"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-400 hover:text-indigo-300 text-xs px-2 py-1 rounded bg-indigo-500/10" title="Renombrar Pestaña"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
+                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-500/10" title="Eliminar Pestaña"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-1.5 pt-1">
-                        ${pipelineConfig[cat].map(st => `
+                        ${item.statuses.map(st => `
                             <span class="inline-flex items-center gap-1.5 bg-slate-800 text-slate-200 border border-slate-700 px-2 py-1 rounded text-[11px]">
                                 ${st}
-                                <i onclick="removeStatusConfig('${cat}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-400 cursor-pointer"></i>
+                                <i onclick="removeStatusConfig('${item.name}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-400 cursor-pointer"></i>
                             </span>
                         `).join('')}
                     </div>
@@ -876,29 +942,32 @@
             `).join('');
         }
 
-        // Renombrar Pestaña y actualizar en lote los candidatos
+        // Reordenamiento Efectivo
+        window.moveCategoryOrder = async function(currentIndex, direction) {
+            const targetIndex = currentIndex + direction;
+            if (targetIndex < 0 || targetIndex >= pipelineList.length) return;
+
+            const temp = pipelineList[currentIndex];
+            pipelineList[currentIndex] = pipelineList[targetIndex];
+            pipelineList[targetIndex] = temp;
+
+            await setDoc(configDocRef, { items: pipelineList });
+        };
+
         window.editCategoryName = async function(oldName) {
             const newName = prompt(`Ingresa el nuevo nombre para la pestaña "${oldName}":`, oldName);
             if (!newName || newName.trim() === '' || newName.trim() === oldName) return;
 
             const cleanNewName = newName.trim();
-            if (pipelineConfig[cleanNewName]) {
-                alert("Ya existe una categoría con ese nombre.");
+            if (pipelineList.some(i => i.name === cleanNewName)) {
+                showAlert("Atención", "Ya existe una categoría con ese nombre.", "warning");
                 return;
             }
 
-            // Reconstruir objeto manteniendo el orden
-            const newConfig = {};
-            Object.keys(pipelineConfig).forEach(k => {
-                if (k === oldName) {
-                    newConfig[cleanNewName] = pipelineConfig[oldName];
-                } else {
-                    newConfig[k] = pipelineConfig[k];
-                }
-            });
+            const item = pipelineList.find(i => i.name === oldName);
+            if (item) item.name = cleanNewName;
 
-            pipelineConfig = newConfig;
-            await setDoc(configDocRef, pipelineConfig);
+            await setDoc(configDocRef, { items: pipelineList });
 
             // Actualizar candidatos que tenían el nombre viejo
             const batch = writeBatch(db);
@@ -920,44 +989,22 @@
             }
         };
 
-        // Reordenar Pestañas (Subir / Bajar)
-        window.moveCategoryOrder = async function(currentIndex, direction) {
-            const keys = Object.keys(pipelineConfig);
-            const targetIndex = currentIndex + direction;
-
-            if (targetIndex < 0 || targetIndex >= keys.length) return;
-
-            // Intercambiar posiciones en el arreglo
-            const temp = keys[currentIndex];
-            keys[currentIndex] = keys[targetIndex];
-            keys[targetIndex] = temp;
-
-            // Reconstruir objeto ordenado
-            const reorderedConfig = {};
-            keys.forEach(k => {
-                reorderedConfig[k] = pipelineConfig[k];
-            });
-
-            pipelineConfig = reorderedConfig;
-            await setDoc(configDocRef, pipelineConfig);
-        };
-
         window.addCategoryConfig = async function() {
             const input = document.getElementById('newCategoryName');
             const catName = input.value.trim();
             if (!catName) return;
 
-            if (!pipelineConfig[catName]) {
-                pipelineConfig[catName] = ['General'];
-                await setDoc(configDocRef, pipelineConfig);
+            if (!pipelineList.some(i => i.name === catName)) {
+                pipelineList.push({ name: catName, statuses: ['General'] });
+                await setDoc(configDocRef, { items: pipelineList });
                 input.value = '';
             }
         };
 
         window.removeCategoryConfig = async function(catName) {
             if (confirm(`¿Eliminar la categoría "${catName}" y todos sus estatus asociadas?`)) {
-                delete pipelineConfig[catName];
-                await setDoc(configDocRef, pipelineConfig);
+                pipelineList = pipelineList.filter(i => i.name !== catName);
+                await setDoc(configDocRef, { items: pipelineList });
             }
         };
 
@@ -968,16 +1015,20 @@
 
             if (!catSelect || !stName) return;
 
-            if (!pipelineConfig[catSelect].includes(stName)) {
-                pipelineConfig[catSelect].push(stName);
-                await setDoc(configDocRef, pipelineConfig);
+            const catObj = pipelineList.find(i => i.name === catSelect);
+            if (catObj && !catObj.statuses.includes(stName)) {
+                catObj.statuses.push(stName);
+                await setDoc(configDocRef, { items: pipelineList });
                 statusInput.value = '';
             }
         };
 
         window.removeStatusConfig = async function(catName, stName) {
-            pipelineConfig[catName] = pipelineConfig[catName].filter(s => s !== stName);
-            await setDoc(configDocRef, pipelineConfig);
+            const catObj = pipelineList.find(i => i.name === catName);
+            if (catObj) {
+                catObj.statuses = catObj.statuses.filter(s => s !== stName);
+                await setDoc(configDocRef, { items: pipelineList });
+            }
         };
     </script>
 </body>
