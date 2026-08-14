@@ -29,6 +29,12 @@
             background: #475569;
             border-radius: 4px;
         }
+
+        /* Estilo personalizado para el icono del calendario nativo */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden">
@@ -128,17 +134,29 @@
             </div>
         </div>
 
-        <!-- Barra de Búsqueda y Limpieza -->
-        <div class="flex items-center justify-between gap-4">
-            <div class="relative w-full md:w-96">
+        <!-- Barra de Filtros: Búsqueda y Fecha -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="relative w-full sm:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                <input type="text" id="globalSearch" placeholder="Buscar en esta sección..." 
+                <input type="text" id="globalSearch" placeholder="Buscar por nombre, correo, cel..." 
                        class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-100 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition">
             </div>
-            <button id="clearAllFiltersBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-2">
-                <i class="fa-solid fa-filter-circle-xmark"></i>
-                <span>Limpiar Filtros</span>
-            </button>
+
+            <!-- Filtro de Calendario por Fecha -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex items-center bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
+                    <i class="fa-regular fa-calendar text-indigo-400 mr-2"></i>
+                    <span class="text-slate-400 mr-2 hidden md:inline">Filtrar Fecha:</span>
+                    <input type="date" id="dateFilterInput" class="bg-transparent text-white focus:outline-none text-xs cursor-pointer">
+                </div>
+                <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-800 hover:bg-slate-700 text-rose-400 px-2.5 py-2 rounded-lg border border-slate-700 transition" title="Quitar filtro de fecha">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <button id="clearAllFiltersBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                    <span>Limpiar Todo</span>
+                </button>
+            </div>
         </div>
 
         <!-- VISTA 1: DASHBOARD GENERAL (Carrusel Demostración) -->
@@ -293,7 +311,7 @@
         </div>
     </div>
 
-    <!-- Modal de Alertas Personalizadas de Sistema -->
+    <!-- Modal de Alertas Informativas -->
     <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[60] p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -305,6 +323,41 @@
             </div>
             <div class="pt-2">
                 <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2.5 rounded-lg transition">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Personalizado de Confirmación de Eliminación -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[65] p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
+            <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+                <h3 id="confirmTitle" class="font-bold text-lg text-white">¿Confirmar Acción?</h3>
+                <p id="confirmMessage" class="text-xs text-slate-300 mt-2 leading-relaxed"></p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-xs py-2.5 rounded-lg transition">Cancelar</button>
+                <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs py-2.5 rounded-lg transition shadow-lg shadow-rose-600/30">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Personalizado de Renombrado -->
+    <div id="renameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[65] p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-base text-white"><i class="fa-solid fa-pen-to-square text-indigo-400 mr-2"></i>Renombrar Categoría</h3>
+                <button onclick="closeRenameModal(false)" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-xs text-slate-400">Nuevo Nombre de Pestaña</label>
+                <input type="text" id="renameCategoryInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeRenameModal(false)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-2 rounded-lg transition">Cancelar</button>
+                <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">Guardar Nombre</button>
             </div>
         </div>
     </div>
@@ -336,7 +389,10 @@
         let currentEditingDocId = null;
         let columnFilters = { status: [] };
 
-        // Estructura como Arreglo para asegurar ORDEN PERMANENTE
+        let confirmCallback = null;
+        let renameCallback = null;
+        let categoryToRenameOld = null;
+
         let pipelineList = [
             { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'] },
             { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'] },
@@ -348,7 +404,7 @@
         let isCarouselPaused = false;
         const ROW_HEIGHT = 58;
 
-        // Modal de Alerta
+        // ALERTA MODAL
         window.showAlert = function(title, message, iconType = 'warning') {
             document.getElementById('alertTitle').textContent = title;
             document.getElementById('alertMessage').innerHTML = message;
@@ -374,7 +430,40 @@
             document.getElementById('alertModal').classList.add('hidden');
         };
 
-        // Escuchar la estructura de categorías en tiempo real
+        // CONFIRM MODAL (Sustituye confirm nativo)
+        window.showConfirm = function(title, message, callback) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').innerHTML = message;
+            confirmCallback = callback;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        };
+
+        window.closeConfirmModal = function(isConfirmed) {
+            document.getElementById('confirmModal').classList.add('hidden');
+            if (confirmCallback) {
+                confirmCallback(isConfirmed);
+                confirmCallback = null;
+            }
+        };
+
+        // RENAME MODAL (Sustituye prompt nativo)
+        window.showRenameModal = function(oldName, callback) {
+            categoryToRenameOld = oldName;
+            document.getElementById('renameCategoryInput').value = oldName;
+            renameCallback = callback;
+            document.getElementById('renameModal').classList.remove('hidden');
+        };
+
+        window.closeRenameModal = function(isSave) {
+            document.getElementById('renameModal').classList.add('hidden');
+            const newName = document.getElementById('renameCategoryInput').value.trim();
+            if (renameCallback) {
+                renameCallback(isSave ? newName : null);
+                renameCallback = null;
+            }
+        };
+
+        // Escuchar estructura en tiempo real
         onSnapshot(configDocRef, (snap) => {
             if (snap.exists() && snap.data().items) {
                 pipelineList = snap.data().items;
@@ -538,9 +627,23 @@
             applyAllFilters();
         };
 
+        // EVENTOS DE BÚSQUEDA Y FECHA
         document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
+        document.getElementById('dateFilterInput').addEventListener('change', (e) => {
+            const val = e.target.value;
+            document.getElementById('clearDateBtn').classList.toggle('hidden', !val);
+            applyAllFilters();
+        });
+
+        window.clearDateFilter = function() {
+            document.getElementById('dateFilterInput').value = '';
+            document.getElementById('clearDateBtn').classList.add('hidden');
+            applyAllFilters();
+        };
+
         document.getElementById('clearAllFiltersBtn').addEventListener('click', () => {
             document.getElementById('globalSearch').value = '';
+            clearDateFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
             columnFilters = { status: [] };
             applyAllFilters();
@@ -548,13 +651,22 @@
 
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
+            const selectedDate = document.getElementById('dateFilterInput').value; // Formato YYYY-MM-DD
 
             if (activeTabSheet === 'ALL') {
-                renderDemoDashboard(allCandidates.filter(c => 
-                    c.name.toLowerCase().includes(search) || 
-                    c.email.toLowerCase().includes(search) || 
-                    c.phone.toLowerCase().includes(search)
-                ));
+                renderDemoDashboard(allCandidates.filter(c => {
+                    const matchesSearch = c.name.toLowerCase().includes(search) || 
+                                          c.email.toLowerCase().includes(search) || 
+                                          c.phone.toLowerCase().includes(search);
+                    
+                    let matchesDate = true;
+                    if (selectedDate && c.createdAt) {
+                        const candDate = c.createdAt.split('T')[0];
+                        matchesDate = candDate === selectedDate;
+                    }
+
+                    return matchesSearch && matchesDate;
+                }));
                 restartCarouselLoop();
             } else {
                 const filtered = allCandidates.filter(c => {
@@ -565,7 +677,13 @@
                                           c.phone.toLowerCase().includes(search) ||
                                           c.notes.toLowerCase().includes(search);
 
-                    return matchesCategory && matchesStatusCol && matchesSearch;
+                    let matchesDate = true;
+                    if (selectedDate && c.createdAt) {
+                        const candDate = c.createdAt.split('T')[0];
+                        matchesDate = candDate === selectedDate;
+                    }
+
+                    return matchesCategory && matchesStatusCol && matchesSearch && matchesDate;
                 });
 
                 renderCategoryTable(filtered);
@@ -853,7 +971,7 @@
                 return;
             }
 
-            // DETECCION DE DUPLICADOS EN TIEMPO REAL
+            // DETECCION DE DUPLICADOS
             const existingDuplicate = allCandidates.find(c => {
                 if (currentEditingDocId && c.docId === currentEditingDocId) return false;
                 
@@ -868,7 +986,7 @@
                     `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente se encuentra registrado en la categoría <span class="text-indigo-400 font-bold">${existingDuplicate.sheet}</span> con el estatus <strong>${existingDuplicate.status}</strong>.`,
                     "danger"
                 );
-                return; // Bloquea la creación
+                return;
             }
 
             const nowIso = new Date().toISOString();
@@ -893,13 +1011,20 @@
             showAlert("¡Guardado!", "Candidato registrado exitosamente.", "success");
         };
 
-        window.deleteCandidate = async function(docId, name) {
-            if (confirm(`¿Estás seguro de que deseas eliminar a ${name}?`)) {
-                await deleteDoc(doc(db, "candidates", docId));
-            }
+        window.deleteCandidate = function(docId, name) {
+            showConfirm(
+                "Eliminar Candidato", 
+                `¿Estás seguro de que deseas eliminar a <strong>${name}</strong>? Esta acción no se puede deshacer.`, 
+                async (confirmed) => {
+                    if (confirmed) {
+                        await deleteDoc(doc(db, "candidates", docId));
+                        showAlert("Eliminado", "Candidato eliminado de la base.", "success");
+                    }
+                }
+            );
         };
 
-        // GESTOR DE ESTRUCTURA Y REORDENAMIENTO REAL
+        // GESTOR DE ESTRUCTURA
         window.openConfigModal = function() {
             renderConfigTree();
             document.getElementById('configModal').classList.remove('hidden');
@@ -942,7 +1067,6 @@
             `).join('');
         }
 
-        // Reordenamiento Efectivo
         window.moveCategoryOrder = async function(currentIndex, direction) {
             const targetIndex = currentIndex + direction;
             if (targetIndex < 0 || targetIndex >= pipelineList.length) return;
@@ -954,39 +1078,38 @@
             await setDoc(configDocRef, { items: pipelineList });
         };
 
-        window.editCategoryName = async function(oldName) {
-            const newName = prompt(`Ingresa el nuevo nombre para la pestaña "${oldName}":`, oldName);
-            if (!newName || newName.trim() === '' || newName.trim() === oldName) return;
+        window.editCategoryName = function(oldName) {
+            showRenameModal(oldName, async (newName) => {
+                if (!newName || newName === oldName) return;
 
-            const cleanNewName = newName.trim();
-            if (pipelineList.some(i => i.name === cleanNewName)) {
-                showAlert("Atención", "Ya existe una categoría con ese nombre.", "warning");
-                return;
-            }
+                if (pipelineList.some(i => i.name === newName)) {
+                    showAlert("Atención", "Ya existe una categoría con ese nombre.", "warning");
+                    return;
+                }
 
-            const item = pipelineList.find(i => i.name === oldName);
-            if (item) item.name = cleanNewName;
+                const item = pipelineList.find(i => i.name === oldName);
+                if (item) item.name = newName;
 
-            await setDoc(configDocRef, { items: pipelineList });
+                await setDoc(configDocRef, { items: pipelineList });
 
-            // Actualizar candidatos que tenían el nombre viejo
-            const batch = writeBatch(db);
-            let updatedCount = 0;
-            allCandidates.forEach(cand => {
-                if (cand.sheet === oldName) {
-                    const docRef = doc(db, "candidates", cand.docId);
-                    batch.update(docRef, { sheet: cleanNewName });
-                    updatedCount++;
+                const batch = writeBatch(db);
+                let updatedCount = 0;
+                allCandidates.forEach(cand => {
+                    if (cand.sheet === oldName) {
+                        const docRef = doc(db, "candidates", cand.docId);
+                        batch.update(docRef, { sheet: newName });
+                        updatedCount++;
+                    }
+                });
+
+                if (updatedCount > 0) {
+                    await batch.commit();
+                }
+
+                if (activeTabSheet === oldName) {
+                    activeTabSheet = newName;
                 }
             });
-
-            if (updatedCount > 0) {
-                await batch.commit();
-            }
-
-            if (activeTabSheet === oldName) {
-                activeTabSheet = cleanNewName;
-            }
         };
 
         window.addCategoryConfig = async function() {
@@ -998,14 +1121,23 @@
                 pipelineList.push({ name: catName, statuses: ['General'] });
                 await setDoc(configDocRef, { items: pipelineList });
                 input.value = '';
+            } else {
+                showAlert("Categoría Existente", "Ya existe una categoría con ese nombre.", "warning");
             }
         };
 
-        window.removeCategoryConfig = async function(catName) {
-            if (confirm(`¿Eliminar la categoría "${catName}" y todos sus estatus asociadas?`)) {
-                pipelineList = pipelineList.filter(i => i.name !== catName);
-                await setDoc(configDocRef, { items: pipelineList });
-            }
+        window.removeCategoryConfig = function(catName) {
+            showConfirm(
+                "Eliminar Categoría", 
+                `¿Deseas eliminar la categoría <strong>${catName}</strong> y todos sus estatus asociados?`, 
+                async (confirmed) => {
+                    if (confirmed) {
+                        pipelineList = pipelineList.filter(i => i.name !== catName);
+                        await setDoc(configDocRef, { items: pipelineList });
+                        showAlert("Categoría Eliminada", `Se ha eliminado la categoría "${catName}".`, "success");
+                    }
+                }
+            );
         };
 
         window.addStatusConfig = async function() {
