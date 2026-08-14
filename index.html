@@ -8,8 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS para Excel -->
+    <!-- SheetJS para Excel / CSV -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- jsPDF + AutoTable para PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -30,7 +34,6 @@
             border-radius: 4px;
         }
 
-        /* Estilo personalizado para el icono del calendario nativo */
         input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
@@ -39,10 +42,8 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden">
 
-    <!-- Overlay oscuro para sidebar -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-sm transition-opacity"></div>
 
-    <!-- Sidebar Lateral Desplegable -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-800 border-r border-slate-700 z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-5 shadow-2xl">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-slate-700 pb-4">
@@ -83,7 +84,6 @@
         </div>
     </aside>
 
-    <!-- Header / Navbar Principal -->
     <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-4">
@@ -134,7 +134,6 @@
             </div>
         </div>
 
-        <!-- Barra de Filtros: Búsqueda y Fecha -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div class="relative w-full sm:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
@@ -142,8 +141,14 @@
                        class="w-full bg-slate-800 border border-slate-700 text-sm text-slate-100 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition">
             </div>
 
-            <!-- Filtro de Calendario por Fecha -->
-            <div class="flex items-center gap-2">
+            <!-- Controles de Filtro de Fecha y Exportación Personalizada -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Botón de Exportación de Candidatos Seleccionados -->
+                <button id="exportSelectedBtn" onclick="openExportModal()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-lg transition flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span>Exportar Seleccionados (<strong id="selectedCountLabel">0</strong>)</span>
+                </button>
+
                 <div class="relative flex items-center bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
                     <i class="fa-regular fa-calendar text-indigo-400 mr-2"></i>
                     <span class="text-slate-400 mr-2 hidden md:inline">Filtrar Fecha:</span>
@@ -159,7 +164,6 @@
             </div>
         </div>
 
-        <!-- VISTA 1: DASHBOARD GENERAL (Carrusel Demostración) -->
         <div id="dashboardView" class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/40">
                 <span class="text-xs font-bold uppercase tracking-wider text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
@@ -189,12 +193,14 @@
             </div>
         </div>
 
-        <!-- VISTA 2: TABLA DEDICADA PARA CATEGORÍAS (Gestión Independiente) -->
         <div id="categoryView" class="bg-slate-800 border border-slate-700/60 rounded-xl shadow-xl overflow-visible relative hidden">
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-900/80 text-slate-300 font-semibold border-b border-slate-700 text-xs uppercase">
+                            <th class="py-3 px-4 w-10 text-center">
+                                <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded bg-slate-900 border-slate-700 cursor-pointer">
+                            </th>
                             <th class="py-3 px-4">Nombre / Referido</th>
                             <th class="py-3 px-4">Contacto</th>
 
@@ -229,7 +235,6 @@
 
     </main>
 
-    <!-- Modal Agregar / Editar Candidato -->
     <div id="candidateModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -277,7 +282,6 @@
         </div>
     </div>
 
-    <!-- Modal Configuración de Categorías -->
     <div id="configModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -311,7 +315,84 @@
         </div>
     </div>
 
-    <!-- Modal de Alertas Informativas -->
+    <div id="exportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-export text-indigo-400"></i>
+                    <span>Exportación Personalizada</span>
+                </h3>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-300 uppercase tracking-wider mb-2">1. Formato de Archivo</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="flex items-center gap-2 bg-slate-900 border border-slate-700 p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                            <input type="radio" name="exportFormat" value="xlsx" checked class="text-indigo-600 focus:ring-0">
+                            <span class="font-semibold text-emerald-400"><i class="fa-solid fa-file-excel mr-1"></i> Excel</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-slate-900 border border-slate-700 p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                            <input type="radio" name="exportFormat" value="csv" class="text-indigo-600 focus:ring-0">
+                            <span class="font-semibold text-sky-400"><i class="fa-solid fa-file-csv mr-1"></i> CSV</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-slate-900 border border-slate-700 p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                            <input type="radio" name="exportFormat" value="pdf" class="text-indigo-600 focus:ring-0">
+                            <span class="font-semibold text-rose-400"><i class="fa-solid fa-file-pdf mr-1"></i> PDF</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="font-bold text-slate-300 uppercase tracking-wider">2. Selecciona Columnas a Incluir</label>
+                        <button onclick="toggleAllExportCols(true)" class="text-indigo-400 hover:underline text-[11px]">Marcar Todas</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 bg-slate-900/60 p-3 border border-slate-700/80 rounded-lg">
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300">
+                            <input type="checkbox" value="name" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Nombre Completo</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300">
+                            <input type="checkbox" value="email" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Correo Electrónico</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300">
+                            <input type="checkbox" value="phone" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Número Teléfono</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300">
+                            <input type="checkbox" value="sheet" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Pestaña (Categoría)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300">
+                            <input type="checkbox" value="status" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Estatus</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300">
+                            <input type="checkbox" value="notes" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Notas / Detalles</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-300 col-span-2 border-t border-slate-800 pt-1.5 mt-0.5">
+                            <input type="checkbox" value="createdAt" checked class="export-col-check rounded bg-slate-900 border-slate-700">
+                            <span>Fecha de Registro</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-700">
+                <button onclick="closeExportModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-3 py-2 rounded-lg transition">Cancelar</button>
+                <button onclick="executeExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Descargar Archivo</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="alertModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[60] p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -327,7 +408,6 @@
         </div>
     </div>
 
-    <!-- Modal Personalizado de Confirmación de Eliminación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[65] p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -344,7 +424,6 @@
         </div>
     </div>
 
-    <!-- Modal Personalizado de Renombrado -->
     <div id="renameModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[65] p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -362,7 +441,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK Modular -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -388,10 +466,10 @@
         let activeTabSheet = 'ALL';
         let currentEditingDocId = null;
         let columnFilters = { status: [] };
+        let selectedCandidateIds = new Set(); // ID de candidatos marcados con Checkbox
 
         let confirmCallback = null;
         let renameCallback = null;
-        let categoryToRenameOld = null;
 
         let pipelineList = [
             { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'] },
@@ -404,7 +482,6 @@
         let isCarouselPaused = false;
         const ROW_HEIGHT = 58;
 
-        // ALERTA MODAL
         window.showAlert = function(title, message, iconType = 'warning') {
             document.getElementById('alertTitle').textContent = title;
             document.getElementById('alertMessage').innerHTML = message;
@@ -430,7 +507,6 @@
             document.getElementById('alertModal').classList.add('hidden');
         };
 
-        // CONFIRM MODAL (Sustituye confirm nativo)
         window.showConfirm = function(title, message, callback) {
             document.getElementById('confirmTitle').textContent = title;
             document.getElementById('confirmMessage').innerHTML = message;
@@ -446,9 +522,7 @@
             }
         };
 
-        // RENAME MODAL (Sustituye prompt nativo)
         window.showRenameModal = function(oldName, callback) {
-            categoryToRenameOld = oldName;
             document.getElementById('renameCategoryInput').value = oldName;
             renameCallback = callback;
             document.getElementById('renameModal').classList.remove('hidden');
@@ -463,7 +537,6 @@
             }
         };
 
-        // Escuchar estructura en tiempo real
         onSnapshot(configDocRef, (snap) => {
             if (snap.exists() && snap.data().items) {
                 pipelineList = snap.data().items;
@@ -505,6 +578,8 @@
         window.selectCategory = function(sheet) {
             activeTabSheet = sheet;
             columnFilters = { status: [] };
+            selectedCandidateIds.clear(); // Limpiar selecciones
+            updateExportBtnVisibility();
 
             document.querySelectorAll('.sidebar-cat-btn').forEach(btn => {
                 btn.classList.remove('text-indigo-400', 'bg-indigo-600/10', 'border', 'border-indigo-500/20', 'active');
@@ -535,7 +610,6 @@
             applyAllFilters();
         };
 
-        // Escuchar candidatos en tiempo real
         onSnapshot(candidatesCol, (snapshot) => {
             allCandidates = [];
             snapshot.forEach(docSnap => {
@@ -627,7 +701,6 @@
             applyAllFilters();
         };
 
-        // EVENTOS DE BÚSQUEDA Y FECHA
         document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
         document.getElementById('dateFilterInput').addEventListener('change', (e) => {
             const val = e.target.value;
@@ -651,7 +724,7 @@
 
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
-            const selectedDate = document.getElementById('dateFilterInput').value; // Formato YYYY-MM-DD
+            const selectedDate = document.getElementById('dateFilterInput').value;
 
             if (activeTabSheet === 'ALL') {
                 renderDemoDashboard(allCandidates.filter(c => {
@@ -738,12 +811,17 @@
             document.getElementById('totalCategoryCount').textContent = totalInCat;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = data.map(c => `
-                <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40">
+            tbody.innerHTML = data.map(c => {
+                const isChecked = selectedCandidateIds.has(c.docId);
+                return `
+                <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/40 ${isChecked ? 'bg-indigo-900/20' : ''}">
+                    <td class="py-3.5 px-4 text-center">
+                        <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded bg-slate-900 border-slate-700 cursor-pointer">
+                    </td>
                     <td class="py-3.5 px-4 font-medium text-white">${c.name}</td>
                     <td class="py-3.5 px-4 text-xs space-y-0.5">
                         <div class="text-slate-300"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
@@ -789,8 +867,155 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
+
+            updateHeaderCheckboxState(data);
         }
+
+        window.toggleRowSelection = function(docId, isChecked) {
+            if (isChecked) {
+                selectedCandidateIds.add(docId);
+            } else {
+                selectedCandidateIds.delete(docId);
+            }
+            updateExportBtnVisibility();
+            applyAllFilters();
+        };
+
+        window.toggleSelectAllRows = function(isChecked) {
+            const currentCatCandidates = allCandidates.filter(c => c.sheet === activeTabSheet);
+            currentCatCandidates.forEach(c => {
+                if (isChecked) {
+                    selectedCandidateIds.add(c.docId);
+                } else {
+                    selectedCandidateIds.delete(c.docId);
+                }
+            });
+            updateExportBtnVisibility();
+            applyAllFilters();
+        };
+
+        function updateHeaderCheckboxState(visibleData) {
+            const headerCheck = document.getElementById('selectAllRowsCheck');
+            if (!headerCheck || visibleData.length === 0) return;
+
+            const allVisibleSelected = visibleData.every(c => selectedCandidateIds.has(c.docId));
+            headerCheck.checked = allVisibleSelected;
+        }
+
+        function updateExportBtnVisibility() {
+            const btn = document.getElementById('exportSelectedBtn');
+            const countLabel = document.getElementById('selectedCountLabel');
+            const count = selectedCandidateIds.size;
+
+            countLabel.textContent = count;
+            if (count > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        window.openExportModal = function() {
+            if (selectedCandidateIds.size === 0) {
+                showAlert("Sin Selección", "Por favor selecciona al menos un candidato de la tabla usando las casillas.", "warning");
+                return;
+            }
+            document.getElementById('exportModal').classList.remove('hidden');
+        };
+
+        window.closeExportModal = function() {
+            document.getElementById('exportModal').classList.add('hidden');
+        };
+
+        window.toggleAllExportCols = function(isChecked) {
+            document.querySelectorAll('.export-col-check').forEach(cb => cb.checked = isChecked);
+        };
+
+        window.executeExport = function() {
+            const selectedFormat = document.querySelector('input[name="exportFormat"]:checked').value;
+            const selectedCols = Array.from(document.querySelectorAll('.export-col-check:checked')).map(cb => cb.value);
+
+            if (selectedCols.length === 0) {
+                showAlert("Columnas Requeridas", "Debes seleccionar al menos una columna para exportar.", "warning");
+                return;
+            }
+
+            // Filtrar únicamente los candidatos seleccionados por ID
+            const candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
+
+            // Mapa de etiquetas para encabezados
+            const colLabels = {
+                name: 'Nombre Completo',
+                email: 'Correo Electrónico',
+                phone: 'Número Teléfono',
+                sheet: 'Pestaña (Categoría)',
+                status: 'Estatus',
+                notes: 'Notas / Detalles',
+                createdAt: 'Fecha de Registro'
+            };
+
+            // Construir dataset con columnas dinámicas
+            const exportData = candidatesToExport.map(c => {
+                const row = {};
+                selectedCols.forEach(col => {
+                    const label = colLabels[col] || col;
+                    if (col === 'createdAt') {
+                        row[label] = formatDate(c[col]);
+                    } else {
+                        row[label] = c[col] || '-';
+                    }
+                });
+                return row;
+            });
+
+            const fileName = `RefiGo_Export_${activeTabSheet}_${new Date().toISOString().split('T')[0]}`;
+
+            if (selectedFormat === 'xlsx') {
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Candidatos");
+                XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            } else if (selectedFormat === 'csv') {
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
+                const blob = new Blob([csvOutput], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", `${fileName}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (selectedFormat === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFontSize(16);
+                doc.setTextColor(30, 41, 59);
+                doc.text(`RefiGo Portal - Exportación (${activeTabSheet})`, 14, 15);
+                
+                doc.setFontSize(9);
+                doc.setTextColor(100, 116, 139);
+                doc.text(`Generado: ${new Date().toLocaleString('es-SV')} | Total Registros: ${exportData.length}`, 14, 22);
+
+                const headers = [selectedCols.map(col => colLabels[col])];
+                const rows = exportData.map(row => Object.values(row));
+
+                doc.autoTable({
+                    head: headers,
+                    body: rows,
+                    startY: 26,
+                    theme: 'striped',
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    headStyles: { fillColor: [79, 70, 229] }
+                });
+
+                doc.save(`${fileName}.pdf`);
+            }
+
+            closeExportModal();
+            showAlert("¡Exportación Completada!", `Se han exportado ${exportData.length} registros en formato ${selectedFormat.toUpperCase()}.`, "success");
+        };
 
         function restartCarouselLoop() {
             if (carouselTimer) clearInterval(carouselTimer);
@@ -844,7 +1069,6 @@
             return phone.replace(/[^0-9]/g, '');
         }
 
-        // Carga Masiva Excel
         document.getElementById('excelInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -889,7 +1113,6 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // FORMULARIO INDIVIDUAL
         window.openAddModal = function() {
             currentEditingDocId = null;
             document.getElementById('modalTitle').textContent = 'Nuevo Candidato';
@@ -1024,7 +1247,6 @@
             );
         };
 
-        // GESTOR DE ESTRUCTURA
         window.openConfigModal = function() {
             renderConfigTree();
             document.getElementById('configModal').classList.remove('hidden');
