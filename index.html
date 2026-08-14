@@ -27,8 +27,6 @@
             --text-muted: #64748b;
             --bg-hover: #f1f5f9;
             --bg-input: #ffffff;
-            --table-header-bg: #f1f5f9;
-            --table-row-hover: #f8fafc;
         }
 
         body.dark {
@@ -41,8 +39,6 @@
             --text-muted: #94a3b8;
             --bg-hover: #334155;
             --bg-input: #0f172a;
-            --table-header-bg: #0f172a;
-            --table-row-hover: #334155;
         }
 
         body { 
@@ -95,6 +91,24 @@
         }
         input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
+        }
+
+        /* Estilo Illustrator Color Swatch Picker */
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            border: 2px solid transparent;
+        }
+        .color-swatch:hover {
+            transform: scale(1.15);
+        }
+        .color-swatch.selected {
+            border-color: #ffffff;
+            box-shadow: 0 0 0 2px #4f46e5;
+            transform: scale(1.1);
         }
     </style>
 </head>
@@ -157,7 +171,7 @@
             </div>
             
             <div class="flex items-center space-x-2 sm:space-x-3">
-                <!-- Botón de Conmutación de Tema Claro / Oscuro -->
+                <!-- Botón de Conmutación de Tema Claro / Oscuro (Claro por defecto) -->
                 <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600" title="Cambiar Tema">
                     <i id="themeIcon" class="fa-solid fa-moon text-indigo-500"></i>
                     <span id="themeLabel" class="hidden sm:inline">Modo Oscuro</span>
@@ -227,6 +241,7 @@
             </div>
         </div>
 
+        <!-- Dashboard General View -->
         <div id="dashboardView" class="theme-card border rounded-xl shadow-sm overflow-visible relative">
             <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
                 <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
@@ -256,6 +271,7 @@
             </div>
         </div>
 
+        <!-- Category Table Independent View -->
         <div id="categoryView" class="theme-card border rounded-xl shadow-sm overflow-visible relative hidden">
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
@@ -346,7 +362,7 @@
         </div>
     </div>
 
-    <!-- Modal Configuración con Asignación de Colores -->
+    <!-- Modal Configuración con Paleta de Colores Estilo Illustrator -->
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="theme-card border rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -373,7 +389,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase">Estructura & Asignación de Colores (Ordena con ⬆️ / ⬇️)</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Estructura & Colores (Selecciona color estilo Illustrator o HEX)</span>
                     <div id="configPipelineTree" class="space-y-2 text-xs"></div>
                 </div>
             </div>
@@ -540,7 +556,6 @@
         let confirmCallback = null;
         let renameCallback = null;
 
-        // Estructura por defecto
         let pipelineList = [
             { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'] },
             { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'] },
@@ -548,36 +563,38 @@
             { name: 'No Referred', statuses: ['Pending Audit'] }
         ];
 
-        // Mapa de Colores Personalizados para Estatus (Predeterminado)
         let statusColorsMap = {
-            'Submitted': 'emerald',
-            'In Review': 'amber',
-            'Scheduled': 'indigo',
-            'Hired': 'purple',
-            'Callback': 'sky',
-            'No respond': 'orange',
-            'Hold': 'teal',
-            'Rejected': 'rose',
-            'Failed Assessment': 'rose',
-            'Pending Audit': 'slate'
+            'Submitted': '#10b981',
+            'In Review': '#f59e0b',
+            'Scheduled': '#6366f1',
+            'Hired': '#a855f7',
+            'Callback': '#0ea5e9',
+            'No respond': '#f97316',
+            'Hold': '#14b8a6',
+            'Rejected': '#f43f5e',
+            'Failed Assessment': '#f43f5e',
+            'Pending Audit': '#64748b'
         };
 
-        // Paleta de opciones de colores disponibles
-        const AVAILABLE_COLORS = [
-            { id: 'emerald', label: 'Verde', lightBg: 'bg-emerald-100 text-emerald-800 border-emerald-300', darkBg: 'dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-700' },
-            { id: 'indigo', label: 'Índigo', lightBg: 'bg-indigo-100 text-indigo-800 border-indigo-300', darkBg: 'dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-700' },
-            { id: 'sky', label: 'Cielo', lightBg: 'bg-sky-100 text-sky-800 border-sky-300', darkBg: 'dark:bg-sky-950 dark:text-sky-300 dark:border-sky-700' },
-            { id: 'amber', label: 'Ámbar', lightBg: 'bg-amber-100 text-amber-800 border-amber-300', darkBg: 'dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700' },
-            { id: 'rose', label: 'Rosa', lightBg: 'bg-rose-100 text-rose-800 border-rose-300', darkBg: 'dark:bg-rose-950 dark:text-rose-300 dark:border-rose-700' },
-            { id: 'purple', label: 'Púrpura', lightBg: 'bg-purple-100 text-purple-800 border-purple-300', darkBg: 'dark:bg-purple-950 dark:text-purple-300 dark:border-purple-700' },
-            { id: 'teal', label: 'Turquesa', lightBg: 'bg-teal-100 text-teal-800 border-teal-300', darkBg: 'dark:bg-teal-950 dark:text-teal-300 dark:border-teal-700' },
-            { id: 'orange', label: 'Naranja', lightBg: 'bg-orange-100 text-orange-800 border-orange-300', darkBg: 'dark:bg-orange-950 dark:text-orange-300 dark:border-orange-700' },
-            { id: 'slate', label: 'Gris', lightBg: 'bg-slate-200 text-slate-800 border-slate-300', darkBg: 'dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600' }
+        // Paleta preestablecida para el selector estilo Illustrator
+        const PRESET_SWATCHES = [
+            '#10b981', '#059669', '#6366f1', '#4f46e5', '#0ea5e9', 
+            '#0284c7', '#f59e0b', '#d97706', '#f97316', '#ea580c', 
+            '#f43f5e', '#e11d48', '#a855f7', '#9333ea', '#14b8a6', 
+            '#0d9488', '#64748b', '#475569'
         ];
 
         let carouselTimer = null;
         let isCarouselPaused = false;
         const ROW_HEIGHT = 58;
+
+        // Tema Claro por Defecto
+        const savedTheme = localStorage.getItem('refigo_theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+            document.getElementById('themeIcon').className = 'fa-solid fa-sun text-amber-400';
+            document.getElementById('themeLabel').textContent = 'Modo Claro';
+        }
 
         window.toggleTheme = function() {
             const isDark = document.body.classList.toggle('dark');
@@ -594,14 +611,6 @@
                 localStorage.setItem('refigo_theme', 'light');
             }
         };
-
-        // Cargar Tema Preferido (Por defecto CLARO)
-        const savedTheme = localStorage.getItem('refigo_theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark');
-            document.getElementById('themeIcon').className = 'fa-solid fa-sun text-amber-400';
-            document.getElementById('themeLabel').textContent = 'Modo Claro';
-        }
 
         window.showAlert = function(title, message, iconType = 'warning') {
             document.getElementById('alertTitle').textContent = title;
@@ -851,24 +860,21 @@
             return clean !== '' && clean !== '-';
         }
 
+        // Ordenamiento Inteligente: Notas primero (ordenados por fecha de actualización ASC), sin notas después
         function sortCandidatesWithNotesFirst(list) {
             return list.sort((a, b) => {
                 const aHas = hasNotes(a);
                 const bHas = hasNotes(b);
 
-                // Regla 1: Candidatos con notas primero
                 if (aHas && !bHas) return -1;
                 if (!aHas && bHas) return 1;
 
-                // Regla 2: Si ambos tienen notas, ordenar por actualización ASC 
-                // (Los recién creados/actualizados con notas pasan al FINAL del grupo con notas)
                 if (aHas && bHas) {
                     const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
                     const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
                     return timeA - timeB;
                 }
 
-                // Regla 3: Si ninguno tiene notas, ordenar por fecha de registro DESC
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
                 return timeB - timeA;
@@ -876,11 +882,10 @@
         }
 
         function renderStatusBadge(statusName) {
-            const colorId = statusColorsMap[statusName] || 'indigo';
-            const colorObj = AVAILABLE_COLORS.find(c => c.id === colorId) || AVAILABLE_COLORS[1];
+            const hexColor = statusColorsMap[statusName] || '#6366f1';
             
             return `
-                <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border ${colorObj.lightBg} ${colorObj.darkBg}">
+                <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
                     ${statusName}
                 </span>
             `;
@@ -1001,7 +1006,8 @@
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
                     </td>
                     <td class="py-3.5 px-4 text-center space-x-2 relative">
-                        <a href="https://wa.me/${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Enviar WhatsApp">
+                        <!-- Enlace configurado para WhatsApp Web -->
+                        <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Abrir en WhatsApp Web">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </a>
 
@@ -1026,7 +1032,7 @@
                                     <i class="fa-solid fa-pen-to-square"></i>
                                     <span>Editar Candidato</span>
                                 </button>
-                                <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-500 hover:text-white flex items-center gap-2 transition">
+                                <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition">
                                     <i class="fa-solid fa-trash-can"></i>
                                     <span>Eliminar Candidato</span>
                                 </button>
@@ -1440,16 +1446,32 @@
                             <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded bg-rose-500/10" title="Eliminar Pestaña"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 pt-1">
+                    <div class="flex flex-wrap gap-3 pt-2">
                         ${item.statuses.map(st => {
-                            const currentColor = statusColorsMap[st] || 'indigo';
+                            const currentColor = statusColorsMap[st] || '#6366f1';
                             return `
-                            <div class="inline-flex items-center gap-1.5 theme-card border px-2 py-1 rounded text-[11px] shadow-sm">
+                            <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-lg text-[11px] shadow-sm">
                                 <span class="font-medium">${st}</span>
-                                <select onchange="updateStatusColor('${st}', this.value)" class="bg-transparent border-0 text-[10px] font-bold cursor-pointer text-indigo-500 focus:outline-none">
-                                    ${AVAILABLE_COLORS.map(col => `<option value="${col.id}" ${col.id === currentColor ? 'selected' : ''}>${col.label}</option>`).join('')}
-                                </select>
-                                <i onclick="removeStatusConfig('${item.name}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-0.5"></i>
+                                <!-- Selector Estilo Illustrator (Swatches en Círculos + Custom Color) -->
+                                <div class="flex items-center gap-1 relative group">
+                                    <div class="color-swatch ${currentColor === statusColorsMap[st] ? 'selected' : ''}" style="background-color: ${currentColor};" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
+                                    <i onclick="removeStatusConfig('${item.name}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1"></i>
+                                    
+                                    <!-- Paleta desplegable tipo Illustrator -->
+                                    <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                        <div class="grid grid-cols-6 gap-2 mb-3">
+                                            ${PRESET_SWATCHES.map(hex => `
+                                                <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
+                                            `).join('')}
+                                        </div>
+                                        <div class="flex items-center gap-2 border-t border-slate-200 dark:border-slate-700 pt-2">
+                                            <span class="text-[10px] font-semibold text-slate-400">HEX:</span>
+                                            <input type="color" value="${currentColor}" onchange="selectStatusColor('${st}', this.value)" class="w-7 h-7 rounded cursor-pointer bg-transparent border-0">
+                                            <input type="text" value="${currentColor}" onchange="selectStatusColor('${st}', this.value)" class="theme-input border rounded px-1.5 py-0.5 text-[10px] w-16">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             `;
                         }).join('')}
@@ -1458,9 +1480,24 @@
             `).join('');
         }
 
-        window.updateStatusColor = async function(statusName, newColor) {
-            statusColorsMap[statusName] = newColor;
+        window.toggleSwatchPalette = function(stName, event) {
+            event.stopPropagation();
+            const paletteEl = document.getElementById(`palette_${cleanId(stName)}`);
+            document.querySelectorAll('[id^="palette_"]').forEach(el => {
+                if (el !== paletteEl) el.classList.add('hidden');
+            });
+            paletteEl.classList.toggle('hidden');
+        };
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('[id^="palette_"]').forEach(el => el.classList.add('hidden'));
+        });
+
+        window.selectStatusColor = async function(statusName, hexColor) {
+            statusColorsMap[statusName] = hexColor;
             await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+            renderConfigTree();
+            applyAllFilters();
         };
 
         window.moveCategoryOrder = async function(currentIndex, direction) {
@@ -1546,7 +1583,7 @@
             const catObj = pipelineList.find(i => i.name === catSelect);
             if (catObj && !catObj.statuses.includes(stName)) {
                 catObj.statuses.push(stName);
-                if (!statusColorsMap[stName]) statusColorsMap[stName] = 'indigo';
+                if (!statusColorsMap[stName]) statusColorsMap[stName] = '#6366f1';
                 await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
                 statusInput.value = '';
             }
