@@ -576,7 +576,6 @@
             'Pending Audit': '#64748b'
         };
 
-        // Paleta preestablecida para el selector estilo Illustrator
         const PRESET_SWATCHES = [
             '#10b981', '#059669', '#6366f1', '#4f46e5', '#0ea5e9', 
             '#0284c7', '#f59e0b', '#d97706', '#f97316', '#ea580c', 
@@ -860,7 +859,6 @@
             return clean !== '' && clean !== '-';
         }
 
-        // Ordenamiento Inteligente: Notas primero (ordenados por fecha de actualización ASC), sin notas después
         function sortCandidatesWithNotesFirst(list) {
             return list.sort((a, b) => {
                 const aHas = hasNotes(a);
@@ -1006,7 +1004,7 @@
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
                     </td>
                     <td class="py-3.5 px-4 text-center space-x-2 relative">
-                        <!-- Enlace configurado para WhatsApp Web -->
+                        <!-- WhatsApp Web Link -->
                         <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Abrir en WhatsApp Web">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </a>
@@ -1452,12 +1450,10 @@
                             return `
                             <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-lg text-[11px] shadow-sm">
                                 <span class="font-medium">${st}</span>
-                                <!-- Selector Estilo Illustrator (Swatches en Círculos + Custom Color) -->
                                 <div class="flex items-center gap-1 relative group">
                                     <div class="color-swatch ${currentColor === statusColorsMap[st] ? 'selected' : ''}" style="background-color: ${currentColor};" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
                                     <i onclick="removeStatusConfig('${item.name}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1"></i>
                                     
-                                    <!-- Paleta desplegable tipo Illustrator -->
                                     <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
                                         <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
                                         <div class="grid grid-cols-6 gap-2 mb-3">
