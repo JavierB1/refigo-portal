@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RefiGo Portal - Sistema de Gestión</title>
-    <link rel="icon" href="https://lh3.googleusercontent.com/d/1OQYupc95-FhH2LhTM6tcI21xn9K-fT7u">
+    <!-- STREAMING_CHUNK:Adding dynamic favicon link element -->
+    <link rel="icon" id="dynamicFavicon" href="https://placehold.co/32x32/4f46e5/ffffff?text=R">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Iconos -->
@@ -79,13 +80,18 @@
             max-height: 295px;
             overflow-y: auto;
             scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
         }
         .carousel-viewport::-webkit-scrollbar {
-            width: 4px;
+            display: none; /* Chrome, Safari, Edge */
         }
-        .carousel-viewport::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
+
+        /* Ocultar barras de desplazamiento en tablas manteniendo funcionalidad de scroll */
+        .overflow-x-auto, .overflow-y-auto {
+            scrollbar-width: none;
+        }
+        .overflow-x-auto::-webkit-scrollbar, .overflow-y-auto::-webkit-scrollbar {
+            display: none;
         }
 
         body.dark input[type="date"]::-webkit-calendar-picker-indicator {
@@ -97,12 +103,13 @@
 
         /* Estilo Illustrator Color Swatch Picker */
         .color-swatch {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             border: 2px solid transparent;
+            flex-shrink: 0;
         }
         .color-swatch:hover {
             transform: scale(1.15);
@@ -138,7 +145,7 @@
                 </button>
             </div>
 
-            <!-- Menú de Categorías adaptado a móvil vertical -->
+            <!-- Menú de Categorías -->
             <div class="space-y-1.5" id="sidebarCategoriesContainer">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">Segmentación</span>
                 
@@ -161,7 +168,6 @@
         </div>
     </aside>
 
-    <!-- Input file oculto para cargar el logo -->
     <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
 
     <!-- STREAMING_CHUNK:Configuring responsive header layout -->
@@ -199,10 +205,9 @@
         </div>
     </header>
 
-    <!-- STREAMING_CHUNK:Building fluid and vertical-friendly main views -->
+    <!-- STREAMING_CHUNK:Building fluid main views -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
 
-        <!-- Métricas Principales (Grid adaptable a celulares verticales) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Total Candidatos</span>
@@ -360,7 +365,6 @@
             </div>
 
             <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-                <!-- Tarjeta para subir el Logo con botón explícito -->
                 <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-3">
                     <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block"><i class="fa-solid fa-image mr-1.5"></i> Logo de la Empresa</span>
                     <div class="flex flex-col sm:flex-row items-center gap-3">
@@ -574,7 +578,7 @@
         let renameCallback = null;
 
         let pipelineList = [
-            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: {} },
+            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow Up?': ['Yes', 'No'] } },
             { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: {} },
             { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: {} },
             { name: 'No Referred', statuses: ['Pending Audit'], columns: {} }
@@ -590,7 +594,9 @@
             'Hold': '#14b8a6',
             'Rejected': '#f43f5e',
             'Failed Assessment': '#f43f5e',
-            'Pending Audit': '#64748b'
+            'Pending Audit': '#64748b',
+            'Yes': '#10b981',
+            'No': '#f43f5e'
         };
 
         const PRESET_SWATCHES = [
@@ -627,7 +633,6 @@
             }
         };
 
-        // Logo Upload Management (Syncs both sidebar & settings modal previews)
         window.handleLogoUpload = function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -645,12 +650,14 @@
             const sidebarIcon = document.getElementById('sidebarLogoIcon');
             const modalImg = document.getElementById('modalLogoImgPreview');
             const modalIcon = document.getElementById('modalLogoIconPreview');
+            const favicon = document.getElementById('dynamicFavicon');
 
             if (url) {
                 if(sidebarImg) { sidebarImg.src = url; sidebarImg.classList.remove('hidden'); }
                 if(sidebarIcon) sidebarIcon.classList.add('hidden');
                 if(modalImg) { modalImg.src = url; modalImg.classList.remove('hidden'); }
                 if(modalIcon) modalIcon.classList.add('hidden');
+                if(favicon) favicon.href = url;
             }
         }
 
@@ -974,6 +981,16 @@
             `;
         }
 
+        function renderOptionBadge(optName) {
+            if (!optName || optName === '-') return '-';
+            const hexColor = statusColorsMap[optName] || '#64748b';
+            return `
+                <span class="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded-md border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
+                    ${optName}
+                </span>
+            `;
+        }
+
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
             const selectedDate = document.getElementById('dateFilterInput').value;
@@ -1165,11 +1182,16 @@
                     <td class="py-3.5 px-4">
                         ${renderStatusBadge(c.status)}
                     </td>
-                    ${customCols.map(colName => `
-                        <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300">
-                            ${c.customFields?.[colName] || '-'}
-                        </td>
-                    `).join('')}
+                    ${customCols.map(colName => {
+                        const val = c.customFields?.[colName] || '-';
+                        const options = catObj.columns[colName] || [];
+                        const hasOpts = options.length > 0;
+                        return `
+                            <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300">
+                                ${hasOpts ? renderOptionBadge(val) : val}
+                            </td>
+                        `;
+                    }).join('')}
                     <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
                     </td>
@@ -1731,19 +1753,19 @@
                         ${catObj.statuses.map(st => {
                             const currentColor = statusColorsMap[st] || '#6366f1';
                             return `
-                                <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm">
+                                <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative">
                                     <span class="font-medium">${st}</span>
-                                    <div class="flex items-center gap-1.5 relative">
-                                        <div class="color-swatch" style="background-color: ${currentColor}; width: 16px; height: 16px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
                                         <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1 text-sm"></i>
-                                        
-                                        <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-50 w-56">
-                                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
-                                            <div class="grid grid-cols-6 gap-2 mb-2">
-                                                ${PRESET_SWATCHES.map(hex => `
-                                                    <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
-                                                `).join('')}
-                                            </div>
+                                    </div>
+                                    
+                                    <div id="palette_${cleanId(st)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                        <div class="grid grid-cols-6 gap-2 mb-2">
+                                            ${PRESET_SWATCHES.map(hex => `
+                                                <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
+                                            `).join('')}
                                         </div>
                                     </div>
                                 </div>
@@ -1759,6 +1781,7 @@
 
             colNames.forEach(colName => {
                 const options = cols[colName] || [];
+                const hasOpts = options.length > 0;
                 html += `
                     <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2">
                         <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
@@ -1766,17 +1789,33 @@
                             <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px] font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                         <div class="flex flex-wrap gap-1.5 items-center pt-1">
-                            ${options.length === 0 ? `<span class="text-slate-400 text-[11px] italic">Sin opciones de filtro (columna libre)</span>` : options.map(opt => `
-                                <span class="inline-flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 px-2.5 py-1 rounded-xl text-xs font-medium">
-                                    ${opt}
-                                    <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500"></i>
-                                </span>
-                            `).join('')}
+                            ${!hasOpts ? `<span class="text-slate-400 text-[11px] italic">Sin opciones de filtro (columna libre)</span>` : options.map(opt => {
+                                const currentColor = statusColorsMap[opt] || '#64748b';
+                                return `
+                                    <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative">
+                                        <span class="font-medium">${opt}</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleSwatchPalette('opt_${cleanId(colName)}_${cleanId(opt)}', event)" title="Cambiar Color"></div>
+                                            <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 text-sm"></i>
+                                        </div>
+
+                                        <div id="palette_opt_${cleanId(colName)}_${cleanId(opt)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
+                                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                            <div class="grid grid-cols-6 gap-2 mb-2">
+                                                ${PRESET_SWATCHES.map(hex => `
+                                                    <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${opt}', '${hex}')"></div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
+                        ${hasOpts ? `
                         <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                             <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full">
                             <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-semibold shadow-sm">+ Opción</button>
-                        </div>
+                        </div>` : ''}
                     </div>
                 `;
             });
@@ -1845,6 +1884,7 @@
             if (catObj && catObj.columns && catObj.columns[colName]) {
                 if (!catObj.columns[colName].includes(optVal)) {
                     catObj.columns[colName].push(optVal);
+                    if (!statusColorsMap[optVal]) statusColorsMap[optVal] = '#64748b';
                     await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
                     input.value = '';
                     renderTabEditModalContents();
@@ -1889,7 +1929,7 @@
             document.querySelectorAll('[id^="palette_"]').forEach(el => {
                 if (el !== paletteEl) el.classList.add('hidden');
             });
-            paletteEl.classList.toggle('hidden');
+            if(paletteEl) paletteEl.classList.toggle('hidden');
         };
 
         document.addEventListener('click', () => {
