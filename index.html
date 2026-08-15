@@ -23,9 +23,9 @@
             --bg-card: #ffffff;
             --bg-header: #ffffff;
             --bg-sidebar: #ffffff;
-            --border-color: #e2e8f0;
+            --border-color: #cbd5e1;
             --text-main: #0f172a;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --bg-hover: #f1f5f9;
             --bg-input: #ffffff;
         }
@@ -46,7 +46,6 @@
             font-family: 'Inter', sans-serif; 
             background-color: var(--bg-main);
             color: var(--text-main);
-            transition: background-color 0.3s ease, color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -119,31 +118,35 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
+    <script>
+        if (localStorage.getItem('refigo_theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+    </script>
 
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
 
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 max-w-[85vw] theme-sidebar border-r z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-4 sm:p-5 shadow-2xl">
         <div class="space-y-6">
-            <div class="flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-700">
+            <div class="flex items-center justify-between border-b pb-4 border-slate-300 dark:border-slate-700">
                 <div class="flex items-center space-x-3">
                     <div class="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
                         <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
                     </div>
                     <div class="min-w-0">
                         <h2 class="font-bold text-base truncate">RefiGo Portal</h2>
-                        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">Gestión de Talento</span>
+                        <span class="text-xs text-slate-600 dark:text-slate-400 block truncate">Gestión de Talento</span>
                     </div>
                 </div>
-                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xl p-2">
+                <button onclick="toggleSidebar()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white text-xl p-2">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Menú de Categorías -->
             <div class="space-y-1.5" id="sidebarCategoriesContainer">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">Segmentación</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-3 block mb-1">Segmentación</span>
                 
-                <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 active" data-sheet="ALL">
+                <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 active" data-sheet="ALL">
                     <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Dashboard General</span>
                     <span id="sideCountAll" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">0</span>
                 </button>
@@ -151,12 +154,12 @@
             </div>
         </div>
 
-        <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 transition font-semibold shadow-sm">
-                <i class="fa-solid fa-sliders text-indigo-500 text-sm"></i>
+        <div class="space-y-3 pt-4 border-t border-slate-300 dark:border-slate-700">
+            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition font-semibold shadow-sm">
+                <i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 text-sm"></i>
                 <span>⚙️ Gestión Global de Pestañas</span>
             </button>
-            <div class="text-[11px] text-slate-400 text-center pb-2">
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 text-center pb-2">
                 RefiGo Cloud DB • Sincronizado
             </div>
         </div>
@@ -165,20 +168,20 @@
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
-                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white p-2.5 sm:px-3 sm:py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600 flex-shrink-0" title="Abrir Menú">
-                    <i class="fa-solid fa-bars text-indigo-500 dark:text-indigo-400 text-base"></i>
+                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-white p-2.5 sm:px-3 sm:py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600 flex-shrink-0" title="Abrir Menú">
+                    <i class="fa-solid fa-bars text-indigo-600 dark:text-indigo-400 text-base"></i>
                     <span class="hidden md:inline">Categorías</span>
                 </button>
 
                 <div class="min-w-0">
                     <h1 class="text-sm sm:text-base font-bold tracking-wide truncate">RefiGo Portal</h1>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="currentCategoryLabel">Dashboard General</p>
+                    <p class="text-[11px] text-slate-600 dark:text-slate-400 truncate" id="currentCategoryLabel">Dashboard General</p>
                 </div>
             </div>
             
             <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
-                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 p-2.5 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600" title="Cambiar Tema">
-                    <i id="themeIcon" class="fa-solid fa-moon text-indigo-500 text-sm"></i>
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 p-2.5 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600" title="Cambiar Tema">
+                    <i id="themeIcon" class="fa-solid fa-moon text-indigo-600 dark:text-indigo-400 text-sm"></i>
                     <span id="themeLabel" class="hidden lg:inline">Modo Oscuro</span>
                 </button>
 
@@ -200,28 +203,28 @@
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Total Candidatos</span>
-                <div id="metricTotal" class="text-xl sm:text-2xl font-bold mt-1">0</div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Total Candidatos</span>
+                <div id="metricTotal" class="text-xl sm:text-2xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Referred</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Referred</span>
                 <div id="metricReferred" class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Cold</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Cold</span>
                 <div id="metricCold" class="text-xl sm:text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Rejected / Other</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Rejected / Other</span>
                 <div id="metricOther" class="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
             </div>
         </div>
 
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             <div class="relative w-full lg:w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 dark:text-slate-400 text-sm"></i>
                 <input type="text" id="globalSearch" placeholder="Buscar por nombre, correo, cel..." 
-                       class="w-full theme-input border text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 transition shadow-sm">
+                       class="w-full theme-input border text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 transition shadow-sm font-medium">
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
@@ -231,30 +234,29 @@
                 </button>
 
                 <div class="relative flex items-center theme-card border rounded-xl px-3 py-2 text-xs shadow-sm flex-1 sm:flex-initial">
-                    <i class="fa-regular fa-calendar text-indigo-500 mr-2 flex-shrink-0"></i>
-                    <span class="text-slate-400 mr-2 hidden sm:inline">Fecha:</span>
-                    <input type="date" id="dateFilterInput" class="bg-transparent focus:outline-none text-xs cursor-pointer w-full">
+                    <i class="fa-regular fa-calendar text-indigo-600 dark:text-indigo-400 mr-2 flex-shrink-0"></i>
+                    <span class="text-slate-600 dark:text-slate-400 mr-2 hidden sm:inline font-medium">Fecha:</span>
+                    <input type="date" id="dateFilterInput" class="bg-transparent focus:outline-none text-xs cursor-pointer w-full font-medium">
                 </div>
-                <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-500 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition flex-shrink-0" title="Quitar fecha">
+                <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-500 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex-shrink-0 font-semibold" title="Quitar fecha">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
-                <button id="clearAllFiltersBtn" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center gap-2 shadow-sm flex-1 sm:flex-initial justify-center">
-                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                <button id="clearAllFiltersBtn" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-2 shadow-sm flex-1 sm:flex-initial justify-center font-semibold">
+                    <i class="fa-solid fa-filter-circle-xmark text-indigo-600 dark:text-indigo-400"></i>
                     <span>Limpiar Todo</span>
                 </button>
             </div>
         </div>
 
-        <!-- Dashboard General View -->
         <div id="dashboardView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
-            <div class="p-3.5 sm:p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 bg-slate-50 dark:bg-slate-900/40 rounded-t-2xl">
-                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
-                <span class="text-[11px] text-slate-400">Selecciona una categoría en el menú lateral para interactuar.</span>
+            <div class="p-3.5 sm:p-4 border-b border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 bg-slate-100 dark:bg-slate-900/40 rounded-t-2xl">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
+                <span class="text-[11px] font-medium text-slate-600 dark:text-slate-400">Selecciona una categoría en el menú lateral para interactuar.</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-700 text-xs uppercase">
+                        <tr class="bg-slate-200/70 dark:bg-slate-900/80 text-slate-700 dark:text-slate-300 font-semibold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                             <th class="py-3 px-4">Nombre / Referido</th>
                             <th class="py-3 px-4">Contacto</th>
                             <th class="py-3 px-4">Pestaña</th>
@@ -266,77 +268,75 @@
             </div>
             <div id="carouselContainer" class="carousel-viewport overflow-x-auto" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
                 <table class="w-full text-left border-collapse text-sm">
-                    <tbody id="demoTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tbody id="demoTableBody" class="divide-y divide-slate-300 dark:divide-slate-700/50">
                     </tbody>
                 </table>
             </div>
-            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center rounded-b-2xl">
-                <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-600 dark:text-slate-200">0</strong></span>
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-400 flex justify-between items-center rounded-b-2xl font-medium">
+                <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-700 dark:text-slate-200">0</strong></span>
             </div>
         </div>
 
-        <!-- Category Table Independent View -->
         <div id="categoryView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative hidden">
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr id="categoryTableHead" class="bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-700 text-xs uppercase">
+                        <tr id="categoryTableHead" class="bg-slate-200/70 dark:bg-slate-900/80 text-slate-700 dark:text-slate-300 font-semibold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                         </tr>
                     </thead>
-                    <tbody id="categoryTableBody" class="divide-y divide-slate-200 dark:divide-slate-700/50">
+                    <tbody id="categoryTableBody" class="divide-y divide-slate-300 dark:divide-slate-700/50">
                     </tbody>
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center rounded-b-2xl">
-                <span>Mostrando <strong id="visibleCount" class="text-indigo-600 dark:text-slate-200">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-600 dark:text-slate-200">0</strong> en esta categoría</span>
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-400 flex justify-between items-center rounded-b-2xl font-medium">
+                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-slate-200">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-700 dark:text-slate-200">0</strong> en esta categoría</span>
             </div>
         </div>
 
     </main>
 
-    <!-- Modal Candidate Add/Edit -->
     <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-base sm:text-lg" id="modalTitle">Nuevo Candidato</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nombre Completo</label>
-                    <input type="text" id="inputName" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm">
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Nombre Completo</label>
+                    <input type="text" id="inputName" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Correo <span class="text-rose-500">*</span></label>
-                        <input type="email" id="inputEmail" required class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Correo <span class="text-rose-500">*</span></label>
+                        <input type="email" id="inputEmail" required class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Número (Prefijo +503) <span class="text-rose-500">*</span></label>
-                        <input type="text" id="inputPhone" required placeholder="+503 " class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Número (Prefijo +503) <span class="text-rose-500">*</span></label>
+                        <input type="text" id="inputPhone" required placeholder="+503 " class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
-                        <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
+                        <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium">
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Estatus</label>
-                        <select id="inputStatus" disabled class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50">
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Estatus <span class="text-slate-400 font-normal">(Opcional)</span></label>
+                        <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50 font-medium">
                         </select>
                     </div>
                 </div>
-                <div id="modalCustomFieldsContainer" class="space-y-3 pt-1 border-t border-slate-200 dark:border-slate-700"></div>
+                <div id="modalCustomFieldsContainer" class="space-y-3 pt-1 border-t border-slate-300 dark:border-slate-700"></div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Notas / Detalle</label>
-                    <textarea id="inputNotes" rows="3" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm"></textarea>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Notas / Detalle</label>
+                    <textarea id="inputNotes" rows="3" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium"></textarea>
                 </div>
             </div>
-            <div class="flex justify-end space-x-2 border-t border-slate-200 dark:border-slate-700 pt-3">
+            <div class="flex justify-end space-x-2 border-t border-slate-300 dark:border-slate-700 pt-3">
                 <button onclick="saveCandidate()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-floppy-disk text-sm"></i>
                     <span>Guardar en Nube</span>
@@ -345,48 +345,46 @@
         </div>
     </div>
 
-    <!-- Modal Configuración General -->
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestión Global de Pestañas</h3>
-                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 mr-2"></i>Gestión Global de Pestañas</h3>
+                <button onclick="closeConfigModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
-                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Agregar Nueva Pestaña / Categoría</span>
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">Agregar Nueva Pestaña / Categoría</span>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="theme-input border rounded-xl p-3 text-xs w-full">
+                        <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="theme-input border rounded-xl p-3 text-xs w-full font-medium">
                         <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Crear</button>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estructura & Pestañas Actuales</span>
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Estructura & Pestañas Actuales</span>
                     <div id="configPipelineTree" class="space-y-2 text-xs"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Edición Específica por Pestaña -->
     <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate">
-                    <i class="fa-solid fa-folder-open text-indigo-500"></i>
+                    <i class="fa-solid fa-folder-open text-indigo-600 dark:text-indigo-400"></i>
                     <span class="truncate">Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
                 </h3>
-                <button onclick="closeTabEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeTabEditModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-3">
-                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400 block tracking-wider">Columnas de esta Pestaña</span>
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
+                    <span class="font-bold uppercase text-indigo-700 dark:text-indigo-400 block tracking-wider">Columnas de esta Pestaña</span>
                     
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Canal, Región)" class="theme-input border rounded-xl p-3 text-xs w-full">
+                        <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Canal, Región)" class="theme-input border rounded-xl p-3 text-xs w-full font-medium">
                         <button onclick="addColumnToTab()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Columna</button>
                     </div>
 
@@ -394,26 +392,25 @@
                 </div>
             </div>
 
-            <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-700">
+            <div class="flex justify-end pt-3 border-t border-slate-300 dark:border-slate-700">
                 <button onclick="closeTabEditModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl transition shadow-sm">Guardar y Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Exportación Personalizada -->
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-base flex items-center gap-2">
-                    <i class="fa-solid fa-file-export text-indigo-500"></i>
+                    <i class="fa-solid fa-file-export text-indigo-600 dark:text-indigo-400"></i>
                     <span>Exportación Personalizada</span>
                 </h3>
-                <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeExportModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs">
                 <div>
-                    <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">1. Formato de Archivo</label>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">1. Formato de Archivo</label>
                     <div class="grid grid-cols-3 gap-2">
                         <label class="flex items-center justify-center gap-1.5 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold text-emerald-600 dark:text-emerald-400">
                             <input type="radio" name="exportFormat" value="xlsx" checked class="text-indigo-600 focus:ring-0">
@@ -431,7 +428,7 @@
                 </div>
 
                 <div id="pdfOrientationContainer">
-                    <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">Orientación de Página (PDF)</label>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Orientación de Página (PDF)</label>
                     <div class="grid grid-cols-2 gap-2">
                         <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold">
                             <input type="radio" name="pdfOrientation" value="portrait" checked class="text-indigo-600 focus:ring-0">
@@ -446,17 +443,17 @@
 
                 <div>
                     <div class="flex justify-between items-center mb-2">
-                        <label class="font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">2. Columnas a Incluir</label>
-                        <button onclick="toggleAllExportCols(true)" class="text-indigo-500 hover:underline text-[11px] font-semibold">Marcar Todas</button>
+                        <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">2. Columnas a Incluir</label>
+                        <button onclick="toggleAllExportCols(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[11px] font-semibold">Marcar Todas</button>
                     </div>
                     
-                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900/60 p-3 border border-slate-200 dark:border-slate-700/80 rounded-xl max-h-48 overflow-y-auto">
+                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-900/60 p-3 border border-slate-300 dark:border-slate-700/80 rounded-xl max-h-48 overflow-y-auto font-medium">
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="closeExportModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 text-xs px-4 py-3 rounded-xl transition">Cancelar</button>
+            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-slate-300 dark:border-slate-700">
+                <button onclick="closeExportModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 text-xs px-4 py-3 rounded-xl transition font-semibold">Cancelar</button>
                 <button onclick="executeExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-download"></i>
                     <span>Descargar Archivo</span>
@@ -465,7 +462,6 @@
         </div>
     </div>
 
-    <!-- Modal Alerta Personalizada -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -473,7 +469,7 @@
             </div>
             <div>
                 <h3 id="alertTitle" class="font-bold text-base">Atención</h3>
-                <p id="alertMessage" class="text-xs text-slate-500 dark:text-slate-300 mt-2 leading-relaxed"></p>
+                <p id="alertMessage" class="text-xs text-slate-700 dark:text-slate-300 mt-2 leading-relaxed font-medium"></p>
             </div>
             <div class="pt-2">
                 <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md">Entendido</button>
@@ -481,7 +477,6 @@
         </div>
     </div>
 
-    <!-- Modal Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -489,28 +484,27 @@
             </div>
             <div>
                 <h3 id="confirmTitle" class="font-bold text-base">¿Confirmar Acción?</h3>
-                <p id="confirmMessage" class="text-xs text-slate-500 dark:text-slate-300 mt-2 leading-relaxed"></p>
+                <p id="confirmMessage" class="text-xs text-slate-700 dark:text-slate-300 mt-2 leading-relaxed font-medium"></p>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-semibold text-xs py-3 rounded-xl transition">Cancelar</button>
+                <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 font-semibold text-xs py-3 rounded-xl transition">Cancelar</button>
                 <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md shadow-rose-600/30">Sí, Eliminar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Renombrar Categoría -->
     <div id="renameModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>Renombrar Categoría</h3>
-                <button onclick="closeRenameModal(false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-pen-to-square text-indigo-600 dark:text-indigo-400 mr-2"></i>Renombrar Categoría</h3>
+                <button onclick="closeRenameModal(false)" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-2">
-                <label class="block text-xs text-slate-400">Nuevo Nombre de Pestaña</label>
-                <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500">
+                <label class="block text-xs text-slate-700 dark:text-slate-400 font-medium">Nuevo Nombre de Pestaña</label>
+                <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium">
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs px-3 py-2.5 rounded-xl transition">Cancelar</button>
+                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs px-3 py-2.5 rounded-xl transition font-semibold">Cancelar</button>
                 <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-sm">Guardar</button>
             </div>
         </div>
@@ -597,7 +591,7 @@
                 label.textContent = 'Modo Claro';
                 localStorage.setItem('refigo_theme', 'dark');
             } else {
-                icon.className = 'fa-solid fa-moon text-indigo-500';
+                icon.className = 'fa-solid fa-moon text-indigo-600 dark:text-indigo-400';
                 label.textContent = 'Modo Oscuro';
                 localStorage.setItem('refigo_theme', 'light');
             }
@@ -699,8 +693,8 @@
             const container = document.getElementById('dynamicSidebarCategories');
             
             container.innerHTML = pipelineList.map(item => `
-                <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-white transition" data-sheet="${item.name}">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-500"></i> ${item.name}</span>
+                <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-white transition" data-sheet="${item.name}">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-600 dark:text-indigo-400"></i> ${item.name}</span>
                     <span id="sideCount_${cleanId(item.name)}" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">0</span>
                 </button>
             `).join('');
@@ -715,14 +709,14 @@
             updateExportBtnVisibility();
 
             document.querySelectorAll('.sidebar-cat-btn').forEach(btn => {
-                btn.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20', 'active');
-                btn.classList.add('text-slate-600', 'dark:text-slate-300');
+                btn.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20', 'active', 'font-semibold');
+                btn.classList.add('text-slate-700', 'dark:text-slate-300', 'font-semibold');
             });
 
             const activeBtn = document.querySelector(`.sidebar-cat-btn[data-sheet="${sheet}"]`);
             if (activeBtn) {
-                activeBtn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20', 'active');
-                activeBtn.classList.remove('text-slate-600', 'dark:text-slate-300');
+                activeBtn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20', 'active', 'font-semibold');
+                activeBtn.classList.remove('text-slate-700', 'dark:text-slate-300');
             }
 
             const dashboardView = document.getElementById('dashboardView');
@@ -800,12 +794,12 @@
             }
 
             container.innerHTML = `
-                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
                     <input type="checkbox" checked onchange="toggleSelectAll('status', this.checked)" class="rounded theme-input">
                     <strong>(Select All)</strong>
                 </label>
             ` + allowedStatuses.map(val => `
-                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
                     <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" checked>
                     <span>${val}</span>
                 </label>
@@ -818,12 +812,12 @@
                         const uniqueVals = catObj.columns[colName] || [];
                         if (uniqueVals.length > 0) {
                             colContainer.innerHTML = `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
                                     <input type="checkbox" checked onchange="toggleSelectAll('custom_${cleanId(colName)}', this.checked)" class="rounded theme-input">
                                     <strong>(Select All)</strong>
                                 </label>
                             ` + uniqueVals.map(val => `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
                                     <input type="checkbox" value="${val}" class="col-check-custom_${cleanId(colName)} rounded theme-input" checked>
                                     <span>${val}</span>
                                 </label>
@@ -902,12 +896,12 @@
                 if (aHas && bHas) {
                     const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
                     const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-                    return timeA - timeB;
+                    return timeA - timeB; // Chronological ascending (oldest first, new items at the bottom)
                 }
 
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
-                return timeB - timeA;
+                return timeA - timeB; // Chronological ascending (oldest first, new items at the bottom)
             });
         }
 
@@ -1005,27 +999,27 @@
             document.getElementById('demoTotalCount').textContent = data.length;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">No hay candidatos en la base.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500 font-semibold">No hay candidatos en la base.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = data.map(c => `
-                <tr class="hover:bg-slate-100 dark:hover:bg-slate-700/30 transition border-b border-slate-200 dark:border-slate-700/40 h-[58px] ${hasNotes(c) ? 'bg-indigo-50/30 dark:bg-indigo-950/20' : ''}">
-                    <td class="py-3 px-4 font-medium w-1/4 truncate">${c.name}</td>
+                <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-700/30 transition border-b border-slate-300 dark:border-slate-700/40 h-[58px] ${hasNotes(c) ? 'bg-indigo-50/70 dark:bg-indigo-950/20' : ''}">
+                    <td class="py-3 px-4 font-semibold text-slate-900 dark:text-white w-1/4 truncate">${c.name}</td>
                     <td class="py-3 px-4 text-xs space-y-0.5 w-1/4 truncate">
-                        <div class="text-slate-600 dark:text-slate-300">${c.email}</div>
-                        <div class="text-slate-400">${c.phone}</div>
+                        <div class="text-slate-800 dark:text-slate-200 font-semibold">${c.email}</div>
+                        <div class="text-slate-600 dark:text-slate-400 font-medium">${c.phone}</div>
                     </td>
                     <td class="py-3 px-4 w-1/6">
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
                             ${c.sheet}
                         </span>
                     </td>
                     <td class="py-3 px-4 w-1/6">
                         ${renderStatusBadge(c.status)}
                     </td>
-                    <td class="py-3 px-4 text-xs text-slate-600 dark:text-slate-300 truncate" title="${c.notes}">
-                        ${hasNotes(c) ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
+                    <td class="py-3 px-4 text-xs text-slate-800 dark:text-slate-300 font-medium truncate" title="${c.notes}">
+                        ${hasNotes(c) ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
                 </tr>
             `).join('');
@@ -1049,15 +1043,15 @@
                 if (hasOptions) {
                     customHeadersHtml += `
                         <th class="py-3 px-4 relative">
-                            <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('colFilter_${cleanId(colName)}')">
+                            <div class="flex items-center justify-between cursor-pointer font-bold text-slate-800 dark:text-slate-200" onclick="toggleDropdown('colFilter_${cleanId(colName)}')">
                                 <span>${colName}</span>
-                                <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-500"></i>
+                                <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
                             </div>
-                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case">
-                                <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
-                                <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
-                                <hr class="border-slate-200 dark:border-slate-700 my-2">
-                                <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2">
+                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-medium">
+                                <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block font-semibold"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
+                                <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block mb-2 font-semibold"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
+                                <hr class="border-slate-300 dark:border-slate-700 my-2">
+                                <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2 font-medium">
                                 <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="customColOptions_${cleanId(colName)}"></div>
                                 <button onclick="applyColumnFilter('custom_${cleanId(colName)}')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-semibold">OK</button>
                             </div>
@@ -1065,7 +1059,7 @@
                     `;
                 } else {
                     customHeadersHtml += `
-                        <th class="py-3 px-4">
+                        <th class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">
                             <span>${colName}</span>
                         </th>
                     `;
@@ -1076,32 +1070,32 @@
                 <th class="py-3 px-4 w-10 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer">
                 </th>
-                <th class="py-3 px-4">Nombre / Referido</th>
-                <th class="py-3 px-4">Contacto</th>
-                <th class="py-3 px-4 relative">
+                <th class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">Nombre / Referido</th>
+                <th class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">Contacto</th>
+                <th class="py-3 px-4 relative font-bold text-slate-800 dark:text-slate-200">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
-                        <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-500"></i>
+                        <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
                     </div>
-                    <div id="statusFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case">
-                        <button onclick="sortData('status', 'asc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
-                        <button onclick="sortData('status', 'desc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
-                        <hr class="border-slate-200 dark:border-slate-700 my-2">
-                        <input type="text" onkeyup="filterMenuOptions('statusFilter', this.value)" placeholder="Buscar estatus..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2">
+                    <div id="statusFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-medium">
+                        <button onclick="sortData('status', 'asc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block font-semibold"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
+                        <button onclick="sortData('status', 'desc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block mb-2 font-semibold"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
+                        <hr class="border-slate-300 dark:border-slate-700 my-2">
+                        <input type="text" onkeyup="filterMenuOptions('statusFilter', this.value)" placeholder="Buscar estatus..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2 font-medium">
                         <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="statusOptions"></div>
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-semibold">OK</button>
                     </div>
                 </th>
                 ${customHeadersHtml}
-                <th class="py-3 px-4">Notas / Seguimiento</th>
-                <th class="py-3 px-4 text-center">Acciones</th>
+                <th class="py-3 px-4 font-bold text-slate-800 dark:text-slate-200">Notas / Seguimiento</th>
+                <th class="py-3 px-4 text-center font-bold text-slate-800 dark:text-slate-200">Acciones</th>
             `;
 
             buildFilterMenus();
 
             if (data.length === 0) {
                 const totalCols = 5 + customCols.length;
-                tbody.innerHTML = `<tr><td colspan="${totalCols}" class="text-center py-8 text-slate-400">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${totalCols}" class="text-center py-8 text-slate-500 font-semibold">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
                 return;
             }
 
@@ -1109,14 +1103,14 @@
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
                 return `
-                <tr class="hover:bg-slate-100 dark:hover:bg-slate-700/35 transition border-b border-slate-200 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/50 dark:bg-indigo-900/30' : (candHasNotes ? 'bg-indigo-50/30 dark:bg-indigo-950/20' : '')}">
+                <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-700/35 transition border-b border-slate-300 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/60 dark:bg-indigo-900/30' : (candHasNotes ? 'bg-indigo-50/70 dark:bg-indigo-950/20' : '')}">
                     <td class="py-3.5 px-4 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3.5 px-4 font-medium">${c.name}</td>
+                    <td class="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">${c.name}</td>
                     <td class="py-3.5 px-4 text-xs space-y-0.5">
-                        <div class="text-slate-600 dark:text-slate-300"><i class="fa-regular fa-envelope mr-1 text-slate-400"></i>${c.email}</div>
-                        <div class="text-slate-400"><i class="fa-solid fa-phone mr-1 text-slate-400"></i>${c.phone}</div>
+                        <div class="text-slate-800 dark:text-slate-200 font-semibold"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
+                        <div class="text-slate-600 dark:text-slate-400 font-medium"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
                     </td>
                     <td class="py-3.5 px-4">
                         ${renderStatusBadge(c.status)}
@@ -1126,13 +1120,13 @@
                         const options = catObj.columns[colName] || [];
                         const hasOpts = options.length > 0;
                         return `
-                            <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300">
+                            <td class="py-3.5 px-4 text-xs text-slate-800 dark:text-slate-300 font-medium">
                                 ${hasOpts ? renderOptionBadge(val) : val}
                             </td>
                         `;
                     }).join('')}
-                    <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${c.notes}">
-                        ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
+                    <td class="py-3.5 px-4 text-xs text-slate-800 dark:text-slate-300 font-medium max-w-xs truncate" title="${c.notes}">
+                        ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
                     <td class="py-3.5 px-4 text-center">
                         <div class="inline-flex items-center justify-center space-x-2">
@@ -1141,28 +1135,28 @@
                             </a>
 
                             <div class="relative">
-                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
+                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
                                     <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                                 </button>
 
-                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-2xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
-                                    <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-2">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
-                                        <div class="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                                            <i class="fa-regular fa-clock text-indigo-500 mr-1"></i> <strong>Creado:</strong> ${formatDate(c.createdAt)}
+                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-2xl shadow-2xl p-3 w-64 z-50 text-left normal-case font-medium">
+                                    <div class="border-b border-slate-300 dark:border-slate-700 pb-2 mb-2">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Información de Registro</span>
+                                        <div class="text-xs text-slate-800 dark:text-slate-300 mt-1">
+                                            <i class="fa-regular fa-clock text-indigo-600 dark:text-indigo-400 mr-1"></i> <strong>Creado:</strong> ${formatDate(c.createdAt)}
                                         </div>
                                         ${c.updatedAt ? `
-                                        <div class="text-[11px] text-slate-400 mt-0.5">
-                                            <i class="fa-solid fa-rotate-right text-slate-400 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
+                                        <div class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                                            <i class="fa-solid fa-rotate-right text-slate-500 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
                                         </div>` : ''}
                                     </div>
 
                                     <div class="space-y-1">
-                                        <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-2 px-2.5 rounded-xl hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition font-medium">
+                                        <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-2 px-2.5 rounded-xl hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition font-semibold">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                             <span>Editar Candidato</span>
                                         </button>
-                                        <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-2 px-2.5 rounded-xl hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition font-medium">
+                                        <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-2 px-2.5 rounded-xl hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition font-semibold">
                                             <i class="fa-solid fa-trash-can"></i>
                                             <span>Eliminar Candidato</span>
                                         </button>
@@ -1232,23 +1226,23 @@
 
             const container = document.getElementById('exportColumnsCheckboxContainer');
             let html = `
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                     <input type="checkbox" value="name" checked class="export-col-check rounded theme-input">
                     <span>Nombre Completo</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                     <input type="checkbox" value="email" checked class="export-col-check rounded theme-input">
                     <span>Correo Electrónico</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                     <input type="checkbox" value="phone" checked class="export-col-check rounded theme-input">
                     <span>Número Teléfono</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                     <input type="checkbox" value="sheet" checked class="export-col-check rounded theme-input">
                     <span>Pestaña (Categoría)</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                     <input type="checkbox" value="status" checked class="export-col-check rounded theme-input">
                     <span>Estatus</span>
                 </label>
@@ -1256,7 +1250,7 @@
 
             customCols.forEach(colName => {
                 html += `
-                    <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                         <input type="checkbox" value="custom_${colName}" checked class="export-col-check rounded theme-input">
                         <span>${colName}</span>
                     </label>
@@ -1264,11 +1258,11 @@
             });
 
             html += `
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold">
                     <input type="checkbox" value="notes" checked class="export-col-check rounded theme-input">
                     <span>Notas / Detalles</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 sm:col-span-2 border-t border-slate-200 dark:border-slate-800 pt-2 mt-1 py-1">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 sm:col-span-2 border-t border-slate-300 dark:border-slate-800 pt-2 mt-1 py-1 font-semibold">
                     <input type="checkbox" value="createdAt" checked class="export-col-check rounded theme-input">
                     <span>Fecha de Registro</span>
                 </label>
@@ -1499,7 +1493,7 @@
                 renderModalCustomFields(selectedSheet, customFields);
             } else {
                 const statusSelect = document.getElementById('inputStatus');
-                statusSelect.innerHTML = `<option value="" disabled selected>-- Seleccionar Estatus --</option>`;
+                statusSelect.innerHTML = `<option value="" selected>-- Seleccionar Estatus (Opcional) --</option>`;
                 statusSelect.disabled = true;
                 document.getElementById('modalCustomFieldsContainer').innerHTML = '';
             }
@@ -1516,7 +1510,7 @@
             const statusSelect = document.getElementById('inputStatus');
 
             if (!currentSheet) {
-                statusSelect.innerHTML = `<option value="" disabled selected>-- Seleccionar Estatus --</option>`;
+                statusSelect.innerHTML = `<option value="" selected>-- Seleccionar Estatus (Opcional) --</option>`;
                 statusSelect.disabled = true;
                 return;
             }
@@ -1525,11 +1519,13 @@
             const statuses = catObj ? catObj.statuses : ['General'];
 
             statusSelect.disabled = false;
-            statusSelect.innerHTML = `<option value="" disabled selected>-- Seleccionar Estatus --</option>` + 
+            statusSelect.innerHTML = `<option value="">-- Sin Estatus Específico --</option>` + 
                 statuses.map(st => `<option value="${st}">${st}</option>`).join('');
 
             if (selectedStatus && statuses.includes(selectedStatus)) {
                 statusSelect.value = selectedStatus;
+            } else {
+                statusSelect.value = "";
             }
         };
 
@@ -1547,8 +1543,8 @@
                 if (options.length > 0) {
                     return `
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">${colName}</label>
-                            <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">${colName}</label>
+                            <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium" data-colname="${colName}">
                                 <option value="" disabled ${!val ? 'selected' : ''}>-- Seleccionar ${colName} --</option>
                                 ${options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                             </select>
@@ -1557,8 +1553,8 @@
                 } else {
                     return `
                         <div>
-                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">${colName}</label>
-                            <input type="text" id="customField_${cleanId(colName)}" value="${val}" placeholder="Escribe ${colName}..." class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">${colName}</label>
+                            <input type="text" id="customField_${cleanId(colName)}" value="${val}" placeholder="Escribe ${colName}..." class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium" data-colname="${colName}">
                         </div>
                     `;
                 }
@@ -1606,7 +1602,7 @@
             if (existingDuplicate) {
                 showAlert(
                     "¡Candidato Ya Registrado!",
-                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente se encuentra registrado en la categoría <span class="text-indigo-500 font-bold">${existingDuplicate.sheet}</span> con el estatus <strong>${existingDuplicate.status}</strong>.`,
+                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente se encuentra registrado en la categoría <span class="text-indigo-600 dark:text-indigo-400 font-bold">${existingDuplicate.sheet}</span> con el estatus <strong>${existingDuplicate.status}</strong>.`,
                     "danger"
                 );
                 return;
@@ -1624,7 +1620,7 @@
                 email: document.getElementById('inputEmail').value.trim(),
                 phone: rawPhone,
                 sheet: sheetVal,
-                status: statusVal || '-',
+                status: statusVal ? statusVal : '-',
                 notes: document.getElementById('inputNotes').value.trim(),
                 customFields: customFieldsData,
                 updatedAt: nowIso
@@ -1685,22 +1681,22 @@
 
             let html = `
                 <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2 bg-indigo-500/5 border-indigo-500/25">
-                    <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-tag"><span>Estatus</span></i> <span class="text-[10px] bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded-full">Columna Principal</span></span>
+                    <div class="flex items-center justify-between font-bold text-indigo-700 dark:text-indigo-400">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-tag"><span>Estatus</span></i> <span class="text-[10px] bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full">Columna Principal</span></span>
                     </div>
                     <div class="flex flex-wrap gap-2 pt-1">
                         ${catObj.statuses.map(st => {
                             const currentColor = statusColorsMap[st] || '#6366f1';
                             return `
-                                <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative">
-                                    <span class="font-medium">${st}</span>
+                                <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative font-medium">
+                                    <span>${st}</span>
                                     <div class="flex items-center gap-1.5">
                                         <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleColorPalette('status_${cleanId(st)}', event)" title="Cambiar Color"></div>
-                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1 text-sm"></i>
+                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-500 hover:text-rose-500 cursor-pointer ml-1 text-sm"></i>
                                     </div>
                                     
                                     <div id="palette_status_${cleanId(st)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
-                                        <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                        <div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Paleta de Colores</div>
                                         <div class="grid grid-cols-6 gap-2 mb-2">
                                             ${PRESET_SWATCHES.map(hex => `
                                                 <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
@@ -1711,8 +1707,8 @@
                             `;
                         }).join('')}
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                        <input type="text" id="modalNewStatusInput" placeholder="Añadir estatus (ej. Pending)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full">
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-300 dark:border-slate-800">
+                        <input type="text" id="modalNewStatusInput" placeholder="Añadir estatus (ej. Pending)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full font-medium">
                         <button onclick="addStatusToTab()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-semibold shadow-sm">+ Estatus</button>
                     </div>
                 </div>
@@ -1722,23 +1718,23 @@
                 const options = cols[colName] || [];
                 html += `
                     <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2">
-                        <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
+                        <div class="flex items-center justify-between font-bold text-indigo-700 dark:text-indigo-400">
                             <span class="flex items-center gap-2"><i class="fa-solid fa-columns"></i><span>${colName}</span></span>
                             <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px] font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                         <div class="flex flex-wrap gap-1.5 items-center pt-1">
-                            ${options.length === 0 ? `<span class="text-slate-400 text-[11px] italic">Añade opciones para filtrar (ej. Yes, No)</span>` : options.map(opt => {
+                            ${options.length === 0 ? `<span class="text-slate-500 dark:text-slate-400 text-[11px] italic font-medium">Añade opciones para filtrar (ej. Yes, No)</span>` : options.map(opt => {
                                 const currentColor = statusColorsMap[opt] || '#64748b';
                                 return `
-                                    <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative">
-                                        <span class="font-medium">${opt}</span>
+                                    <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative font-medium">
+                                        <span>${opt}</span>
                                         <div class="flex items-center gap-1.5">
                                             <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleColorPalette('opt_${cleanId(colName)}_${cleanId(opt)}', event)" title="Cambiar Color"></div>
-                                            <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 text-sm"></i>
+                                            <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 text-sm text-slate-500"></i>
                                         </div>
 
                                         <div id="palette_opt_${cleanId(colName)}_${cleanId(opt)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
-                                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                            <div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Paleta de Colores</div>
                                             <div class="grid grid-cols-6 gap-2 mb-2">
                                                 ${PRESET_SWATCHES.map(hex => `
                                                     <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${opt}', '${hex}')"></div>
@@ -1749,8 +1745,8 @@
                                 `;
                             }).join('')}
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full">
+                        <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-300 dark:border-slate-800">
+                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full font-medium">
                             <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-semibold shadow-sm">+ Opción</button>
                         </div>
                     </div>
@@ -1841,19 +1837,19 @@
         function renderConfigTree() {
             const treeContainer = document.getElementById('configPipelineTree');
             treeContainer.innerHTML = pipelineList.map((item, index) => `
-                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl p-3.5 space-y-2">
+                <div class="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700/80 rounded-xl p-3.5 space-y-2">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <div class="flex items-center gap-2.5">
                             <div class="flex flex-col gap-0.5">
-                                <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-500 text-xs p-1"'} title="Subir">▲</button>
-                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === pipelineList.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-500 text-xs p-1"'} title="Bajar">▼</button>
+                                <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-600 dark:hover:text-indigo-400 text-xs p-1 font-bold"'} title="Subir">▲</button>
+                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === pipelineList.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-600 dark:hover:text-indigo-400 text-xs p-1 font-bold"'} title="Bajar">▼</button>
                             </div>
-                            <span class="font-bold text-indigo-600 dark:text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${item.name}</span>
+                            <span class="font-bold text-indigo-700 dark:text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${item.name}</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto justify-end">
-                            <button onclick="openTabEditModal('${item.name}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-800 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/10 font-semibold"><i class="fa-solid fa-sliders mr-1"></i>Configurar</button>
-                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-xs px-2.5 py-1.5 rounded-lg bg-indigo-500/10 font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i>Renombrar</button>
-                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-500 hover:text-rose-700 text-xs px-2.5 py-1.5 rounded-lg bg-rose-500/10 font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                            <button onclick="openTabEditModal('${item.name}')" class="text-sky-700 dark:text-sky-400 hover:text-sky-900 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/10 font-semibold"><i class="fa-solid fa-sliders mr-1"></i>Configurar</button>
+                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 text-xs px-2.5 py-1.5 rounded-lg bg-indigo-500/10 font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i>Renombrar</button>
+                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-600 dark:text-rose-400 hover:text-rose-800 text-xs px-2.5 py-1.5 rounded-lg bg-rose-500/10 font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                     </div>
                 </div>
