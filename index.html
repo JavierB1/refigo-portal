@@ -46,6 +46,7 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .theme-card {
@@ -71,7 +72,7 @@
 
         .dropdown-menu { display: none; }
         .dropdown-menu.active { display: block; }
-        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+        .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
         .carousel-viewport {
             max-height: 295px;
@@ -93,6 +94,7 @@
             cursor: pointer;
         }
 
+        /* Estilo Illustrator Color Swatch Picker */
         .color-swatch {
             width: 24px;
             height: 24px;
@@ -113,125 +115,134 @@
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
+    <!-- STREAMING_CHUNK:Initializing overlay and responsive sidebar structure -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 theme-sidebar border-r z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-5 shadow-2xl">
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 max-w-[85vw] theme-sidebar border-r z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-4 sm:p-5 shadow-2xl">
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-700">
                 <div class="flex items-center space-x-3">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white font-bold text-lg shadow-md shadow-indigo-600/30">
-                        <i class="fa-solid fa-users-viewfinder"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-base">RefiGo Portal</h2>
-                        <span class="text-xs text-slate-500 dark:text-slate-400">Categorías & Flujos</span>
+                    <label for="logoFileInput" id="sidebarLogoBox" class="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-600/35 overflow-hidden cursor-pointer relative group flex-shrink-0" title="Haz clic para subir tu logo">
+                        <i id="sidebarLogoIcon" class="fa-solid fa-users-viewfinder"></i>
+                        <img id="sidebarLogoImg" class="w-full h-full object-cover hidden" alt="Logo">
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-[10px] text-white font-medium">Subir</div>
+                    </label>
+                    <div class="min-w-0">
+                        <h2 class="font-bold text-base truncate">RefiGo Portal</h2>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">Gestión de Talento</span>
                     </div>
                 </div>
-                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg p-1">
+                <button onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xl p-2">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Menú de Categorías -->
-            <div class="space-y-1" id="sidebarCategoriesContainer">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-2">Segmentación</span>
+            <!-- Menú de Categorías adaptado a móvil vertical -->
+            <div class="space-y-1.5" id="sidebarCategoriesContainer">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 block mb-1">Segmentación</span>
                 
-                <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 active" data-sheet="ALL">
+                <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 active" data-sheet="ALL">
                     <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Dashboard General</span>
-                    <span id="sideCountAll" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
+                    <span id="sideCountAll" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">0</span>
                 </button>
-                <div id="dynamicSidebarCategories" class="space-y-1"></div>
+                <div id="dynamicSidebarCategories" class="space-y-1.5"></div>
             </div>
         </div>
 
-        <div class="space-y-3">
-            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs py-2.5 px-3 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 transition font-medium">
-                <i class="fa-solid fa-sliders text-indigo-500"></i>
-                <span>⚙️ Gestión Global de Pestañas</span>
+        <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 transition font-semibold shadow-sm">
+                <i class="fa-solid fa-sliders text-indigo-500 text-sm"></i>
+                <span>⚙️ Gestión Global y Logo</span>
             </button>
-            <div class="border-t border-slate-200 dark:border-slate-700 pt-3 text-[11px] text-slate-400 text-center">
+            <div class="text-[11px] text-slate-400 text-center pb-2">
                 RefiGo Cloud DB • Sincronizado
             </div>
         </div>
     </aside>
 
+    <!-- Input file oculto para cargar el logo -->
+    <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+
+    <!-- STREAMING_CHUNK:Configuring responsive header layout -->
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600">
-                    <i class="fa-solid fa-bars text-indigo-500 dark:text-indigo-400"></i>
-                    <span>Categorías</span>
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
+                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-white p-2.5 sm:px-3 sm:py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600 flex-shrink-0" title="Abrir Menú">
+                    <i class="fa-solid fa-bars text-indigo-500 dark:text-indigo-400 text-base"></i>
+                    <span class="hidden md:inline">Categorías</span>
                 </button>
 
-                <div>
-                    <h1 class="text-base font-bold tracking-wide">RefiGo Portal</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400" id="currentCategoryLabel">Vista: Dashboard General (Demostración)</p>
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-base font-bold tracking-wide truncate">RefiGo Portal</h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="currentCategoryLabel">Dashboard General</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600" title="Cambiar Tema">
-                    <i id="themeIcon" class="fa-solid fa-moon text-indigo-500"></i>
-                    <span id="themeLabel" class="hidden sm:inline">Modo Oscuro</span>
+            <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 p-2.5 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600" title="Cambiar Tema">
+                    <i id="themeIcon" class="fa-solid fa-moon text-indigo-500 text-sm"></i>
+                    <span id="themeLabel" class="hidden lg:inline">Modo Oscuro</span>
                 </button>
 
-                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold px-3 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-md shadow-emerald-600/20">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span class="hidden sm:inline">+ Nuevo Candidato</span>
+                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-emerald-600/20" title="Nuevo Candidato">
+                    <i class="fa-solid fa-user-plus text-sm"></i>
+                    <span class="hidden sm:inline">Nuevo</span>
                 </button>
-                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold px-3 py-2 rounded-lg transition duration-200 flex items-center space-x-2 shadow-md shadow-indigo-600/20">
-                    <i class="fa-solid fa-file-import"></i>
-                    <span class="hidden sm:inline">Cargar Excel</span>
+                
+                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-indigo-600/20" title="Cargar Excel">
+                    <i class="fa-solid fa-file-import text-sm"></i>
+                    <span class="hidden md:inline">Excel</span>
                     <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden">
                 </label>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+    <!-- STREAMING_CHUNK:Building fluid and vertical-friendly main views -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
 
-        <!-- Métricas Principales -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="theme-card border rounded-xl p-4 shadow-sm">
-                <span class="text-xs font-semibold uppercase text-slate-400">Total Candidatos</span>
-                <div id="metricTotal" class="text-2xl font-bold mt-1">0</div>
+        <!-- Métricas Principales (Grid adaptable a celulares verticales) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Total Candidatos</span>
+                <div id="metricTotal" class="text-xl sm:text-2xl font-bold mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-xl p-4 shadow-sm">
-                <span class="text-xs font-semibold uppercase text-slate-400">Referred</span>
-                <div id="metricReferred" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Referred</span>
+                <div id="metricReferred" class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-xl p-4 shadow-sm">
-                <span class="text-xs font-semibold uppercase text-slate-400">Cold</span>
-                <div id="metricCold" class="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Cold</span>
+                <div id="metricCold" class="text-xl sm:text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-xl p-4 shadow-sm">
-                <span class="text-xs font-semibold uppercase text-slate-400">Rejected / No Ref.</span>
-                <div id="metricOther" class="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block truncate">Rejected / Other</span>
+                <div id="metricOther" class="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
             </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <div class="relative w-full sm:w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            <div class="relative w-full lg:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
                 <input type="text" id="globalSearch" placeholder="Buscar por nombre, correo, cel..." 
-                       class="w-full theme-input border text-sm rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition">
+                       class="w-full theme-input border text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 transition shadow-sm">
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <button id="exportSelectedBtn" onclick="openExportModal()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-lg transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
+                <button id="exportSelectedBtn" onclick="openExportModal()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
                     <i class="fa-solid fa-file-export"></i>
-                    <span>Exportar Seleccionados (<strong id="selectedCountLabel">0</strong>)</span>
+                    <span>Exportar (<strong id="selectedCountLabel">0</strong>)</span>
                 </button>
 
-                <div class="relative flex items-center theme-card border rounded-lg px-3 py-1.5 text-xs">
-                    <i class="fa-regular fa-calendar text-indigo-500 mr-2"></i>
-                    <span class="text-slate-400 mr-2 hidden md:inline">Filtrar Fecha:</span>
-                    <input type="date" id="dateFilterInput" class="bg-transparent focus:outline-none text-xs cursor-pointer">
+                <div class="relative flex items-center theme-card border rounded-xl px-3 py-2 text-xs shadow-sm flex-1 sm:flex-initial">
+                    <i class="fa-regular fa-calendar text-indigo-500 mr-2 flex-shrink-0"></i>
+                    <span class="text-slate-400 mr-2 hidden sm:inline">Fecha:</span>
+                    <input type="date" id="dateFilterInput" class="bg-transparent focus:outline-none text-xs cursor-pointer w-full">
                 </div>
-                <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-500 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 transition" title="Quitar filtro de fecha">
+                <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-500 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition flex-shrink-0" title="Quitar fecha">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
-                <button id="clearAllFiltersBtn" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 transition flex items-center gap-2">
+                <button id="clearAllFiltersBtn" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center gap-2 shadow-sm flex-1 sm:flex-initial justify-center">
                     <i class="fa-solid fa-filter-circle-xmark"></i>
                     <span>Limpiar Todo</span>
                 </button>
@@ -239,10 +250,10 @@
         </div>
 
         <!-- Dashboard General View -->
-        <div id="dashboardView" class="theme-card border rounded-xl shadow-sm overflow-visible relative">
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
+        <div id="dashboardView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
+            <div class="p-3.5 sm:p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 bg-slate-50 dark:bg-slate-900/40 rounded-t-2xl">
                 <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
-                <span class="text-xs text-slate-400">Para gestionar registros, selecciona una categoría en el menú lateral.</span>
+                <span class="text-[11px] text-slate-400">Selecciona una categoría en el menú lateral para interactuar.</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
@@ -263,16 +274,13 @@
                     </tbody>
                 </table>
             </div>
-            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center rounded-b-xl">
+            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center rounded-b-2xl">
                 <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-600 dark:text-slate-200">0</strong></span>
             </div>
         </div>
 
-        <!-- Category Table Independent View (Limpia, sin botones flotantes de edición) -->
-        <div id="categoryView" class="theme-card border rounded-xl shadow-sm overflow-visible relative hidden">
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
-                <span id="activeCategoryHeaderTitle" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Gestión de Categoría</span>
-            </div>
+        <!-- Category Table Independent View -->
+        <div id="categoryView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative hidden">
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
@@ -284,44 +292,45 @@
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center rounded-b-xl">
+            <div class="px-4 py-3 bg-slate-50 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex justify-between items-center rounded-b-2xl">
                 <span>Mostrando <strong id="visibleCount" class="text-indigo-600 dark:text-slate-200">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-600 dark:text-slate-200">0</strong> en esta categoría</span>
             </div>
         </div>
 
     </main>
 
+    <!-- STREAMING_CHUNK:Configuring modals for candidates, configuration and logo upload -->
     <!-- Modal Candidate Add/Edit -->
-    <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-        <div class="theme-card border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+    <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-lg" id="modalTitle">Nuevo Candidato</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-base sm:text-lg" id="modalTitle">Nuevo Candidato</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nombre Completo</label>
-                    <input type="text" id="inputName" class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="inputName" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Correo <span class="text-rose-500">*</span></label>
-                        <input type="email" id="inputEmail" required class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                        <input type="email" id="inputEmail" required class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Número (Prefijo +503) <span class="text-rose-500">*</span></label>
-                        <input type="text" id="inputPhone" required placeholder="+503 " class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="inputPhone" required placeholder="+503 " class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
-                        <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500">
+                        <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500">
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Estatus <span class="text-rose-500">*</span></label>
-                        <select id="inputStatus" disabled class="w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50">
+                        <select id="inputStatus" disabled class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50">
                         </select>
                     </div>
                 </div>
@@ -329,132 +338,150 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Notas / Detalle</label>
-                    <textarea id="inputNotes" rows="3" class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500"></textarea>
+                    <textarea id="inputNotes" rows="3" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm"></textarea>
                 </div>
             </div>
             <div class="flex justify-end space-x-2 border-t border-slate-200 dark:border-slate-700 pt-3">
-                <button onclick="saveCandidate()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg flex items-center gap-2">
-                    <i class="fa-solid fa-floppy-disk"></i>
+                <button onclick="saveCandidate()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-floppy-disk text-sm"></i>
                     <span>Guardar en Nube</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Configuración Global -->
-    <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-        <div class="theme-card border rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
+    <!-- Modal Configuración General & Logo Uploader -->
+    <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestión Global de Pestañas</h3>
-                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestión Global y Logo</h3>
+                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 space-y-2">
-                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">1. Agregar Nueva Pestaña / Categoría</span>
-                    <div class="flex gap-2">
-                        <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="theme-input border rounded-lg p-2 text-xs w-full">
-                        <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Crear</button>
+                <!-- Tarjeta para subir el Logo con botón explícito -->
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-3">
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block"><i class="fa-solid fa-image mr-1.5"></i> Logo de la Empresa</span>
+                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md overflow-hidden flex-shrink-0 relative">
+                            <i id="modalLogoIconPreview" class="fa-solid fa-users-viewfinder"></i>
+                            <img id="modalLogoImgPreview" class="w-full h-full object-cover hidden" alt="Logo">
+                        </div>
+                        <div class="flex-1 w-full text-center sm:text-left">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Sube el logo corporativo desde tu dispositivo. Se actualizará instantáneamente.</p>
+                            <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition inline-flex items-center gap-2 shadow-sm w-full sm:w-auto justify-center">
+                                <i class="fa-solid fa-upload"></i>
+                                <span>Seleccionar Logo de la PC</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Agregar Nueva Pestaña / Categoría</span>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="theme-input border rounded-xl p-3 text-xs w-full">
+                        <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Crear</button>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase">Estructura & Pestañas Actuales</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estructura & Pestañas Actuales</span>
                     <div id="configPipelineTree" class="space-y-2 text-xs"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Configuración Unificada de Columnas por Pestaña -->
-    <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-4">
-        <div class="theme-card border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+    <!-- Modal de Edición Específica por Pestaña -->
+    <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base flex items-center gap-2">
+                <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate">
                     <i class="fa-solid fa-folder-open text-indigo-500"></i>
-                    <span>Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
+                    <span class="truncate">Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
                 </h3>
-                <button onclick="closeTabEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeTabEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas de la Pestaña</span>
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-3">
+                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400 block tracking-wider">Columnas de esta Pestaña</span>
+                    
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Canal, Región)" class="theme-input border rounded-xl p-3 text-xs w-full">
+                        <button onclick="addColumnToTab()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Columna</button>
                     </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="modalNewColumnInput" placeholder="Añadir nueva columna (ej. Canal, Región)" class="theme-input border rounded-lg p-2 text-xs w-full">
-                        <button onclick="addColumnToTab()" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Columna</button>
-                    </div>
-                    <div id="modalTabColumnsList" class="space-y-3 pt-2"></div>
+
+                    <div id="modalTabColumnsList" class="space-y-3 pt-1"></div>
                 </div>
             </div>
 
-            <div class="flex justify-end pt-2 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="closeTabEditModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">Guardar y Cerrar</button>
+            <div class="flex justify-end pt-3 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="closeTabEditModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl transition shadow-sm">Guardar y Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Exportación Personalizada con Orientación de Página -->
-    <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-4">
-        <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+    <!-- Modal Exportación Personalizada -->
+    <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-base flex items-center gap-2">
                     <i class="fa-solid fa-file-export text-indigo-500"></i>
                     <span>Exportación Personalizada</span>
                 </h3>
-                <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs">
                 <div>
                     <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">1. Formato de Archivo</label>
                     <div class="grid grid-cols-3 gap-2">
-                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
-                            <input type="radio" name="exportFormat" value="xlsx" checked onchange="togglePdfOrientationOption()" class="text-indigo-600 focus:ring-0">
-                            <span class="font-semibold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-file-excel mr-1"></i> Excel</span>
+                        <label class="flex items-center justify-center gap-1.5 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold text-emerald-600 dark:text-emerald-400">
+                            <input type="radio" name="exportFormat" value="xlsx" checked class="text-indigo-600 focus:ring-0">
+                            <span>Excel</span>
                         </label>
-                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
-                            <input type="radio" name="exportFormat" value="csv" onchange="togglePdfOrientationOption()" class="text-indigo-600 focus:ring-0">
-                            <span class="font-semibold text-sky-600 dark:text-sky-400"><i class="fa-solid fa-file-csv mr-1"></i> CSV</span>
+                        <label class="flex items-center justify-center gap-1.5 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold text-sky-600 dark:text-sky-400">
+                            <input type="radio" name="exportFormat" value="csv" class="text-indigo-600 focus:ring-0">
+                            <span>CSV</span>
                         </label>
-                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
-                            <input type="radio" name="exportFormat" value="pdf" onchange="togglePdfOrientationOption()" class="text-indigo-600 focus:ring-0">
-                            <span class="font-semibold text-rose-600 dark:text-rose-400"><i class="fa-solid fa-file-pdf mr-1"></i> PDF</span>
+                        <label class="flex items-center justify-center gap-1.5 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold text-rose-600 dark:text-rose-400">
+                            <input type="radio" name="exportFormat" value="pdf" class="text-indigo-600 focus:ring-0">
+                            <span>PDF</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- Opciones de PDF (Orientación) -->
-                <div id="pdfOrientationWrapper" class="space-y-2 pt-1 border-t border-slate-200 dark:border-slate-700/80 hidden">
-                    <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1">Orientación de Página (PDF)</label>
+                <div id="pdfOrientationContainer">
+                    <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">Orientación de Página (PDF)</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                        <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold">
                             <input type="radio" name="pdfOrientation" value="portrait" checked class="text-indigo-600 focus:ring-0">
-                            <span class="font-semibold"><i class="fa-solid fa-file text-indigo-500 mr-1"></i> Vertical</span>
+                            <span>Vertical</span>
                         </label>
-                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                        <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold">
                             <input type="radio" name="pdfOrientation" value="landscape" class="text-indigo-600 focus:ring-0">
-                            <span class="font-semibold"><i class="fa-solid fa-file-lines text-indigo-500 mr-1"></i> Horizontal</span>
+                            <span>Horizontal</span>
                         </label>
                     </div>
                 </div>
 
                 <div>
                     <div class="flex justify-between items-center mb-2">
-                        <label class="font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">2. Selecciona Columnas a Incluir</label>
-                        <button onclick="toggleAllExportCols(true)" class="text-indigo-500 hover:underline text-[11px]">Marcar Todas</button>
+                        <label class="font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">2. Columnas a Incluir</label>
+                        <button onclick="toggleAllExportCols(true)" class="text-indigo-500 hover:underline text-[11px] font-semibold">Marcar Todas</button>
                     </div>
                     
-                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900/60 p-3 border border-slate-200 dark:border-slate-700/80 rounded-lg max-h-48 overflow-y-auto">
+                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-900/60 p-3 border border-slate-200 dark:border-slate-700/80 rounded-xl max-h-48 overflow-y-auto">
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="closeExportModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 text-xs px-3 py-2 rounded-lg transition">Cancelar</button>
-                <button onclick="executeExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition flex items-center gap-1.5">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-700">
+                <button onclick="closeExportModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 text-xs px-4 py-3 rounded-xl transition">Cancelar</button>
+                <button onclick="executeExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-download"></i>
                     <span>Descargar Archivo</span>
                 </button>
@@ -462,55 +489,58 @@
         </div>
     </div>
 
-    <!-- Modales de Alerta y Confirmación -->
+    <!-- Modal Alerta Personalizada -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
-        <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
                 <i id="alertIcon" class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
-                <h3 id="alertTitle" class="font-bold text-lg">Atención</h3>
+                <h3 id="alertTitle" class="font-bold text-base">Atención</h3>
                 <p id="alertMessage" class="text-xs text-slate-500 dark:text-slate-300 mt-2 leading-relaxed"></p>
             </div>
             <div class="pt-2">
-                <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2.5 rounded-lg transition">Entendido</button>
+                <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md">Entendido</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
-        <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
                 <i class="fa-solid fa-trash-can"></i>
             </div>
             <div>
-                <h3 id="confirmTitle" class="font-bold text-lg">¿Confirmar Acción?</h3>
+                <h3 id="confirmTitle" class="font-bold text-base">¿Confirmar Acción?</h3>
                 <p id="confirmMessage" class="text-xs text-slate-500 dark:text-slate-300 mt-2 leading-relaxed"></p>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-semibold text-xs py-2.5 rounded-lg transition">Cancelar</button>
-                <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs py-2.5 rounded-lg transition shadow-md shadow-rose-600/30">Sí, Eliminar</button>
+                <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-semibold text-xs py-3 rounded-xl transition">Cancelar</button>
+                <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md shadow-rose-600/30">Sí, Eliminar</button>
             </div>
         </div>
     </div>
 
+    <!-- Modal Renombrar Categoría -->
     <div id="renameModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
-        <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>Renombrar Categoría</h3>
-                <button onclick="closeRenameModal(false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="font-bold text-sm"><i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>Renombrar Categoría</h3>
+                <button onclick="closeRenameModal(false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-2">
                 <label class="block text-xs text-slate-400">Nuevo Nombre de Pestaña</label>
-                <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500">
+                <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500">
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs px-3 py-2 rounded-lg transition">Cancelar</button>
-                <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">Guardar Nombre</button>
+                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs px-3 py-2.5 rounded-xl transition">Cancelar</button>
+                <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-sm">Guardar</button>
             </div>
         </div>
     </div>
 
+    <!-- STREAMING_CHUNK:Initializing application runtime logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -543,7 +573,7 @@
         let renameCallback = null;
 
         let pipelineList = [
-            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow Up?': ['Yes', 'No', 'Pending'] } },
+            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: {} },
             { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: {} },
             { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: {} },
             { name: 'No Referred', statuses: ['Pending Audit'], columns: {} }
@@ -595,6 +625,36 @@
                 localStorage.setItem('refigo_theme', 'light');
             }
         };
+
+        // Logo Upload Management (Syncs both sidebar & settings modal previews)
+        window.handleLogoUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Url = e.target.result;
+                localStorage.setItem('refigo_logo', base64Url);
+                applyLogo(base64Url);
+            };
+            reader.readAsDataURL(file);
+        };
+
+        function applyLogo(url) {
+            const sidebarImg = document.getElementById('sidebarLogoImg');
+            const sidebarIcon = document.getElementById('sidebarLogoIcon');
+            const modalImg = document.getElementById('modalLogoImgPreview');
+            const modalIcon = document.getElementById('modalLogoIconPreview');
+
+            if (url) {
+                if(sidebarImg) { sidebarImg.src = url; sidebarImg.classList.remove('hidden'); }
+                if(sidebarIcon) sidebarIcon.classList.add('hidden');
+                if(modalImg) { modalImg.src = url; modalImg.classList.remove('hidden'); }
+                if(modalIcon) modalIcon.classList.add('hidden');
+            }
+        }
+
+        const savedLogo = localStorage.getItem('refigo_logo');
+        if (savedLogo) applyLogo(savedLogo);
 
         window.showAlert = function(title, message, iconType = 'warning') {
             document.getElementById('alertTitle').textContent = title;
@@ -692,9 +752,9 @@
             const container = document.getElementById('dynamicSidebarCategories');
             
             container.innerHTML = pipelineList.map(item => `
-                <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-white transition" data-sheet="${item.name}">
+                <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-white transition" data-sheet="${item.name}">
                     <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-500"></i> ${item.name}</span>
-                    <span id="sideCount_${cleanId(item.name)}" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 rounded-full font-semibold">0</span>
+                    <span id="sideCount_${cleanId(item.name)}" class="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2.5 py-0.5 rounded-full font-semibold">0</span>
                 </button>
             `).join('');
 
@@ -722,12 +782,11 @@
             const categoryView = document.getElementById('categoryView');
 
             if (sheet === 'ALL') {
-                document.getElementById('currentCategoryLabel').textContent = `Vista: Dashboard General (Demostración)`;
+                document.getElementById('currentCategoryLabel').textContent = `Dashboard General`;
                 dashboardView.classList.remove('hidden');
                 categoryView.classList.add('hidden');
             } else {
-                document.getElementById('currentCategoryLabel').textContent = `Categoría Activa: ${sheet}`;
-                document.getElementById('activeCategoryHeaderTitle').textContent = `Categoría: ${sheet}`;
+                document.getElementById('currentCategoryLabel').textContent = `Categoría: ${sheet}`;
                 dashboardView.classList.add('hidden');
                 categoryView.classList.remove('hidden');
             }
@@ -794,12 +853,12 @@
             }
 
             container.innerHTML = `
-                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" checked onchange="toggleSelectAll('status', this.checked)" class="rounded theme-input">
                     <strong>(Select All)</strong>
                 </label>
             ` + allowedStatuses.map(val => `
-                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" checked>
                     <span>${val}</span>
                 </label>
@@ -812,12 +871,12 @@
                         const uniqueVals = catObj.columns[colName] || [];
                         if (uniqueVals.length > 0) {
                             colContainer.innerHTML = `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
                                     <input type="checkbox" checked onchange="toggleSelectAll('custom_${cleanId(colName)}', this.checked)" class="rounded theme-input">
                                     <strong>(Select All)</strong>
                                 </label>
                             ` + uniqueVals.map(val => `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500 py-1">
                                     <input type="checkbox" value="${val}" class="col-check-custom_${cleanId(colName)} rounded theme-input" checked>
                                     <span>${val}</span>
                                 </label>
@@ -908,7 +967,7 @@
         function renderStatusBadge(statusName) {
             const hexColor = statusColorsMap[statusName] || '#6366f1';
             return `
-                <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
+                <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-lg border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
                     ${statusName}
                 </span>
             `;
@@ -1037,13 +1096,13 @@
                                 <span>${colName}</span>
                                 <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-500"></i>
                             </div>
-                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-lg shadow-2xl p-3 w-60 z-50 normal-case">
-                                <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
-                                <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
+                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case">
+                                <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
+                                <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
                                 <hr class="border-slate-200 dark:border-slate-700 my-2">
-                                <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded p-1 text-xs mb-2">
+                                <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2">
                                 <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="customColOptions_${cleanId(colName)}"></div>
-                                <button onclick="applyColumnFilter('custom_${cleanId(colName)}')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
+                                <button onclick="applyColumnFilter('custom_${cleanId(colName)}')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-semibold">OK</button>
                             </div>
                         </th>
                     `;
@@ -1067,13 +1126,13 @@
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-500"></i>
                     </div>
-                    <div id="statusFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-lg shadow-2xl p-3 w-60 z-50 normal-case">
-                        <button onclick="sortData('status', 'asc')" class="w-full text-left text-xs py-1 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
-                        <button onclick="sortData('status', 'desc')" class="w-full text-left text-xs py-1 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
+                    <div id="statusFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case">
+                        <button onclick="sortData('status', 'asc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
+                        <button onclick="sortData('status', 'desc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
                         <hr class="border-slate-200 dark:border-slate-700 my-2">
-                        <input type="text" onkeyup="filterMenuOptions('statusFilter', this.value)" placeholder="Buscar estatus..." class="w-full theme-input border rounded p-1 text-xs mb-2">
+                        <input type="text" onkeyup="filterMenuOptions('statusFilter', this.value)" placeholder="Buscar estatus..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2">
                         <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="statusOptions"></div>
-                        <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
+                        <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-semibold">OK</button>
                     </div>
                 </th>
                 ${customHeadersHtml}
@@ -1093,7 +1152,7 @@
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
                 return `
-                <tr class="hover:bg-slate-100 dark:hover:bg-slate-700/30 transition border-b border-slate-200 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/50 dark:bg-indigo-900/30' : (candHasNotes ? 'bg-indigo-50/30 dark:bg-indigo-950/20' : '')}">
+                <tr class="hover:bg-slate-100 dark:hover:bg-slate-700/35 transition border-b border-slate-200 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/50 dark:bg-indigo-900/30' : (candHasNotes ? 'bg-indigo-50/30 dark:bg-indigo-950/20' : '')}">
                     <td class="py-3.5 px-4 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
@@ -1113,18 +1172,18 @@
                     <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
                     </td>
-                    <td class="py-3.5 px-4 text-center relative">
-                        <div class="flex items-center justify-center gap-3">
-                            <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="Abrir en WhatsApp Web">
-                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <td class="py-3.5 px-4 text-center">
+                        <div class="inline-flex items-center justify-center space-x-2">
+                            <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="WhatsApp">
+                                <i class="fa-brands fa-whatsapp text-base"></i>
                             </a>
 
                             <div class="relative">
-                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
+                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
                                     <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                                 </button>
 
-                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
+                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-2xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
                                     <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-2">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
                                         <div class="text-xs text-slate-600 dark:text-slate-300 mt-1">
@@ -1137,11 +1196,11 @@
                                     </div>
 
                                     <div class="space-y-1">
-                                        <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition">
+                                        <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-2 px-2.5 rounded-xl hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition font-medium">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                             <span>Editar Candidato</span>
                                         </button>
-                                        <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition">
+                                        <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-2 px-2.5 rounded-xl hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition font-medium">
                                             <i class="fa-solid fa-trash-can"></i>
                                             <span>Eliminar Candidato</span>
                                         </button>
@@ -1187,7 +1246,7 @@
             headerCheck.checked = allVisibleSelected;
         }
 
-        function updateExportBtnVisibility() {
+        window.updateExportBtnVisibility = function() {
             const btn = document.getElementById('exportSelectedBtn');
             const countLabel = document.getElementById('selectedCountLabel');
             const count = selectedCandidateIds.size;
@@ -1198,7 +1257,7 @@
             } else {
                 btn.classList.add('hidden');
             }
-        }
+        };
 
         window.openExportModal = function() {
             if (selectedCandidateIds.size === 0) {
@@ -1211,23 +1270,23 @@
 
             const container = document.getElementById('exportColumnsCheckboxContainer');
             let html = `
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="name" checked class="export-col-check rounded theme-input">
                     <span>Nombre Completo</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="email" checked class="export-col-check rounded theme-input">
                     <span>Correo Electrónico</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="phone" checked class="export-col-check rounded theme-input">
                     <span>Número Teléfono</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="sheet" checked class="export-col-check rounded theme-input">
                     <span>Pestaña (Categoría)</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="status" checked class="export-col-check rounded theme-input">
                     <span>Estatus</span>
                 </label>
@@ -1235,7 +1294,7 @@
 
             customCols.forEach(colName => {
                 html += `
-                    <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                         <input type="checkbox" value="custom_${colName}" checked class="export-col-check rounded theme-input">
                         <span>${colName}</span>
                     </label>
@@ -1243,11 +1302,11 @@
             });
 
             html += `
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 py-1">
                     <input type="checkbox" value="notes" checked class="export-col-check rounded theme-input">
                     <span>Notas / Detalles</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 col-span-2 border-t border-slate-200 dark:border-slate-800 pt-1.5 mt-0.5">
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-500 sm:col-span-2 border-t border-slate-200 dark:border-slate-800 pt-2 mt-1 py-1">
                     <input type="checkbox" value="createdAt" checked class="export-col-check rounded theme-input">
                     <span>Fecha de Registro</span>
                 </label>
@@ -1265,14 +1324,9 @@
             document.querySelectorAll('.export-col-check').forEach(cb => cb.checked = isChecked);
         };
 
-        window.togglePdfOrientationOption = function() {
-            const isPdf = document.querySelector('input[name="exportFormat"][value="pdf"]').checked;
-            document.getElementById('pdfOrientationWrapper').classList.toggle('hidden', !isPdf);
-        };
-
         window.executeExport = function() {
             const selectedFormat = document.querySelector('input[name="exportFormat"]:checked').value;
-            const pdfOrientation = document.querySelector('input[name="pdfOrientation"]:checked')?.value || 'portrait';
+            const pdfOrientation = document.querySelector('input[name="pdfOrientation"]:checked').value;
             const selectedCols = Array.from(document.querySelectorAll('.export-col-check:checked')).map(cb => cb.value);
 
             if (selectedCols.length === 0) {
@@ -1333,7 +1387,7 @@
                 document.body.removeChild(link);
             } else if (selectedFormat === 'pdf') {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: pdfOrientation, unit: 'mm', format: 'a4' });
+                const doc = new jsPDF({ orientation: pdfOrientation });
 
                 doc.setFontSize(16);
                 doc.setTextColor(30, 41, 59);
@@ -1341,7 +1395,7 @@
                 
                 doc.setFontSize(9);
                 doc.setTextColor(100, 116, 139);
-                doc.text(`Generado: ${new Date().toLocaleString('es-SV')} | Total Registros: ${exportData.length} | Orientación: ${pdfOrientation === 'landscape' ? 'Horizontal' : 'Vertical'}`, 14, 22);
+                doc.text(`Generado: ${new Date().toLocaleString('es-SV')} | Total Registros: ${exportData.length}`, 14, 22);
 
                 const headers = [selectedCols.map(col => colLabels[col])];
                 const rows = exportData.map(row => Object.values(row));
@@ -1532,7 +1586,7 @@
                     return `
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">${colName}</label>
-                            <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
+                            <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
                                 <option value="" disabled ${!val ? 'selected' : ''}>-- Seleccionar ${colName} --</option>
                                 ${options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                             </select>
@@ -1542,7 +1596,7 @@
                     return `
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">${colName}</label>
-                            <input type="text" id="customField_${cleanId(colName)}" value="${val}" placeholder="Escribe ${colName}..." class="modal-custom-input w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
+                            <input type="text" id="customField_${cleanId(colName)}" value="${val}" placeholder="Escribe ${colName}..." class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
                         </div>
                     `;
                 }
@@ -1664,42 +1718,27 @@
             if (!catObj) return;
 
             const columnsContainer = document.getElementById('modalTabColumnsList');
-            
-            let html = `
-                <!-- Columnas Base / Estructurales -->
-                <div class="theme-card border rounded-lg p-3 space-y-2 border-slate-200 dark:border-slate-700/60 opacity-85">
-                    <div class="flex items-center justify-between font-bold text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider mb-1">
-                        <span><i class="fa-solid fa-table-cells mr-1.5 text-indigo-500"></i> Columnas Base de la Tabla</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 text-xs">
-                        <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium">Nombre / Referido</span>
-                        <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium">Contacto (Correo / Teléfono)</span>
-                        <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-medium">Notas / Seguimiento</span>
-                    </div>
-                </div>
+            const cols = catObj.columns || {};
+            const colNames = Object.keys(cols);
 
-                <!-- Columna Principal: Estatus -->
-                <div class="theme-card border rounded-lg p-3 space-y-2.5 border-indigo-500/40 shadow-sm">
+            let html = `
+                <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2 bg-indigo-500/5 border-indigo-500/20">
                     <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-tag"></i>
-                            <span>Estatus</span>
-                            <span class="text-[10px] font-normal px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-500">Columna Principal</span>
-                        </span>
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-tag"><span>Estatus</span></i> <span class="text-[10px] bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded-full">Columna Principal</span></span>
                     </div>
-                    <div class="flex flex-wrap gap-1.5 items-center">
+                    <div class="flex flex-wrap gap-2 pt-1">
                         ${catObj.statuses.map(st => {
                             const currentColor = statusColorsMap[st] || '#6366f1';
                             return `
-                                <div class="inline-flex items-center gap-1.5 theme-card border px-2.5 py-1 rounded-lg text-[11px] shadow-sm">
-                                    <span class="font-medium" style="color: ${currentColor}">${st}</span>
-                                    <div class="flex items-center gap-1 relative">
-                                        <div class="color-swatch" style="background-color: ${currentColor}; width: 14px; height: 14px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
-                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-0.5"></i>
+                                <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm">
+                                    <span class="font-medium">${st}</span>
+                                    <div class="flex items-center gap-1.5 relative">
+                                        <div class="color-swatch" style="background-color: ${currentColor}; width: 16px; height: 16px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
+                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1 text-sm"></i>
                                         
-                                        <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
+                                        <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-50 w-56">
                                             <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
-                                            <div class="grid grid-cols-6 gap-2 mb-3">
+                                            <div class="grid grid-cols-6 gap-2 mb-2">
                                                 ${PRESET_SWATCHES.map(hex => `
                                                     <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
                                                 `).join('')}
@@ -1710,40 +1749,32 @@
                             `;
                         }).join('')}
                     </div>
-                    <div class="flex gap-1.5 pt-1">
-                        <input type="text" id="newStatusInput" placeholder="Añadir nuevo estatus (ej. Pending)" class="theme-input border rounded px-2.5 py-1.5 text-xs w-full">
-                        <button onclick="addStatusToTabModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-xs whitespace-nowrap font-semibold">+ Estatus</button>
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                        <input type="text" id="modalNewStatusInput" placeholder="Añadir estatus (ej. Pending)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full">
+                        <button onclick="addStatusToTab()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-semibold shadow-sm">+ Estatus</button>
                     </div>
                 </div>
             `;
 
-            // Columnas Personalizadas / Adicionales con su tarjeta idéntica
-            const cols = catObj.columns || {};
-            const colNames = Object.keys(cols);
-
             colNames.forEach(colName => {
                 const options = cols[colName] || [];
                 html += `
-                    <div class="theme-card border rounded-lg p-3 space-y-2.5 shadow-sm">
+                    <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2">
                         <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
-                            <span class="flex items-center gap-2">
-                                <i class="fa-solid fa-columns"></i>
-                               <span>${colName}</span>
-                                <span class="text-[10px] font-normal px-2 py-0.5 rounded bg-sky-500/10 text-sky-500">Columna Personalizada</span>
-                            </span>
-                            <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px]"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar Columna</button>
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-columns"></i><span>${colName}</span></span>
+                            <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px] font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
-                        <div class="flex flex-wrap gap-1.5 items-center">
-                            ${options.length === 0 ? '<span class="text-slate-400 italic text-[11px]">Sin opciones de filtro configuradas.</span>' : options.map(opt => `
-                                <span class="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg text-[11px]">
-                                    <span class="font-medium">${opt}</span>
-                                    <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 ml-0.5"></i>
+                        <div class="flex flex-wrap gap-1.5 items-center pt-1">
+                            ${options.length === 0 ? `<span class="text-slate-400 text-[11px] italic">Sin opciones de filtro (columna libre)</span>` : options.map(opt => `
+                                <span class="inline-flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 px-2.5 py-1 rounded-xl text-xs font-medium">
+                                    ${opt}
+                                    <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500"></i>
                                 </span>
                             `).join('')}
                         </div>
-                        <div class="flex gap-1.5 pt-1">
-                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción de filtro (ej. Yes, No)" class="theme-input border rounded px-2.5 py-1.5 text-xs w-full">
-                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded text-xs whitespace-nowrap font-semibold">+ Opción</button>
+                        <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full">
+                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-semibold shadow-sm">+ Opción</button>
                         </div>
                     </div>
                 `;
@@ -1752,9 +1783,9 @@
             columnsContainer.innerHTML = html;
         }
 
-        window.addStatusToTabModal = async function() {
-            const input = document.getElementById('newStatusInput');
-            const stName = input ? input.value.trim() : '';
+        window.addStatusToTab = async function() {
+            const input = document.getElementById('modalNewStatusInput');
+            const stName = input.value.trim();
             if (!editingTabName || !stName) return;
 
             const catObj = pipelineList.find(i => i.name === editingTabName);
@@ -1762,7 +1793,7 @@
                 catObj.statuses.push(stName);
                 if (!statusColorsMap[stName]) statusColorsMap[stName] = '#6366f1';
                 await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                if (input) input.value = '';
+                input.value = '';
                 renderTabEditModalContents();
             }
         };
@@ -1785,7 +1816,7 @@
             if (catObj) {
                 if (!catObj.columns) catObj.columns = {};
                 if (!catObj.columns[colName]) {
-                    catObj.columns[colName] = [];
+                    catObj.columns[colName] = []; 
                     await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
                     input.value = '';
                     renderTabEditModalContents();
@@ -1832,19 +1863,19 @@
         function renderConfigTree() {
             const treeContainer = document.getElementById('configPipelineTree');
             treeContainer.innerHTML = pipelineList.map((item, index) => `
-                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg p-3 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
+                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl p-3.5 space-y-2">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
                             <div class="flex flex-col gap-0.5">
-                                <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-500 text-[10px]"'} title="Subir orden">▲</button>
-                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === pipelineList.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-500 text-[10px]"'} title="Bajar orden">▼</button>
+                                <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-500 text-xs p-1"'} title="Subir">▲</button>
+                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === pipelineList.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-500 text-xs p-1"'} title="Bajar">▼</button>
                             </div>
                             <span class="font-bold text-indigo-600 dark:text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${item.name}</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="openTabEditModal('${item.name}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-800 text-xs px-2 py-1 rounded bg-sky-500/10 font-semibold"><i class="fa-solid fa-sliders mr-1"></i>Editar Pestaña</button>
-                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-xs px-2 py-1 rounded bg-indigo-500/10"><i class="fa-solid fa-pen-to-square mr-1"></i>Renombrar</button>
-                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded bg-rose-500/10"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                        <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto justify-end">
+                            <button onclick="openTabEditModal('${item.name}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-800 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/10 font-semibold"><i class="fa-solid fa-sliders mr-1"></i>Configurar</button>
+                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-xs px-2.5 py-1.5 rounded-lg bg-indigo-500/10 font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i>Renombrar</button>
+                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-500 hover:text-rose-700 text-xs px-2.5 py-1.5 rounded-lg bg-rose-500/10 font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                     </div>
                 </div>
