@@ -268,7 +268,7 @@
             </div>
         </div>
 
-        <!-- Category Table Independent View (Sin el botón de edición flotante en la tabla) -->
+        <!-- Category Table Independent View (Sin botones flotantes de edición) -->
         <div id="categoryView" class="theme-card border rounded-xl shadow-sm overflow-visible relative hidden">
             <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
                 <span id="activeCategoryHeaderTitle" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Gestión de Categoría</span>
@@ -366,7 +366,7 @@
         </div>
     </div>
 
-    <!-- Modal de Edición Específica por Pestaña (Gestor Maestro) -->
+    <!-- Modal de Edición Específica por Pestaña (Gestor Maestro Unificado) -->
     <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-4">
         <div class="theme-card border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -378,18 +378,7 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
-                <!-- Columnas Fijas e Informativas de la Tabla -->
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
-                    <span class="font-bold uppercase text-slate-400 tracking-wider">Columnas Fijas de la Tabla</span>
-                    <div class="flex flex-wrap gap-1.5 pt-1">
-                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Nombre / Referido</span>
-                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Contacto (Correo / Teléfono)</span>
-                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Estatus</span>
-                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Notas / Seguimiento</span>
-                    </div>
-                </div>
-
-                <!-- Estatus -->
+                <!-- Estatus de esta Pestaña -->
                 <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
                     <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Estatus de esta Pestaña</span>
                     <div class="flex gap-2">
@@ -399,11 +388,13 @@
                     <div id="modalTabStatusesList" class="flex flex-wrap gap-2 pt-1"></div>
                 </div>
 
-                <!-- Columnas Personalizadas con Opciones/Valores -->
+                <!-- Columnas Unificadas (Todas manejadas por igual con sus opciones) -->
                 <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
-                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas Personalizadas y sus Filtros</span>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas de la Pestaña</span>
+                    </div>
                     <div class="flex gap-2">
-                        <input type="text" id="modalNewColumnInput" placeholder="Columna (ej. Follow Up?, Canal)" class="theme-input border rounded-lg p-2 text-xs w-full">
+                        <input type="text" id="modalNewColumnInput" placeholder="Nombre de columna (ej. Follow Up?, Canal)" class="theme-input border rounded-lg p-2 text-xs w-full">
                         <button onclick="addColumnToTab()" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Columna</button>
                     </div>
                     <div id="modalTabColumnsList" class="space-y-3 pt-2"></div>
@@ -416,7 +407,7 @@
         </div>
     </div>
 
-    <!-- Modal Exportación Personalizada -->
+    <!-- Modal Exportación Personalizada con Orientación de Página -->
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-4">
         <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -432,16 +423,31 @@
                     <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-2">1. Formato de Archivo</label>
                     <div class="grid grid-cols-3 gap-2">
                         <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
-                            <input type="radio" name="exportFormat" value="xlsx" checked class="text-indigo-600 focus:ring-0">
+                            <input type="radio" name="exportFormat" value="xlsx" checked onchange="togglePdfOrientationOption()" class="text-indigo-600 focus:ring-0">
                             <span class="font-semibold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-file-excel mr-1"></i> Excel</span>
                         </label>
                         <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
-                            <input type="radio" name="exportFormat" value="csv" class="text-indigo-600 focus:ring-0">
+                            <input type="radio" name="exportFormat" value="csv" onchange="togglePdfOrientationOption()" class="text-indigo-600 focus:ring-0">
                             <span class="font-semibold text-sky-600 dark:text-sky-400"><i class="fa-solid fa-file-csv mr-1"></i> CSV</span>
                         </label>
                         <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
-                            <input type="radio" name="exportFormat" value="pdf" class="text-indigo-600 focus:ring-0">
+                            <input type="radio" name="exportFormat" value="pdf" onchange="togglePdfOrientationOption()" class="text-indigo-600 focus:ring-0">
                             <span class="font-semibold text-rose-600 dark:text-rose-400"><i class="fa-solid fa-file-pdf mr-1"></i> PDF</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Opciones de PDF (Orientación) -->
+                <div id="pdfOrientationWrapper" class="space-y-2 pt-1 border-t border-slate-200 dark:border-slate-700/80 hidden">
+                    <label class="block font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1">Orientación de Página (PDF)</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                            <input type="radio" name="pdfOrientation" value="portrait" checked class="text-indigo-600 focus:ring-0">
+                            <span class="font-semibold"><i class="fa-solid fa-file text-indigo-500 mr-1"></i> Vertical</span>
+                        </label>
+                        <label class="flex items-center gap-2 theme-input border p-2.5 rounded-lg cursor-pointer hover:border-indigo-500 transition">
+                            <input type="radio" name="pdfOrientation" value="landscape" class="text-indigo-600 focus:ring-0">
+                            <span class="font-semibold"><i class="fa-solid fa-file-lines text-indigo-500 mr-1"></i> Horizontal</span>
                         </label>
                     </div>
                 </div>
@@ -467,7 +473,7 @@
         </div>
     </div>
 
-    <!-- Modal Alerta Personalizada -->
+    <!-- Modales de Alerta y Confirmación -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
         <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -483,7 +489,6 @@
         </div>
     </div>
 
-    <!-- Modal Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -500,7 +505,6 @@
         </div>
     </div>
 
-    <!-- Modal Renombrar Categoría -->
     <div id="renameModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -1120,36 +1124,40 @@
                     <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300 max-w-xs truncate" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
                     </td>
-                    <td class="py-3.5 px-4 text-center space-x-2 relative">
-                        <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Abrir en WhatsApp Web">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                        </a>
+                    <td class="py-3.5 px-4 text-center relative">
+                        <div class="flex items-center justify-center gap-3">
+                            <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="Abrir en WhatsApp Web">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                            </a>
 
-                        <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition" title="Opciones">
-                            <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
-                        </button>
+                            <div class="relative">
+                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
+                                    <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+                                </button>
 
-                        <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-2 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
-                            <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-2">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
-                                <div class="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                                    <i class="fa-regular fa-clock text-indigo-500 mr-1"></i> <strong>Creado:</strong> ${formatDate(c.createdAt)}
+                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-64 z-50 text-left normal-case">
+                                    <div class="border-b border-slate-200 dark:border-slate-700 pb-2 mb-2">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Información de Registro</span>
+                                        <div class="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                                            <i class="fa-regular fa-clock text-indigo-500 mr-1"></i> <strong>Creado:</strong> ${formatDate(c.createdAt)}
+                                        </div>
+                                        ${c.updatedAt ? `
+                                        <div class="text-[11px] text-slate-400 mt-0.5">
+                                            <i class="fa-solid fa-rotate-right text-slate-400 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
+                                        </div>` : ''}
+                                    </div>
+
+                                    <div class="space-y-1">
+                                        <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                            <span>Editar Candidato</span>
+                                        </button>
+                                        <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                            <span>Eliminar Candidato</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                ${c.updatedAt ? `
-                                <div class="text-[11px] text-slate-400 mt-0.5">
-                                    <i class="fa-solid fa-rotate-right text-slate-400 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
-                                </div>` : ''}
-                            </div>
-
-                            <div class="space-y-1">
-                                <button onclick="openEditModal('${c.docId}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-indigo-600 hover:text-white flex items-center gap-2 transition">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                    <span>Editar Candidato</span>
-                                </button>
-                                <button onclick="deleteCandidate('${c.docId}', '${c.name}')" class="w-full text-left text-xs py-1.5 px-2 rounded hover:bg-rose-600 hover:text-white text-rose-500 flex items-center gap-2 transition">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                    <span>Eliminar Candidato</span>
-                                </button>
                             </div>
                         </div>
                     </td>
@@ -1268,8 +1276,14 @@
             document.querySelectorAll('.export-col-check').forEach(cb => cb.checked = isChecked);
         };
 
+        window.togglePdfOrientationOption = function() {
+            const isPdf = document.querySelector('input[name="exportFormat"][value="pdf"]').checked;
+            document.getElementById('pdfOrientationWrapper').classList.toggle('hidden', !isPdf);
+        };
+
         window.executeExport = function() {
             const selectedFormat = document.querySelector('input[name="exportFormat"]:checked').value;
+            const pdfOrientation = document.querySelector('input[name="pdfOrientation"]:checked')?.value || 'portrait';
             const selectedCols = Array.from(document.querySelectorAll('.export-col-check:checked')).map(cb => cb.value);
 
             if (selectedCols.length === 0) {
@@ -1330,7 +1344,7 @@
                 document.body.removeChild(link);
             } else if (selectedFormat === 'pdf') {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
+                const doc = new jsPDF({ orientation: pdfOrientation, unit: 'mm', format: 'a4' });
 
                 doc.setFontSize(16);
                 doc.setTextColor(30, 41, 59);
@@ -1338,7 +1352,7 @@
                 
                 doc.setFontSize(9);
                 doc.setTextColor(100, 116, 139);
-                doc.text(`Generado: ${new Date().toLocaleString('es-SV')} | Total Registros: ${exportData.length}`, 14, 22);
+                doc.text(`Generado: ${new Date().toLocaleString('es-SV')} | Total Registros: ${exportData.length} | Orientación: ${pdfOrientation === 'landscape' ? 'Horizontal' : 'Vertical'}`, 14, 22);
 
                 const headers = [selectedCols.map(col => colLabels[col])];
                 const rows = exportData.map(row => Object.values(row));
@@ -1688,7 +1702,7 @@
             const colNames = Object.keys(cols);
 
             if (colNames.length === 0) {
-                columnsContainer.innerHTML = `<span class="text-slate-400 italic">No hay columnas personalizadas en esta pestaña.</span>`;
+                columnsContainer.innerHTML = `<span class="text-slate-400 italic">No hay columnas configuradas en esta pestaña.</span>`;
                 return;
             }
 
