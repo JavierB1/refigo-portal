@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RefiGo Portal - Sistema de Gestión</title>
-    <!-- STREAMING_CHUNK:Adding dynamic favicon link element -->
-    <link rel="icon" id="dynamicFavicon" href="https://placehold.co/32x32/4f46e5/ffffff?text=R">
+    <!-- STREAMING_CHUNK:Configuring static Google Drive favicon -->
+    <link rel="icon" id="dynamicFavicon" href="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Iconos -->
@@ -80,13 +80,12 @@
             max-height: 295px;
             overflow-y: auto;
             scroll-behavior: smooth;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .carousel-viewport::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Edge */
+            display: none;
         }
 
-        /* Ocultar barras de desplazamiento en tablas manteniendo funcionalidad de scroll */
         .overflow-x-auto, .overflow-y-auto {
             scrollbar-width: none;
         }
@@ -101,7 +100,6 @@
             cursor: pointer;
         }
 
-        /* Estilo Illustrator Color Swatch Picker */
         .color-swatch {
             width: 22px;
             height: 22px;
@@ -130,11 +128,9 @@
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-700">
                 <div class="flex items-center space-x-3">
-                    <label for="logoFileInput" id="sidebarLogoBox" class="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-600/35 overflow-hidden cursor-pointer relative group flex-shrink-0" title="Haz clic para subir tu logo">
-                        <i id="sidebarLogoIcon" class="fa-solid fa-users-viewfinder"></i>
-                        <img id="sidebarLogoImg" class="w-full h-full object-cover hidden" alt="Logo">
-                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-[10px] text-white font-medium">Subir</div>
-                    </label>
+                    <div class="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
+                        <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
+                    </div>
                     <div class="min-w-0">
                         <h2 class="font-bold text-base truncate">RefiGo Portal</h2>
                         <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">Gestión de Talento</span>
@@ -160,15 +156,13 @@
         <div class="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
             <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 transition font-semibold shadow-sm">
                 <i class="fa-solid fa-sliders text-indigo-500 text-sm"></i>
-                <span>⚙️ Gestión Global y Logo</span>
+                <span>⚙️ Gestión Global de Pestañas</span>
             </button>
             <div class="text-[11px] text-slate-400 text-center pb-2">
                 RefiGo Cloud DB • Sincronizado
             </div>
         </div>
     </aside>
-
-    <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
 
     <!-- STREAMING_CHUNK:Configuring responsive header layout -->
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
@@ -305,7 +299,7 @@
 
     </main>
 
-    <!-- STREAMING_CHUNK:Configuring modals for candidates, configuration and logo upload -->
+    <!-- STREAMING_CHUNK:Configuring modals for candidates and configuration -->
     <!-- Modal Candidate Add/Edit -->
     <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
@@ -356,33 +350,15 @@
         </div>
     </div>
 
-    <!-- Modal Configuración General & Logo Uploader -->
+    <!-- Modal Configuración General -->
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestión Global y Logo</h3>
+                <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestión Global de Pestañas</h3>
                 <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-3">
-                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block"><i class="fa-solid fa-image mr-1.5"></i> Logo de la Empresa</span>
-                    <div class="flex flex-col sm:flex-row items-center gap-3">
-                        <div class="w-14 h-14 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md overflow-hidden flex-shrink-0 relative">
-                            <i id="modalLogoIconPreview" class="fa-solid fa-users-viewfinder"></i>
-                            <img id="modalLogoImgPreview" class="w-full h-full object-cover hidden" alt="Logo">
-                        </div>
-                        <div class="flex-1 w-full text-center sm:text-left">
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Sube el logo corporativo desde tu dispositivo. Se actualizará instantáneamente.</p>
-                            <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition inline-flex items-center gap-2 shadow-sm w-full sm:w-auto justify-center">
-                                <i class="fa-solid fa-upload"></i>
-                                <span>Seleccionar Logo de la PC</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="bg-slate-50 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
                     <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Agregar Nueva Pestaña / Categoría</span>
                     <div class="flex flex-col sm:flex-row gap-2">
@@ -632,37 +608,6 @@
                 localStorage.setItem('refigo_theme', 'light');
             }
         };
-
-        window.handleLogoUpload = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Url = e.target.result;
-                localStorage.setItem('refigo_logo', base64Url);
-                applyLogo(base64Url);
-            };
-            reader.readAsDataURL(file);
-        };
-
-        function applyLogo(url) {
-            const sidebarImg = document.getElementById('sidebarLogoImg');
-            const sidebarIcon = document.getElementById('sidebarLogoIcon');
-            const modalImg = document.getElementById('modalLogoImgPreview');
-            const modalIcon = document.getElementById('modalLogoIconPreview');
-            const favicon = document.getElementById('dynamicFavicon');
-
-            if (url) {
-                if(sidebarImg) { sidebarImg.src = url; sidebarImg.classList.remove('hidden'); }
-                if(sidebarIcon) sidebarIcon.classList.add('hidden');
-                if(modalImg) { modalImg.src = url; modalImg.classList.remove('hidden'); }
-                if(modalIcon) modalIcon.classList.add('hidden');
-                if(favicon) favicon.href = url;
-            }
-        }
-
-        const savedLogo = localStorage.getItem('refigo_logo');
-        if (savedLogo) applyLogo(savedLogo);
 
         window.showAlert = function(title, message, iconType = 'warning') {
             document.getElementById('alertTitle').textContent = title;
@@ -1781,7 +1726,6 @@
 
             colNames.forEach(colName => {
                 const options = cols[colName] || [];
-                const hasOpts = options.length > 0;
                 html += `
                     <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2">
                         <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
@@ -1789,7 +1733,7 @@
                             <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px] font-semibold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
                         </div>
                         <div class="flex flex-wrap gap-1.5 items-center pt-1">
-                            ${!hasOpts ? `<span class="text-slate-400 text-[11px] italic">Sin opciones de filtro (columna libre)</span>` : options.map(opt => {
+                            ${options.length === 0 ? `<span class="text-slate-400 text-[11px] italic">Añade opciones para filtrar (ej. Yes, No)</span>` : options.map(opt => {
                                 const currentColor = statusColorsMap[opt] || '#64748b';
                                 return `
                                     <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative">
@@ -1811,11 +1755,10 @@
                                 `;
                             }).join('')}
                         </div>
-                        ${hasOpts ? `
                         <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                             <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full">
                             <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-semibold shadow-sm">+ Opción</button>
-                        </div>` : ''}
+                        </div>
                     </div>
                 `;
             });
