@@ -268,7 +268,7 @@
             </div>
         </div>
 
-        <!-- Category Table Independent View (Sin botones flotantes de edición) -->
+        <!-- Category Table Independent View (Limpia, sin botones flotantes de edición) -->
         <div id="categoryView" class="theme-card border rounded-xl shadow-sm overflow-visible relative hidden">
             <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
                 <span id="activeCategoryHeaderTitle" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Gestión de Categoría</span>
@@ -341,7 +341,7 @@
         </div>
     </div>
 
-    <!-- Modal Configuración General -->
+    <!-- Modal Configuración Global -->
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="theme-card border rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -366,7 +366,7 @@
         </div>
     </div>
 
-    <!-- Modal de Edición Específica por Pestaña (Gestor Maestro Unificado) -->
+    <!-- Modal de Configuración Unificada de Columnas por Pestaña -->
     <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-4">
         <div class="theme-card border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -378,23 +378,12 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
-                <!-- Estatus de esta Pestaña -->
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
-                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Estatus de esta Pestaña</span>
-                    <div class="flex gap-2">
-                        <input type="text" id="modalNewStatusInput" placeholder="Nuevo estatus (ej. Pending)" class="theme-input border rounded-lg p-2 text-xs w-full">
-                        <button onclick="addStatusToTab()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Agregar</button>
-                    </div>
-                    <div id="modalTabStatusesList" class="flex flex-wrap gap-2 pt-1"></div>
-                </div>
-
-                <!-- Columnas Unificadas (Todas manejadas por igual con sus opciones) -->
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas de la Pestaña</span>
                     </div>
                     <div class="flex gap-2">
-                        <input type="text" id="modalNewColumnInput" placeholder="Nombre de columna (ej. Follow Up?, Canal)" class="theme-input border rounded-lg p-2 text-xs w-full">
+                        <input type="text" id="modalNewColumnInput" placeholder="Añadir nueva columna (ej. Canal, Región)" class="theme-input border rounded-lg p-2 text-xs w-full">
                         <button onclick="addColumnToTab()" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Columna</button>
                     </div>
                     <div id="modalTabColumnsList" class="space-y-3 pt-2"></div>
@@ -1674,66 +1663,78 @@
             const catObj = pipelineList.find(i => i.name === editingTabName);
             if (!catObj) return;
 
-            const statusContainer = document.getElementById('modalTabStatusesList');
-            statusContainer.innerHTML = catObj.statuses.map(st => {
-                const currentColor = statusColorsMap[st] || '#6366f1';
-                return `
-                    <div class="inline-flex items-center gap-2 theme-card border px-2 py-1 rounded-lg text-[11px] shadow-sm">
-                        <span class="font-medium">${st}</span>
-                        <div class="flex items-center gap-1 relative">
-                            <div class="color-swatch" style="background-color: ${currentColor}; width: 16px; height: 16px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
-                            <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1"></i>
-                            
-                            <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
-                                <div class="grid grid-cols-6 gap-2 mb-3">
-                                    ${PRESET_SWATCHES.map(hex => `
-                                        <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
             const columnsContainer = document.getElementById('modalTabColumnsList');
+            
+            // 1. Tarjeta principal de Estatus
+            let html = `
+                <div class="theme-card border rounded-lg p-3 space-y-2.5 border-indigo-500/30">
+                    <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
+                        <span><i class="fa-solid fa-tag mr-1.5"></i> Estatus <span class="text-[10px] font-normal px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-500 ml-1">Columna Principal</span></span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 items-center">
+                        ${catObj.statuses.map(st => {
+                            const currentColor = statusColorsMap[st] || '#6366f1';
+                            return `
+                                <div class="inline-flex items-center gap-1.5 theme-card border px-2 py-1 rounded-lg text-[11px] shadow-sm">
+                                    <span class="font-medium" style="color: ${currentColor}">${st}</span>
+                                    <div class="flex items-center gap-1 relative">
+                                        <div class="color-swatch" style="background-color: ${currentColor}; width: 14px; height: 14px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
+                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-0.5"></i>
+                                        
+                                        <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
+                                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                            <div class="grid grid-cols-6 gap-2 mb-3">
+                                                ${PRESET_SWATCHES.map(hex => `
+                                                    <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="flex gap-1.5 pt-1">
+                        <input type="text" id="newStatusInput" placeholder="Añadir nuevo estatus (ej. Pending)" class="theme-input border rounded px-2.5 py-1.5 text-xs w-full">
+                        <button onclick="addStatusToTabModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded text-xs whitespace-nowrap font-semibold">+ Estatus</button>
+                    </div>
+                </div>
+            `;
+
+            // 2. Tarjetas para cada columna adicional/personalizada
             const cols = catObj.columns || {};
             const colNames = Object.keys(cols);
 
-            if (colNames.length === 0) {
-                columnsContainer.innerHTML = `<span class="text-slate-400 italic">No hay columnas configuradas en esta pestaña.</span>`;
-                return;
-            }
-
-            columnsContainer.innerHTML = colNames.map(colName => {
+            colNames.forEach(colName => {
                 const options = cols[colName] || [];
-                return `
-                    <div class="theme-card border rounded-lg p-2.5 space-y-2">
+                html += `
+                    <div class="theme-card border rounded-lg p-3 space-y-2.5">
                         <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
-                            <span><i class="fa-solid fa-columns mr-1"></i> ${colName}</span>
+                            <span><i class="fa-solid fa-columns mr-1.5"></i> ${colName}</span>
                             <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px]"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar Columna</button>
                         </div>
-                        <div class="flex flex-wrap gap-1 items-center">
-                            ${options.map(opt => `
-                                <span class="inline-flex items-center gap-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded text-[10px]">
+                        <div class="flex flex-wrap gap-1.5 items-center">
+                            ${options.length === 0 ? '<span class="text-slate-400 italic text-[11px]">Sin opciones de filtro configuradas.</span>' : options.map(opt => `
+                                <span class="inline-flex items-center gap-1 bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-[11px]">
                                     ${opt}
-                                    <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500"></i>
+                                    <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 ml-1"></i>
                                 </span>
                             `).join('')}
                         </div>
-                        <div class="flex gap-1 pt-1">
-                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción de filtro (ej. Yes, No)" class="theme-input border rounded px-2 py-1 text-[11px] w-full">
-                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded text-[10px]">+ Opción</button>
+                        <div class="flex gap-1.5 pt-1">
+                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción de filtro (ej. Yes, No)" class="theme-input border rounded px-2.5 py-1.5 text-xs w-full">
+                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded text-xs whitespace-nowrap font-semibold">+ Opción</button>
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            columnsContainer.innerHTML = html;
         }
 
-        window.addStatusToTab = async function() {
-            const input = document.getElementById('modalNewStatusInput');
-            const stName = input.value.trim();
+        window.addStatusToTabModal = async function() {
+            const input = document.getElementById('newStatusInput');
+            const stName = input ? input.value.trim() : '';
             if (!editingTabName || !stName) return;
 
             const catObj = pipelineList.find(i => i.name === editingTabName);
@@ -1741,7 +1742,7 @@
                 catObj.statuses.push(stName);
                 if (!statusColorsMap[stName]) statusColorsMap[stName] = '#6366f1';
                 await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                input.value = '';
+                if (input) input.value = '';
                 renderTabEditModalContents();
             }
         };
