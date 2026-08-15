@@ -268,14 +268,10 @@
             </div>
         </div>
 
-        <!-- Category Table Independent View -->
+        <!-- Category Table Independent View (Sin el botón de edición flotante en la tabla) -->
         <div id="categoryView" class="theme-card border rounded-xl shadow-sm overflow-visible relative hidden">
             <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
                 <span id="activeCategoryHeaderTitle" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Gestión de Categoría</span>
-                <button onclick="openTabEditModal(activeTabSheet)" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>⚙️ Editar Pestaña y Columnas</span>
-                </button>
             </div>
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
@@ -370,7 +366,7 @@
         </div>
     </div>
 
-    <!-- Modal de Edición Específica por Pestaña -->
+    <!-- Modal de Edición Específica por Pestaña (Gestor Maestro) -->
     <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-4">
         <div class="theme-card border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
@@ -382,6 +378,17 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
+                <!-- Columnas Fijas e Informativas de la Tabla -->
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
+                    <span class="font-bold uppercase text-slate-400 tracking-wider">Columnas Fijas de la Tabla</span>
+                    <div class="flex flex-wrap gap-1.5 pt-1">
+                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Nombre / Referido</span>
+                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Contacto (Correo / Teléfono)</span>
+                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Estatus</span>
+                        <span class="bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-medium">Notas / Seguimiento</span>
+                    </div>
+                </div>
+
                 <!-- Estatus -->
                 <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
                     <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Estatus de esta Pestaña</span>
@@ -394,7 +401,7 @@
 
                 <!-- Columnas Personalizadas con Opciones/Valores -->
                 <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
-                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas Personalizadas y sus Opciones</span>
+                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas Personalizadas y sus Filtros</span>
                     <div class="flex gap-2">
                         <input type="text" id="modalNewColumnInput" placeholder="Columna (ej. Follow Up?, Canal)" class="theme-input border rounded-lg p-2 text-xs w-full">
                         <button onclick="addColumnToTab()" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Columna</button>
@@ -1743,7 +1750,7 @@
             if (catObj) {
                 if (!catObj.columns) catObj.columns = {};
                 if (!catObj.columns[colName]) {
-                    catObj.columns[colName] = []; 
+                    catObj.columns[colName] = [];
                     await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
                     input.value = '';
                     renderTabEditModalContents();
