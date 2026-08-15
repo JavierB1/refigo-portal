@@ -171,6 +171,7 @@
             </div>
             
             <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Botón de Conmutación de Tema Claro / Oscuro (Claro por defecto) -->
                 <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition border border-slate-200 dark:border-slate-600" title="Cambiar Tema">
                     <i id="themeIcon" class="fa-solid fa-moon text-indigo-500"></i>
                     <span id="themeLabel" class="hidden sm:inline">Modo Oscuro</span>
@@ -218,6 +219,7 @@
                        class="w-full theme-input border text-sm rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition">
             </div>
 
+            <!-- Controles de Filtro de Fecha y Exportación Personalizada -->
             <div class="flex flex-wrap items-center gap-2">
                 <button id="exportSelectedBtn" onclick="openExportModal()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-lg transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
                     <i class="fa-solid fa-file-export"></i>
@@ -271,14 +273,6 @@
 
         <!-- Category Table Independent View -->
         <div id="categoryView" class="theme-card border rounded-xl shadow-sm overflow-visible relative hidden">
-            <!-- Botón Editar Pestaña Actual -->
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/40 rounded-t-xl">
-                <span id="activeCategoryHeaderTitle" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Gestión de Categoría</span>
-                <button onclick="openTabEditModal(activeTabSheet)" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>⚙️ Editar Pestaña y Columnas</span>
-                </button>
-            </div>
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
@@ -311,27 +305,27 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Correo <span class="text-rose-500">*</span></label>
-                        <input type="email" id="inputEmail" required class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Correo</label>
+                        <input type="email" id="inputEmail" class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Número (Prefijo +503) <span class="text-rose-500">*</span></label>
-                        <input type="text" id="inputPhone" required placeholder="+503 " class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Número (Prefijo +503)</label>
+                        <input type="text" id="inputPhone" placeholder="+503 " class="w-full theme-input border rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Pestaña (Categoría)</label>
                         <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500">
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Estatus <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Estatus (Subcategoría Exclusiva)</label>
                         <select id="inputStatus" disabled class="w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50">
                         </select>
                     </div>
                 </div>
-                <!-- Contenedor dinámico para selectores de columnas personalizadas en el modal -->
+                <!-- Contenedor dinámico para inputs de columnas personalizadas en el modal -->
                 <div id="modalCustomFieldsContainer" class="space-y-3 pt-1 border-t border-slate-200 dark:border-slate-700"></div>
 
                 <div>
@@ -348,11 +342,11 @@
         </div>
     </div>
 
-    <!-- Modal Configuración General -->
+    <!-- Modal Configuración con Gestión de Columnas y Paleta Estilo Illustrator -->
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
         <div class="theme-card border rounded-xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestión Global de Pestañas</h3>
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-sliders text-indigo-500 mr-2"></i>Gestionar Categorías, Estatus y Columnas</h3>
                 <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
@@ -365,49 +359,28 @@
                     </div>
                 </div>
 
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">2. Agregar Estatus a Categoría</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="configCategorySelect" class="theme-input border rounded-lg p-2 text-xs"></select>
+                        <input type="text" id="newStatusName" placeholder="Nombre estatus (ej. Submitted)" class="theme-input border rounded-lg p-2 text-xs">
+                    </div>
+                    <button onclick="addStatusConfig()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2 rounded-lg transition">+ Agregar Estatus</button>
+                </div>
+
+                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">3. Agregar Columna Personalizada (ej. Follow Up?, Canal)</span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="configColCategorySelect" class="theme-input border rounded-lg p-2 text-xs"></select>
+                        <input type="text" id="newColumnName" placeholder="Nombre de columna" class="theme-input border rounded-lg p-2 text-xs">
+                    </div>
+                    <button onclick="addColumnConfig()" class="w-full bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold py-2 rounded-lg transition">+ Agregar Columna a Categoría</button>
+                </div>
+
                 <div class="space-y-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase">Estructura & Pestañas Actuales</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Estructura & Colores Actuales</span>
                     <div id="configPipelineTree" class="space-y-2 text-xs"></div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Edición Específica por Pestaña -->
-    <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-4">
-        <div class="theme-card border rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base flex items-center gap-2">
-                    <i class="fa-solid fa-folder-open text-indigo-500"></i>
-                    <span>Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
-                </h3>
-                <button onclick="closeTabEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
-                <!-- Estatus -->
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
-                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Estatus de esta Pestaña</span>
-                    <div class="flex gap-2">
-                        <input type="text" id="modalNewStatusInput" placeholder="Nuevo estatus (ej. Pending)" class="theme-input border rounded-lg p-2 text-xs w-full">
-                        <button onclick="addStatusToTab()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Agregar</button>
-                    </div>
-                    <div id="modalTabStatusesList" class="flex flex-wrap gap-2 pt-1"></div>
-                </div>
-
-                <!-- Columnas Personalizadas con Opciones/Valores -->
-                <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/80 space-y-2">
-                    <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400">Columnas Personalizadas y sus Opciones</span>
-                    <div class="flex gap-2">
-                        <input type="text" id="modalNewColumnInput" placeholder="Columna (ej. Follow Up?, Canal)" class="theme-input border rounded-lg p-2 text-xs w-full">
-                        <button onclick="addColumnToTab()" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-2 rounded-lg transition whitespace-nowrap">+ Columna</button>
-                    </div>
-                    <div id="modalTabColumnsList" class="space-y-3 pt-2"></div>
-                </div>
-            </div>
-
-            <div class="flex justify-end pt-2 border-t border-slate-200 dark:border-slate-700">
-                <button onclick="closeTabEditModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2 rounded-lg transition">Guardar y Cerrar</button>
             </div>
         </div>
     </div>
@@ -540,16 +513,15 @@
         let currentEditingDocId = null;
         let columnFilters = { status: {} };
         let selectedCandidateIds = new Set();
-        let editingTabName = null;
 
         let confirmCallback = null;
         let renameCallback = null;
 
         let pipelineList = [
-            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow Up?': ['Yes', 'No', 'Pending'] } },
-            { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: {} },
-            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: {} },
-            { name: 'No Referred', statuses: ['Pending Audit'], columns: {} }
+            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: ['Follow Up?'] },
+            { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: [] },
+            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: [] },
+            { name: 'No Referred', statuses: ['Pending Audit'], columns: [] }
         ];
 
         let statusColorsMap = {
@@ -576,6 +548,7 @@
         let isCarouselPaused = false;
         const ROW_HEIGHT = 58;
 
+        // Tema Claro por Defecto
         const savedTheme = localStorage.getItem('refigo_theme') || 'light';
         if (savedTheme === 'dark') {
             document.body.classList.add('dark');
@@ -658,15 +631,10 @@
             if (snap.exists()) {
                 const data = snap.data();
                 if (data.items) {
-                    pipelineList = data.items.map(item => {
-                        let cols = item.columns;
-                        if (Array.isArray(cols)) {
-                            let obj = {};
-                            cols.forEach(c => obj[c] = ['Option 1', 'Option 2']);
-                            cols = obj;
-                        }
-                        return { ...item, columns: cols || {} };
-                    });
+                    pipelineList = data.items.map(item => ({
+                        ...item,
+                        columns: item.columns || []
+                    }));
                 }
                 if (data.statusColors) statusColorsMap = data.statusColors;
             } else {
@@ -730,7 +698,6 @@
                 categoryView.classList.add('hidden');
             } else {
                 document.getElementById('currentCategoryLabel').textContent = `Categoría Activa: ${sheet}`;
-                document.getElementById('activeCategoryHeaderTitle').textContent = `Categoría: ${sheet}`;
                 dashboardView.classList.add('hidden');
                 categoryView.classList.remove('hidden');
             }
@@ -808,24 +775,23 @@
                 </label>
             `).join('');
 
+            // Construir también menús para columnas personalizadas si las hay
             if (activeTabSheet !== 'ALL' && catObj && catObj.columns) {
-                Object.keys(catObj.columns).forEach(colName => {
+                catObj.columns.forEach(colName => {
                     const colContainer = document.getElementById(`customColOptions_${cleanId(colName)}`);
                     if (colContainer) {
-                        const uniqueVals = catObj.columns[colName] || [];
-                        if (uniqueVals.length > 0) {
-                            colContainer.innerHTML = `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
-                                    <input type="checkbox" checked onchange="toggleSelectAll('custom_${cleanId(colName)}', this.checked)" class="rounded theme-input">
-                                    <strong>(Select All)</strong>
-                                </label>
-                            ` + uniqueVals.map(val => `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
-                                    <input type="checkbox" value="${val}" class="col-check-custom_${cleanId(colName)} rounded theme-input" checked>
-                                    <span>${val}</span>
-                                </label>
-                            `).join('');
-                        }
+                        const uniqueVals = [...new Set(allCandidates.filter(c => c.sheet === activeTabSheet).map(c => c.customFields?.[colName] || '-'))].filter(Boolean).sort();
+                        colContainer.innerHTML = `
+                            <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
+                                <input type="checkbox" checked onchange="toggleSelectAll('custom_${cleanId(colName)}', this.checked)" class="rounded theme-input">
+                                <strong>(Select All)</strong>
+                            </label>
+                        ` + uniqueVals.map(val => `
+                            <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-500">
+                                <input type="checkbox" value="${val}" class="col-check-custom_${cleanId(colName)} rounded theme-input" checked>
+                                <span>${val}</span>
+                            </label>
+                        `).join('');
                     }
                 });
             }
@@ -910,6 +876,7 @@
 
         function renderStatusBadge(statusName) {
             const hexColor = statusColorsMap[statusName] || '#6366f1';
+            
             return `
                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-md border" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
                     ${statusName}
@@ -943,12 +910,14 @@
                 const filtered = allCandidates.filter(c => {
                     const matchesCategory = c.sheet === activeTabSheet;
                     
+                    // Filtro estatus
                     const statusFilterList = columnFilters.status['status'];
                     const matchesStatusCol = !statusFilterList || statusFilterList.length === 0 || statusFilterList.includes(c.status);
 
+                    // Filtros columnas personalizadas
                     let matchesCustomCols = true;
                     if (catObj && catObj.columns) {
-                        Object.keys(catObj.columns).forEach(colName => {
+                        catObj.columns.forEach(colName => {
                             const filterList = columnFilters.status[`custom_${cleanId(colName)}`];
                             const val = c.customFields?.[colName] || '-';
                             if (filterList && filterList.length > 0 && !filterList.includes(val)) {
@@ -1019,41 +988,13 @@
             const thead = document.getElementById('categoryTableHead');
             const tbody = document.getElementById('categoryTableBody');
             const catObj = pipelineList.find(c => c.name === activeTabSheet);
-            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+            const customCols = catObj && catObj.columns ? catObj.columns : [];
 
             const totalInCat = allCandidates.filter(c => c.sheet === activeTabSheet).length;
             document.getElementById('visibleCount').textContent = data.length;
             document.getElementById('totalCategoryCount').textContent = totalInCat;
 
-            let customHeadersHtml = '';
-            customCols.forEach(colName => {
-                const hasOptions = catObj.columns[colName] && catObj.columns[colName].length > 0;
-                if (hasOptions) {
-                    customHeadersHtml += `
-                        <th class="py-3 px-4 relative">
-                            <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('colFilter_${cleanId(colName)}')">
-                                <span>${colName}</span>
-                                <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-500"></i>
-                            </div>
-                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-lg shadow-2xl p-3 w-60 z-50 normal-case">
-                                <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
-                                <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
-                                <hr class="border-slate-200 dark:border-slate-700 my-2">
-                                <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded p-1 text-xs mb-2">
-                                <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="customColOptions_${cleanId(colName)}"></div>
-                                <button onclick="applyColumnFilter('custom_${cleanId(colName)}')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
-                            </div>
-                        </th>
-                    `;
-                } else {
-                    customHeadersHtml += `
-                        <th class="py-3 px-4">
-                            <span>${colName}</span>
-                        </th>
-                    `;
-                }
-            });
-
+            // Renderizar cabecera dinámica con columnas personalizadas
             thead.innerHTML = `
                 <th class="py-3 px-4 w-10 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer">
@@ -1074,7 +1015,22 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
                     </div>
                 </th>
-                ${customHeadersHtml}
+                ${customCols.map(colName => `
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('colFilter_${cleanId(colName)}')">
+                            <span>${colName}</span>
+                            <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-500"></i>
+                        </div>
+                        <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-lg shadow-2xl p-3 w-60 z-50 normal-case">
+                            <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1 hover:text-indigo-500 block"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
+                            <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1 hover:text-indigo-500 block mb-2"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
+                            <hr class="border-slate-200 dark:border-slate-700 my-2">
+                            <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded p-1 text-xs mb-2">
+                            <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="customColOptions_${cleanId(colName)}"></div>
+                            <button onclick="applyColumnFilter('custom_${cleanId(colName)}')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-1 rounded">OK</button>
+                        </div>
+                    </th>
+                `).join('')}
                 <th class="py-3 px-4">Notas / Seguimiento</th>
                 <th class="py-3 px-4 text-center">Acciones</th>
             `;
@@ -1112,6 +1068,7 @@
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500">📝</span>` : ''}${c.notes}
                     </td>
                     <td class="py-3.5 px-4 text-center space-x-2 relative">
+                        <!-- WhatsApp Web Link -->
                         <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition" title="Abrir en WhatsApp Web">
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                         </a>
@@ -1200,8 +1157,9 @@
                 return;
             }
 
+            // Construir checkboxes de columnas dinámicamente según la categoría activa
             const catObj = pipelineList.find(c => c.name === activeTabSheet);
-            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+            const customCols = catObj && catObj.columns ? catObj.columns : [];
 
             const container = document.getElementById('exportColumnsCheckboxContainer');
             let html = `
@@ -1270,7 +1228,7 @@
 
             const candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
             const catObj = pipelineList.find(c => c.name === activeTabSheet);
-            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+            const customCols = catObj && catObj.columns ? catObj.columns : [];
 
             const colLabels = {
                 name: 'Nombre Completo',
@@ -1508,21 +1466,17 @@
         function renderModalCustomFields(sheetName, existingCustomFields = {}) {
             const container = document.getElementById('modalCustomFieldsContainer');
             const catObj = pipelineList.find(i => i.name === sheetName);
-            if (!catObj || !catObj.columns || Object.keys(catObj.columns).length === 0) {
+            if (!catObj || !catObj.columns || catObj.columns.length === 0) {
                 container.innerHTML = '';
                 return;
             }
 
-            container.innerHTML = Object.keys(catObj.columns).map(colName => {
-                const options = catObj.columns[colName] || [];
+            container.innerHTML = catObj.columns.map(colName => {
                 const val = existingCustomFields[colName] || '';
                 return `
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">${colName}</label>
-                        <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
-                            <option value="" disabled ${!val ? 'selected' : ''}>-- Seleccionar ${colName} --</option>
-                            ${options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
-                        </select>
+                        <input type="text" id="customField_${cleanId(colName)}" value="${val}" class="modal-custom-input w-full theme-input border rounded-lg p-2.5 text-xs focus:outline-none focus:border-indigo-500" data-colname="${colName}">
                     </div>
                 `;
             }).join('');
@@ -1549,18 +1503,19 @@
         window.saveCandidate = async function() {
             const nameVal = document.getElementById('inputName').value.trim();
             const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
-            const rawPhone = document.getElementById('inputPhone').value.trim();
+            const rawPhone = document.getElementById('inputPhone').value;
             const phoneVal = cleanPhone(rawPhone);
             const sheetVal = document.getElementById('inputSheet').value;
             const statusVal = document.getElementById('inputStatus').value;
 
-            if (!emailVal || !rawPhone || rawPhone === '+503' || !sheetVal || !statusVal) {
-                showAlert("Campos Obligatorios", "Es obligatorio ingresar el <strong>correo electrónico</strong>, el <strong>número de teléfono</strong>, la <strong>pestaña</strong> y el <strong>estatus</strong> para guardar el registro.", "warning");
+            if (!nameVal || !emailVal || !rawPhone.trim() || rawPhone.trim() === '+503' || !sheetVal || !statusVal) {
+                showAlert("Campos Incompletos", "Por favor completa el nombre, <strong>correo</strong>, <strong>número de teléfono</strong>, la Pestaña y el Estatus antes de continuar.", "warning");
                 return;
             }
 
             const existingDuplicate = allCandidates.find(c => {
                 if (currentEditingDocId && c.docId === currentEditingDocId) return false;
+                
                 const matchEmail = emailVal !== '' && c.email.trim().toLowerCase() === emailVal;
                 const matchPhone = phoneVal !== '' && cleanPhone(c.phone) === phoneVal && phoneVal !== '503';
                 return matchEmail || matchPhone;
@@ -1575,17 +1530,18 @@
                 return;
             }
 
+            // Recopilar campos personalizados
             const customFieldsData = {};
             document.querySelectorAll('.modal-custom-input').forEach(input => {
                 const colName = input.getAttribute('data-colname');
-                customFieldsData[colName] = input.value;
+                customFieldsData[colName] = input.value.trim();
             });
 
             const nowIso = new Date().toISOString();
             const dataPayload = {
-                name: nameVal || 'Sin Nombre',
+                name: nameVal,
                 email: document.getElementById('inputEmail').value.trim(),
-                phone: rawPhone,
+                phone: rawPhone.trim(),
                 sheet: sheetVal,
                 status: statusVal,
                 notes: document.getElementById('inputNotes').value.trim(),
@@ -1626,163 +1582,17 @@
             document.getElementById('configModal').classList.add('hidden');
         };
 
-        // Modal de Edición Específica por Pestaña
-        window.openTabEditModal = function(tabName) {
-            editingTabName = tabName;
-            document.getElementById('modalTabNameTitle').textContent = tabName;
-            renderTabEditModalContents();
-            document.getElementById('tabEditModal').classList.remove('hidden');
-        };
-
-        window.closeTabEditModal = function() {
-            document.getElementById('tabEditModal').classList.add('hidden');
-            editingTabName = null;
-        };
-
-        function renderTabEditModalContents() {
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (!catObj) return;
-
-            // Renderizar Estatus
-            const statusContainer = document.getElementById('modalTabStatusesList');
-            statusContainer.innerHTML = catObj.statuses.map(st => {
-                const currentColor = statusColorsMap[st] || '#6366f1';
-                return `
-                    <div class="inline-flex items-center gap-2 theme-card border px-2 py-1 rounded-lg text-[11px] shadow-sm">
-                        <span class="font-medium">${st}</span>
-                        <div class="flex items-center gap-1 relative">
-                            <div class="color-swatch" style="background-color: ${currentColor}; width: 16px; height: 16px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
-                            <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1"></i>
-                            
-                            <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
-                                <div class="grid grid-cols-6 gap-2 mb-3">
-                                    ${PRESET_SWATCHES.map(hex => `
-                                        <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Renderizar Columnas con sus opciones
-            const columnsContainer = document.getElementById('modalTabColumnsList');
-            const cols = catObj.columns || {};
-            const colNames = Object.keys(cols);
-
-            if (colNames.length === 0) {
-                columnsContainer.innerHTML = `<span class="text-slate-400 italic">No hay columnas personalizadas en esta pestaña.</span>`;
-                return;
-            }
-
-            columnsContainer.innerHTML = colNames.map(colName => {
-                const options = cols[colName] || [];
-                return `
-                    <div class="theme-card border rounded-lg p-2.5 space-y-2">
-                        <div class="flex items-center justify-between font-bold text-indigo-600 dark:text-indigo-400">
-                            <span><i class="fa-solid fa-columns mr-1"></i> ${colName}</span>
-                            <button onclick="removeColumnFromTab('${colName}')" class="text-rose-500 hover:underline text-[11px]"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar Columna</button>
-                        </div>
-                        <div class="flex flex-wrap gap-1 items-center">
-                            ${options.map(opt => `
-                                <span class="inline-flex items-center gap-1 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded text-[10px]">
-                                    ${opt}
-                                    <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500"></i>
-                                </span>
-                            `).join('')}
-                        </div>
-                        <div class="flex gap-1 pt-1">
-                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción de filtro (ej. Yes, No)" class="theme-input border rounded px-2 py-1 text-[11px] w-full">
-                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded text-[10px]">+ Opción</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        window.addStatusToTab = async function() {
-            const input = document.getElementById('modalNewStatusInput');
-            const stName = input.value.trim();
-            if (!editingTabName || !stName) return;
-
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (catObj && !catObj.statuses.includes(stName)) {
-                catObj.statuses.push(stName);
-                if (!statusColorsMap[stName]) statusColorsMap[stName] = '#6366f1';
-                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                input.value = '';
-                renderTabEditModalContents();
-            }
-        };
-
-        window.removeStatusFromTab = async function(stName) {
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (catObj) {
-                catObj.statuses = catObj.statuses.filter(s => s !== stName);
-                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                renderTabEditModalContents();
-            }
-        };
-
-        window.addColumnToTab = async function() {
-            const input = document.getElementById('modalNewColumnInput');
-            const colName = input.value.trim();
-            if (!editingTabName || !colName) return;
-
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (catObj) {
-                if (!catObj.columns) catObj.columns = {};
-                if (!catObj.columns[colName]) {
-                    catObj.columns[colName] = []; // Inicia sin opciones para que aparezca como columna pura y sin filtro hasta que se agreguen opciones
-                    await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                    input.value = '';
-                    renderTabEditModalContents();
-                } else {
-                    showAlert("Columna Existente", "Esta columna ya existe en la pestaña.", "warning");
-                }
-            }
-        };
-
-        window.removeColumnFromTab = async function(colName) {
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (catObj && catObj.columns) {
-                delete catObj.columns[colName];
-                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                renderTabEditModalContents();
-            }
-        };
-
-        window.addOptionToColumn = async function(colName) {
-            const input = document.getElementById(`newOptInput_${cleanId(colName)}`);
-            const optVal = input.value.trim();
-            if (!optVal) return;
-
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (catObj && catObj.columns && catObj.columns[colName]) {
-                if (!catObj.columns[colName].includes(optVal)) {
-                    catObj.columns[colName].push(optVal);
-                    await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                    input.value = '';
-                    renderTabEditModalContents();
-                }
-            }
-        };
-
-        window.removeOptionFromColumn = async function(colName, optVal) {
-            const catObj = pipelineList.find(i => i.name === editingTabName);
-            if (catObj && catObj.columns && catObj.columns[colName]) {
-                catObj.columns[colName] = catObj.columns[colName].filter(o => o !== optVal);
-                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
-                renderTabEditModalContents();
-            }
-        };
-
         function renderConfigTree() {
+            const categorySelect = document.getElementById('configCategorySelect');
+            const colCategorySelect = document.getElementById('configColCategorySelect');
             const treeContainer = document.getElementById('configPipelineTree');
+
+            const optionsHtml = pipelineList.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+            categorySelect.innerHTML = optionsHtml;
+            colCategorySelect.innerHTML = optionsHtml;
+
             treeContainer.innerHTML = pipelineList.map((item, index) => `
-                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg p-3 space-y-2">
+                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg p-3 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <div class="flex flex-col gap-0.5">
@@ -1792,9 +1602,54 @@
                             <span class="font-bold text-indigo-600 dark:text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${item.name}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="openTabEditModal('${item.name}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-800 text-xs px-2 py-1 rounded bg-sky-500/10 font-semibold"><i class="fa-solid fa-sliders mr-1"></i>Editar Pestaña</button>
-                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-xs px-2 py-1 rounded bg-indigo-500/10"><i class="fa-solid fa-pen-to-square mr-1"></i>Renombrar</button>
-                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded bg-rose-500/10"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-xs px-2 py-1 rounded bg-indigo-500/10" title="Renombrar Pestaña"><i class="fa-solid fa-pen-to-square mr-1"></i>Editar</button>
+                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-500 hover:text-rose-700 text-xs px-2 py-1 rounded bg-rose-500/10" title="Eliminar Pestaña"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                        </div>
+                    </div>
+
+                    <!-- Estatus -->
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Estatus:</span>
+                        <div class="flex flex-wrap gap-2">
+                            ${item.statuses.map(st => {
+                                const currentColor = statusColorsMap[st] || '#6366f1';
+                                return `
+                                <div class="inline-flex items-center gap-2 theme-card border px-2 py-1 rounded-lg text-[11px] shadow-sm">
+                                    <span class="font-medium">${st}</span>
+                                    <div class="flex items-center gap-1 relative group">
+                                        <div class="color-swatch ${currentColor === statusColorsMap[st] ? 'selected' : ''}" style="background-color: ${currentColor}; width: 18px; height: 18px;" onclick="toggleSwatchPalette('${st}', event)" title="Cambiar Color"></div>
+                                        <i onclick="removeStatusConfig('${item.name}', '${st}')" class="fa-solid fa-xmark text-slate-400 hover:text-rose-500 cursor-pointer ml-1"></i>
+                                        
+                                        <div id="palette_${cleanId(st)}" class="hidden absolute left-0 top-full mt-2 theme-card border rounded-xl p-3 shadow-2xl z-50 w-56">
+                                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Paleta de Colores</div>
+                                            <div class="grid grid-cols-6 gap-2 mb-3">
+                                                ${PRESET_SWATCHES.map(hex => `
+                                                    <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
+                                                `).join('')}
+                                            </div>
+                                            <div class="flex items-center gap-2 border-t border-slate-200 dark:border-slate-700 pt-2">
+                                                <span class="text-[10px] font-semibold text-slate-400">HEX:</span>
+                                                <input type="color" value="${currentColor}" onchange="selectStatusColor('${st}', this.value)" class="w-7 h-7 rounded cursor-pointer bg-transparent border-0">
+                                                <input type="text" value="${currentColor}" onchange="selectStatusColor('${st}', this.value)" class="theme-input border rounded px-1.5 py-0.5 text-[10px] w-16">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Columnas Personalizadas -->
+                    <div class="pt-1 border-t border-slate-200 dark:border-slate-800">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Columnas Personalizadas:</span>
+                        <div class="flex flex-wrap gap-2">
+                            ${(!item.columns || item.columns.length === 0) ? `<span class="text-[11px] text-slate-400 italic">Sin columnas adicionales</span>` : item.columns.map(col => `
+                                <div class="inline-flex items-center gap-1.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded text-[11px] font-medium">
+                                    <span>${col}</span>
+                                    <i onclick="removeColumnConfig('${item.name}', '${col}')" class="fa-solid fa-xmark hover:text-rose-500 cursor-pointer"></i>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 </div>
@@ -1818,7 +1673,6 @@
             statusColorsMap[statusName] = hexColor;
             await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
             renderConfigTree();
-            if(editingTabName) renderTabEditModalContents();
             applyAllFilters();
         };
 
@@ -1873,10 +1727,9 @@
             if (!catName) return;
 
             if (!pipelineList.some(i => i.name === catName)) {
-                pipelineList.push({ name: catName, statuses: ['General'], columns: {} });
+                pipelineList.push({ name: catName, statuses: ['General'], columns: [] });
                 await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
                 input.value = '';
-                renderConfigTree();
             } else {
                 showAlert("Categoría Existente", "Ya existe una categoría con ese nombre.", "warning");
             }
@@ -1885,7 +1738,7 @@
         window.removeCategoryConfig = function(catName) {
             showConfirm(
                 "Eliminar Categoría", 
-                `¿Deseas eliminar la categoría <strong>${catName}</strong> y todos sus datos asociados?`, 
+                `¿Deseas eliminar la categoría <strong>${catName}</strong> y todos sus estatus y columnas asociados?`, 
                 async (confirmed) => {
                     if (confirmed) {
                         pipelineList = pipelineList.filter(i => i.name !== catName);
@@ -1894,6 +1747,58 @@
                     }
                 }
             );
+        };
+
+        window.addStatusConfig = async function() {
+            const catSelect = document.getElementById('configCategorySelect').value;
+            const statusInput = document.getElementById('newStatusName');
+            const stName = statusInput.value.trim();
+
+            if (!catSelect || !stName) return;
+
+            const catObj = pipelineList.find(i => i.name === catSelect);
+            if (catObj && !catObj.statuses.includes(stName)) {
+                catObj.statuses.push(stName);
+                if (!statusColorsMap[stName]) statusColorsMap[stName] = '#6366f1';
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                statusInput.value = '';
+            }
+        };
+
+        window.removeStatusConfig = async function(catName, stName) {
+            const catObj = pipelineList.find(i => i.name === catName);
+            if (catObj) {
+                catObj.statuses = catObj.statuses.filter(s => s !== stName);
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+            }
+        };
+
+        window.addColumnConfig = async function() {
+            const catSelect = document.getElementById('configColCategorySelect').value;
+            const colInput = document.getElementById('newColumnName');
+            const colName = colInput.value.trim();
+
+            if (!catSelect || !colName) return;
+
+            const catObj = pipelineList.find(i => i.name === catSelect);
+            if (catObj) {
+                if (!catObj.columns) catObj.columns = [];
+                if (!catObj.columns.includes(colName)) {
+                    catObj.columns.push(colName);
+                    await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                    colInput.value = '';
+                } else {
+                    showAlert("Columna Existente", "Esta columna ya existe en la categoría.", "warning");
+                }
+            }
+        };
+
+        window.removeColumnConfig = async function(catName, colName) {
+            const catObj = pipelineList.find(i => i.name === catName);
+            if (catObj && catObj.columns) {
+                catObj.columns = catObj.columns.filter(c => c !== colName);
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+            }
         };
     </script>
 </body>
