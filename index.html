@@ -134,8 +134,8 @@
                         <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
                     </div>
                     <div class="min-w-0">
-                        <h2 class="font-bold text-base truncate">RefiGo Portal</h2>
-                        <span class="text-xs text-slate-600 dark:text-slate-400 block truncate">Gestión de Talento</span>
+                        <h2 class="font-bold text-base truncate text-slate-900 dark:text-white">RefiGo Portal</h2>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 block truncate">Gestión de Talento</span>
                     </div>
                 </div>
                 <button onclick="toggleSidebar()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white text-xl p-2">
@@ -174,8 +174,8 @@
                 </button>
 
                 <div class="min-w-0">
-                    <h1 class="text-sm sm:text-base font-bold tracking-wide truncate">RefiGo Portal</h1>
-                    <p class="text-[11px] text-slate-600 dark:text-slate-400 truncate" id="currentCategoryLabel">Dashboard General</p>
+                    <h1 class="text-sm sm:text-base font-bold tracking-wide text-slate-900 dark:text-white truncate">RefiGo Portal</h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="currentCategoryLabel">Dashboard General</p>
                 </div>
             </div>
             
@@ -203,26 +203,26 @@
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Total Candidatos</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block truncate">Total Candidatos</span>
                 <div id="metricTotal" class="text-xl sm:text-2xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Referred</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block truncate">Referred</span>
                 <div id="metricReferred" class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Cold</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block truncate">Cold</span>
                 <div id="metricCold" class="text-xl sm:text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 block truncate">Rejected / Other</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block truncate">Rejected / Other</span>
                 <div id="metricOther" class="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
             </div>
         </div>
 
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             <div class="relative w-full lg:w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 dark:text-slate-400 text-sm"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
                 <input type="text" id="globalSearch" placeholder="Buscar por nombre, correo, cel..." 
                        class="w-full theme-input border text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 transition shadow-sm font-medium">
             </div>
@@ -235,8 +235,8 @@
 
                 <div class="relative flex items-center theme-card border rounded-xl px-3 py-2 text-xs shadow-sm flex-1 sm:flex-initial">
                     <i class="fa-regular fa-calendar text-indigo-600 dark:text-indigo-400 mr-2 flex-shrink-0"></i>
-                    <span class="text-slate-600 dark:text-slate-400 mr-2 hidden sm:inline font-medium">Fecha:</span>
-                    <input type="date" id="dateFilterInput" class="bg-transparent focus:outline-none text-xs cursor-pointer w-full font-medium">
+                    <span class="text-slate-500 dark:text-slate-400 mr-2 hidden sm:inline font-medium">Fecha:</span>
+                    <input type="date" id="dateFilterInput" class="bg-transparent text-slate-900 dark:text-white focus:outline-none text-xs cursor-pointer w-full font-medium">
                 </div>
                 <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-500 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex-shrink-0 font-semibold" title="Quitar fecha">
                     <i class="fa-solid fa-xmark"></i>
@@ -251,12 +251,12 @@
         <div id="dashboardView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
             <div class="p-3.5 sm:p-4 border-b border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 bg-slate-100 dark:bg-slate-900/40 rounded-t-2xl">
                 <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
-                <span class="text-[11px] font-medium text-slate-600 dark:text-slate-400">Selecciona una categoría en el menú lateral para interactuar.</span>
+                <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400">Selecciona una categoría en el menú lateral para interactuar.</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-200/70 dark:bg-slate-900/80 text-slate-700 dark:text-slate-300 font-semibold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
+                        <tr class="bg-slate-200/70 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 font-semibold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                             <th class="py-3 px-4">Nombre / Referido</th>
                             <th class="py-3 px-4">Contacto</th>
                             <th class="py-3 px-4">Pestaña</th>
@@ -272,8 +272,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-400 flex justify-between items-center rounded-b-2xl font-medium">
-                <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-700 dark:text-slate-200">0</strong></span>
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 flex justify-between items-center rounded-b-2xl font-medium">
+                <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
             </div>
         </div>
 
@@ -281,7 +281,7 @@
             <div class="overflow-x-auto min-h-[350px]">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr id="categoryTableHead" class="bg-slate-200/70 dark:bg-slate-900/80 text-slate-700 dark:text-slate-300 font-semibold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
+                        <tr id="categoryTableHead" class="bg-slate-200/70 dark:bg-slate-900/80 text-slate-800 dark:text-slate-200 font-semibold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                         </tr>
                     </thead>
                     <tbody id="categoryTableBody" class="divide-y divide-slate-300 dark:divide-slate-700/50">
@@ -289,8 +289,8 @@
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-400 flex justify-between items-center rounded-b-2xl font-medium">
-                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-slate-200">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-700 dark:text-slate-200">0</strong> en esta categoría</span>
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-400 flex justify-between items-center rounded-b-2xl font-medium">
+                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-700 dark:text-indigo-300">0</strong> en esta categoría</span>
             </div>
         </div>
 
@@ -299,32 +299,32 @@
     <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base sm:text-lg" id="modalTitle">Nuevo Candidato</h3>
+                <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white" id="modalTitle">Nuevo Candidato</h3>
                 <button onclick="closeModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Nombre Completo</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nombre Completo</label>
                     <input type="text" id="inputName" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Correo <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Correo <span class="text-rose-500">*</span></label>
                         <input type="email" id="inputEmail" required class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Número (Prefijo +503) <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Número (Prefijo +503) <span class="text-rose-500">*</span></label>
                         <input type="text" id="inputPhone" required placeholder="+503 " class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
                         <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium">
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Estatus <span class="text-slate-400 font-normal">(Opcional)</span></label>
+                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Estatus <span class="text-slate-400 font-normal">(Opcional)</span></label>
                         <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50 font-medium">
                         </select>
                     </div>
@@ -332,7 +332,7 @@
                 <div id="modalCustomFieldsContainer" class="space-y-3 pt-1 border-t border-slate-300 dark:border-slate-700"></div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">Notas / Detalle</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Notas / Detalle</label>
                     <textarea id="inputNotes" rows="3" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-medium"></textarea>
                 </div>
             </div>
@@ -345,10 +345,55 @@
         </div>
     </div>
 
+    <div id="whatsappModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate text-slate-900 dark:text-white">
+                    <i class="fa-brands fa-whatsapp text-emerald-500 text-lg"></i>
+                    <span class="truncate">Enviar WhatsApp a: <strong id="waCandidateName" class="text-indigo-600 dark:text-indigo-400"></strong></span>
+                </h3>
+                <button onclick="closeWhatsAppModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
+                <!-- Creator Form -->
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
+                    <span class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Título de Plantilla (para buscar)</label>
+                        <input type="text" id="waTemplateTitleInput" placeholder="Ej. Invitación a Entrevista, Recordatorio..." class="theme-input border rounded-xl p-3 text-xs w-full font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">Mensaje Predefinido</label>
+                        <textarea id="waTemplateMessageInput" rows="3" placeholder="Hola [Nombre], te contactamos de RefiGo..." class="theme-input border rounded-xl p-3 text-xs w-full font-medium"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="saveWhatsAppTemplate()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar Plantilla
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Templates List -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Plantillas Guardadas</span>
+                        <input type="text" id="waSearchTemplateInput" oninput="filterWhatsAppTemplates(this.value)" placeholder="Buscar plantilla..." class="theme-input border rounded-lg px-3 py-1.5 text-xs w-48 font-medium">
+                    </div>
+                    <div id="waTemplatesListContainer" class="space-y-2 pt-1"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t border-slate-300 dark:border-slate-700">
+                <button onclick="closeWhatsAppModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 text-xs px-4 py-2.5 rounded-xl transition font-semibold">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base sm:text-lg"><i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 mr-2"></i>Gestión Global de Pestañas</h3>
+                <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white"><i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 mr-2"></i>Gestión Global de Pestañas</h3>
                 <button onclick="closeConfigModal()" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
@@ -362,7 +407,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Estructura & Pestañas Actuales</span>
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Estructura & Pestañas Actuales</span>
                     <div id="configPipelineTree" class="space-y-2 text-xs"></div>
                 </div>
             </div>
@@ -372,7 +417,7 @@
     <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate">
+                <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate text-slate-900 dark:text-white">
                     <i class="fa-solid fa-folder-open text-indigo-600 dark:text-indigo-400"></i>
                     <span class="truncate">Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
                 </h3>
@@ -401,7 +446,7 @@
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base flex items-center gap-2">
+                <h3 class="font-bold text-base flex items-center gap-2 text-slate-900 dark:text-white">
                     <i class="fa-solid fa-file-export text-indigo-600 dark:text-indigo-400"></i>
                     <span>Exportación Personalizada</span>
                 </h3>
@@ -430,11 +475,11 @@
                 <div id="pdfOrientationContainer">
                     <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Orientación de Página (PDF)</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold">
+                        <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold text-slate-800 dark:text-slate-200">
                             <input type="radio" name="pdfOrientation" value="portrait" checked class="text-indigo-600 focus:ring-0">
                             <span>Vertical</span>
                         </label>
-                        <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold">
+                        <label class="flex items-center gap-2 theme-input border p-3 rounded-xl cursor-pointer hover:border-indigo-500 transition font-semibold text-slate-800 dark:text-slate-200">
                             <input type="radio" name="pdfOrientation" value="landscape" class="text-indigo-600 focus:ring-0">
                             <span>Horizontal</span>
                         </label>
@@ -447,7 +492,7 @@
                         <button onclick="toggleAllExportCols(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[11px] font-semibold">Marcar Todas</button>
                     </div>
                     
-                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-900/60 p-3 border border-slate-300 dark:border-slate-700/80 rounded-xl max-h-48 overflow-y-auto font-medium">
+                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-900/60 p-3 border border-slate-300 dark:border-slate-700/80 rounded-xl max-h-48 overflow-y-auto font-medium text-slate-800 dark:text-slate-200">
                     </div>
                 </div>
             </div>
@@ -468,7 +513,7 @@
                 <i id="alertIcon" class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
-                <h3 id="alertTitle" class="font-bold text-base">Atención</h3>
+                <h3 id="alertTitle" class="font-bold text-base text-slate-900 dark:text-white">Atención</h3>
                 <p id="alertMessage" class="text-xs text-slate-700 dark:text-slate-300 mt-2 leading-relaxed font-medium"></p>
             </div>
             <div class="pt-2">
@@ -483,7 +528,7 @@
                 <i class="fa-solid fa-trash-can"></i>
             </div>
             <div>
-                <h3 id="confirmTitle" class="font-bold text-base">¿Confirmar Acción?</h3>
+                <h3 id="confirmTitle" class="font-bold text-base text-slate-900 dark:text-white">¿Confirmar Acción?</h3>
                 <p id="confirmMessage" class="text-xs text-slate-700 dark:text-slate-300 mt-2 leading-relaxed font-medium"></p>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
@@ -496,11 +541,11 @@
     <div id="renameModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-sm"><i class="fa-solid fa-pen-to-square text-indigo-600 dark:text-indigo-400 mr-2"></i>Renombrar Categoría</h3>
+                <h3 class="font-bold text-sm text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-indigo-600 dark:text-indigo-400 mr-2"></i>Renombrar Categoría</h3>
                 <button onclick="closeRenameModal(false)" class="text-slate-500 hover:text-slate-800 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-2">
-                <label class="block text-xs text-slate-700 dark:text-slate-400 font-medium">Nuevo Nombre de Pestaña</label>
+                <label class="block text-xs text-slate-700 dark:text-slate-300 font-medium">Nuevo Nombre de Pestaña</label>
                 <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium">
             </div>
             <div class="flex justify-end gap-2 pt-2">
@@ -529,9 +574,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const candidatesCol = collection(db, "candidates");
+        const templatesCol = collection(db, "whatsapp_templates");
         const configDocRef = doc(db, "pipeline_config", "structure");
 
         let allCandidates = [];
+        let whatsappTemplates = [];
+        let activeWhatsAppCandidateId = null;
         let activeTabSheet = 'ALL';
         let currentEditingDocId = null;
         let columnFilters = { status: {} };
@@ -651,6 +699,20 @@
                 renameCallback = null;
             }
         };
+
+        // Snapshot WhatsApp templates
+        onSnapshot(templatesCol, (snapshot) => {
+            whatsappTemplates = [];
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                whatsappTemplates.push({
+                    id: docSnap.id,
+                    title: data.title || 'Sin Título',
+                    message: data.message || ''
+                });
+            });
+            renderWhatsAppTemplatesList(whatsappTemplates);
+        });
 
         onSnapshot(configDocRef, (snap) => {
             if (snap.exists()) {
@@ -794,12 +856,12 @@
             }
 
             container.innerHTML = `
-                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium text-slate-800 dark:text-slate-200">
                     <input type="checkbox" checked onchange="toggleSelectAll('status', this.checked)" class="rounded theme-input">
                     <strong>(Select All)</strong>
                 </label>
             ` + allowedStatuses.map(val => `
-                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium text-slate-800 dark:text-slate-200">
                     <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" checked>
                     <span>${val}</span>
                 </label>
@@ -812,12 +874,12 @@
                         const uniqueVals = catObj.columns[colName] || [];
                         if (uniqueVals.length > 0) {
                             colContainer.innerHTML = `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium text-slate-800 dark:text-slate-200">
                                     <input type="checkbox" checked onchange="toggleSelectAll('custom_${cleanId(colName)}', this.checked)" class="rounded theme-input">
                                     <strong>(Select All)</strong>
                                 </label>
                             ` + uniqueVals.map(val => `
-                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium">
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-medium text-slate-800 dark:text-slate-200">
                                     <input type="checkbox" value="${val}" class="col-check-custom_${cleanId(colName)} rounded theme-input" checked>
                                     <span>${val}</span>
                                 </label>
@@ -885,23 +947,11 @@
             return clean !== '' && clean !== '-';
         }
 
-        function sortCandidatesWithNotesFirst(list) {
+        function sortCandidatesByCreation(list) {
             return list.sort((a, b) => {
-                const aHas = hasNotes(a);
-                const bHas = hasNotes(b);
-
-                if (aHas && !bHas) return -1;
-                if (!aHas && bHas) return 1;
-
-                if (aHas && bHas) {
-                    const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-                    const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-                    return timeA - timeB; // Chronological ascending (oldest first, new items at the bottom)
-                }
-
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
-                return timeA - timeB; // Chronological ascending (oldest first, new items at the bottom)
+                return timeA - timeB; // Chronological ascending (oldest first, new entries appear at the bottom)
             });
         }
 
@@ -943,7 +993,7 @@
                     return matchesSearch && matchesDate;
                 });
 
-                renderDemoDashboard(sortCandidatesWithNotesFirst(filtered));
+                renderDemoDashboard(sortCandidatesByCreation(filtered));
                 restartCarouselLoop();
             } else {
                 const catObj = pipelineList.find(c => c.name === activeTabSheet);
@@ -981,7 +1031,7 @@
                     return matchesCategory && matchesStatusCol && matchesCustomCols && matchesSearch && matchesDate;
                 });
 
-                renderCategoryTable(sortCandidatesWithNotesFirst(filtered));
+                renderCategoryTable(sortCandidatesByCreation(filtered));
             }
         }
 
@@ -1004,7 +1054,7 @@
             }
 
             tbody.innerHTML = data.map(c => `
-                <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-700/30 transition border-b border-slate-300 dark:border-slate-700/40 h-[58px] ${hasNotes(c) ? 'bg-indigo-50/70 dark:bg-indigo-950/20' : ''}">
+                <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-700/30 transition border-b border-slate-300 dark:border-slate-700/40 h-[58px]">
                     <td class="py-3 px-4 font-semibold text-slate-900 dark:text-white w-1/4 truncate">${c.name}</td>
                     <td class="py-3 px-4 text-xs space-y-0.5 w-1/4 truncate">
                         <div class="text-slate-800 dark:text-slate-200 font-semibold">${c.email}</div>
@@ -1045,9 +1095,9 @@
                         <th class="py-3 px-4 relative">
                             <div class="flex items-center justify-between cursor-pointer font-bold text-slate-800 dark:text-slate-200" onclick="toggleDropdown('colFilter_${cleanId(colName)}')">
                                 <span>${colName}</span>
-                                <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
+                                <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
                             </div>
-                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-medium">
+                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-medium text-slate-800 dark:text-slate-200">
                                 <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block font-semibold"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
                                 <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block mb-2 font-semibold"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
                                 <hr class="border-slate-300 dark:border-slate-700 my-2">
@@ -1075,9 +1125,9 @@
                 <th class="py-3 px-4 relative font-bold text-slate-800 dark:text-slate-200">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
-                        <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
+                        <i class="fa-solid fa-filter text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
                     </div>
-                    <div id="statusFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-medium">
+                    <div id="statusFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-medium text-slate-800 dark:text-slate-200">
                         <button onclick="sortData('status', 'asc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block font-semibold"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
                         <button onclick="sortData('status', 'desc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block mb-2 font-semibold"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
                         <hr class="border-slate-300 dark:border-slate-700 my-2">
@@ -1103,14 +1153,14 @@
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
                 return `
-                <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-700/35 transition border-b border-slate-300 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/60 dark:bg-indigo-900/30' : (candHasNotes ? 'bg-indigo-50/70 dark:bg-indigo-950/20' : '')}">
+                <tr class="hover:bg-slate-200/50 dark:hover:bg-slate-700/35 transition border-b border-slate-300 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/60 dark:bg-indigo-900/30' : ''}">
                     <td class="py-3.5 px-4 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
                     <td class="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">${c.name}</td>
                     <td class="py-3.5 px-4 text-xs space-y-0.5">
-                        <div class="text-slate-800 dark:text-slate-200 font-semibold"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
-                        <div class="text-slate-600 dark:text-slate-400 font-medium"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
+                        <div class="text-slate-800 dark:text-slate-200 font-semibold"><i class="fa-regular fa-envelope mr-1 text-slate-400"></i>${c.email}</div>
+                        <div class="text-slate-600 dark:text-slate-400 font-medium"><i class="fa-solid fa-phone mr-1 text-slate-400"></i>${c.phone}</div>
                     </td>
                     <td class="py-3.5 px-4">
                         ${renderStatusBadge(c.status)}
@@ -1130,16 +1180,16 @@
                     </td>
                     <td class="py-3.5 px-4 text-center">
                         <div class="inline-flex items-center justify-center space-x-2">
-                            <a href="https://web.whatsapp.com/send?phone=${cleanPhone(c.phone)}" target="_blank" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="WhatsApp">
+                            <button onclick="openWhatsAppModal('${c.docId}')" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="WhatsApp Mensajes Predeterminados">
                                 <i class="fa-brands fa-whatsapp text-base"></i>
-                            </a>
+                            </button>
 
                             <div class="relative">
                                 <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
                                     <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                                 </button>
 
-                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-2xl shadow-2xl p-3 w-64 z-50 text-left normal-case font-medium">
+                                <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-2xl shadow-2xl p-3 w-64 z-50 text-left normal-case font-medium text-slate-800 dark:text-slate-200">
                                     <div class="border-b border-slate-300 dark:border-slate-700 pb-2 mb-2">
                                         <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Información de Registro</span>
                                         <div class="text-xs text-slate-800 dark:text-slate-300 mt-1">
@@ -1147,7 +1197,7 @@
                                         </div>
                                         ${c.updatedAt ? `
                                         <div class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                                            <i class="fa-solid fa-rotate-right text-slate-500 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
+                                            <i class="fa-solid fa-rotate-right text-slate-400 mr-1"></i> <strong>Actualizado:</strong> ${formatDate(c.updatedAt)}
                                         </div>` : ''}
                                     </div>
 
@@ -1170,6 +1220,100 @@
 
             updateHeaderCheckboxState(data);
         }
+
+        // WhatsApp Modal & Templates Functions
+        window.openWhatsAppModal = function(docId) {
+            const cand = allCandidates.find(c => c.docId === docId);
+            if (!cand) return;
+            activeWhatsAppCandidateId = docId;
+            document.getElementById('waCandidateName').textContent = cand.name;
+            document.getElementById('waTemplateTitleInput').value = '';
+            document.getElementById('waTemplateMessageInput').value = '';
+            document.getElementById('waSearchTemplateInput').value = '';
+            renderWhatsAppTemplatesList(whatsappTemplates);
+            document.getElementById('whatsappModal').classList.remove('hidden');
+        };
+
+        window.closeWhatsAppModal = function() {
+            document.getElementById('whatsappModal').classList.add('hidden');
+            activeWhatsAppCandidateId = null;
+        };
+
+        window.saveWhatsAppTemplate = async function() {
+            const title = document.getElementById('waTemplateTitleInput').value.trim();
+            const message = document.getElementById('waTemplateMessageInput').value.trim();
+
+            if (!title || !message) {
+                showAlert("Campos Requeridos", "Debes ingresar un <strong>título</strong> y el <strong>mensaje predefinido</strong> para guardar la plantilla.", "warning");
+                return;
+            }
+
+            await addDoc(templatesCol, { title, message });
+            document.getElementById('waTemplateTitleInput').value = '';
+            document.getElementById('waTemplateMessageInput').value = '';
+            showAlert("Plantilla Guardada", "La plantilla de WhatsApp se ha guardado correctamente.", "success");
+        };
+
+        window.confirmDeleteWhatsAppTemplate = function(templateId, templateTitle) {
+            showConfirm(
+                "Eliminar Plantilla",
+                `¿Estás seguro de que deseas eliminar la plantilla <strong>"${templateTitle}"</strong>? Esta acción no se puede deshacer.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        await deleteDoc(doc(db, "whatsapp_templates", templateId));
+                        showAlert("Plantilla Eliminada", "La plantilla ha sido eliminada.", "success");
+                    }
+                }
+            );
+        };
+
+        window.filterWhatsAppTemplates = function(query) {
+            const filtered = whatsappTemplates.filter(t => t.title.toLowerCase().includes(query.toLowerCase()) || t.message.toLowerCase().includes(query.toLowerCase()));
+            renderWhatsAppTemplatesList(filtered);
+        };
+
+        function renderWhatsAppTemplatesList(templates) {
+            const container = document.getElementById('waTemplatesListContainer');
+            if (!container) return;
+
+            if (templates.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-slate-500 font-medium text-xs">No hay plantillas guardadas. Crea una arriba.</div>`;
+                return;
+            }
+
+            container.innerHTML = templates.map(t => `
+                <div class="theme-card border rounded-xl p-3 space-y-2 flex flex-col justify-between shadow-sm">
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="font-bold text-indigo-700 dark:text-indigo-300 text-xs"><i class="fa-solid fa-bookmark mr-1.5 text-emerald-500"></i>${t.title}</span>
+                        <button onclick="confirmDeleteWhatsAppTemplate('${t.id}', '${t.title.replace(/'/g, "\\'")}')" class="text-rose-500 hover:text-rose-700 text-xs p-1" title="Eliminar Plantilla">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap bg-slate-100 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 font-medium">${t.message}</p>
+                    <div class="flex justify-end pt-1">
+                        <button onclick="sendWhatsAppTemplate('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span>Enviar Mensaje</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.sendWhatsAppTemplate = function(templateId) {
+            const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
+            const template = whatsappTemplates.find(t => t.id === templateId);
+            if (!cand || !template) return;
+
+            let msg = template.message;
+            // Reemplazo automático de etiquetas de variables si las usan
+            msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
+
+            const phoneClean = cleanPhone(cand.phone);
+            const url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+            closeWhatsAppModal();
+        };
 
         window.toggleRowSelection = function(docId, isChecked) {
             if (isChecked) {
@@ -1453,7 +1597,6 @@
                         const status = String(row['Estatus'] || '-').trim();
                         const notes = String(row['Nota'] || row['Notas'] || '-').trim();
 
-                        // Verificar si el candidato ya existe por correo o teléfono para actualizar en lugar de duplicar
                         const existing = allCandidates.find(c => {
                             const matchEmail = email && email !== '-' && c.email && c.email.toLowerCase() === email.toLowerCase();
                             const matchPhone = phone && phone !== '503' && c.phone && cleanPhone(c.phone) === phone;
@@ -1581,7 +1724,7 @@
                 if (options.length > 0) {
                     return `
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">${colName}</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">${colName}</label>
                             <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium" data-colname="${colName}">
                                 <option value="" disabled ${!val ? 'selected' : ''}>-- Seleccionar ${colName} --</option>
                                 ${options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
@@ -1591,7 +1734,7 @@
                 } else {
                     return `
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1">${colName}</label>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">${colName}</label>
                             <input type="text" id="customField_${cleanId(colName)}" value="${val}" placeholder="Escribe ${colName}..." class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-medium" data-colname="${colName}">
                         </div>
                     `;
