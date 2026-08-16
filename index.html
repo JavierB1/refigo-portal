@@ -52,16 +52,19 @@
         .theme-card {
             background-color: var(--bg-card);
             border-color: var(--border-color);
+            color: var(--text-main);
         }
 
         .theme-header {
             background-color: var(--bg-header);
             border-color: var(--border-color);
+            color: var(--text-main);
         }
 
         .theme-sidebar {
             background-color: var(--bg-sidebar);
             border-color: var(--border-color);
+            color: var(--text-main);
         }
 
         .theme-input {
@@ -116,6 +119,11 @@
             transform: scale(1.1);
         }
     </style>
+    <script>
+        if (localStorage.getItem('refigo_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
     <script>
@@ -135,10 +143,10 @@
                     </div>
                     <div class="min-w-0">
                         <h2 class="font-bold text-base truncate text-slate-900 dark:text-white">RefiGo Portal</h2>
-                        <span class="text-xs text-slate-700 dark:text-slate-300 block truncate font-medium">Gestión de Talento</span>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 block truncate">Gestión de Talento</span>
                     </div>
                 </div>
-                <button onclick="toggleSidebar()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white text-xl p-2">
+                <button onclick="toggleSidebar()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white text-xl p-2 font-bold">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -148,18 +156,18 @@
                 
                 <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 active" data-sheet="ALL">
                     <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Dashboard General</span>
-                    <span id="sideCountAll" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
+                    <span id="sideCountAll" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
                 </button>
                 <div id="dynamicSidebarCategories" class="space-y-1.5"></div>
             </div>
         </div>
 
         <div class="space-y-3 pt-4 border-t border-slate-300 dark:border-slate-700">
-            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition font-semibold shadow-sm">
+            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition font-bold shadow-sm">
                 <i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 text-sm"></i>
                 <span>⚙️ Gestión Global de Pestañas</span>
             </button>
-            <div class="text-[11px] text-slate-700 dark:text-slate-300 text-center pb-2 font-medium">
+            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 text-center pb-2">
                 RefiGo Cloud DB • Sincronizado
             </div>
         </div>
@@ -168,29 +176,29 @@
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
-                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white p-2.5 sm:px-3 sm:py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600 flex-shrink-0" title="Abrir Menú">
+                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white p-2.5 sm:px-3 sm:py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600 flex-shrink-0" title="Abrir Menú">
                     <i class="fa-solid fa-bars text-indigo-600 dark:text-indigo-400 text-base"></i>
                     <span class="hidden md:inline">Categorías</span>
                 </button>
 
                 <div class="min-w-0">
                     <h1 class="text-sm sm:text-base font-bold tracking-wide text-slate-900 dark:text-white truncate">RefiGo Portal</h1>
-                    <p class="text-[11px] text-slate-700 dark:text-slate-300 truncate font-medium" id="currentCategoryLabel">Dashboard General</p>
+                    <p class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate" id="currentCategoryLabel">Dashboard General</p>
                 </div>
             </div>
             
             <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
-                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 p-2.5 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600" title="Cambiar Tema">
+                <button onclick="toggleTheme()" id="themeToggleBtn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 p-2.5 sm:px-3 sm:py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600" title="Cambiar Tema">
                     <i id="themeIcon" class="fa-solid fa-moon text-indigo-600 dark:text-indigo-400 text-sm"></i>
                     <span id="themeLabel" class="hidden lg:inline">Modo Oscuro</span>
                 </button>
 
-                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-emerald-600/20" title="Nuevo Candidato">
+                <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-emerald-600/20" title="Nuevo Candidato">
                     <i class="fa-solid fa-user-plus text-sm"></i>
                     <span class="hidden sm:inline">Nuevo</span>
                 </button>
                 
-                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-indigo-600/20" title="Cargar Excel">
+                <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-indigo-600/20" title="Cargar Excel">
                     <i class="fa-solid fa-file-import text-sm"></i>
                     <span class="hidden md:inline">Excel</span>
                     <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden">
@@ -228,20 +236,22 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <button id="exportSelectedBtn" onclick="openExportModal()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
+                <button id="exportSelectedBtn" onclick="openExportModal()" class="hidden text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-md shadow-indigo-600/30">
                     <i class="fa-solid fa-file-export"></i>
                     <span>Exportar (<strong id="selectedCountLabel">0</strong>)</span>
                 </button>
 
-                <div class="relative flex items-center theme-card border rounded-xl px-3 py-2 text-xs shadow-sm flex-1 sm:flex-initial">
-                    <i class="fa-regular fa-calendar text-indigo-600 dark:text-indigo-400 mr-2 flex-shrink-0"></i>
-                    <span class="text-slate-700 dark:text-slate-300 mr-2 hidden sm:inline font-semibold">Fecha:</span>
-                    <input type="date" id="dateFilterInput" class="bg-transparent text-slate-900 dark:text-white focus:outline-none text-xs cursor-pointer w-full font-semibold">
+                <div class="relative flex items-center theme-card border rounded-xl px-3 py-2 text-xs shadow-sm flex-1 sm:flex-initial gap-2">
+                    <i class="fa-regular fa-calendar text-indigo-600 dark:text-indigo-400 flex-shrink-0"></i>
+                    <span class="text-slate-800 dark:text-slate-200 font-bold">Del:</span>
+                    <input type="date" id="dateFromInput" class="bg-transparent text-slate-900 dark:text-white focus:outline-none text-xs cursor-pointer font-bold">
+                    <span class="text-slate-800 dark:text-slate-200 font-bold">Al:</span>
+                    <input type="date" id="dateToInput" class="bg-transparent text-slate-900 dark:text-white focus:outline-none text-xs cursor-pointer font-bold">
                 </div>
-                <button id="clearDateBtn" onclick="clearDateFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex-shrink-0 font-semibold" title="Quitar fecha">
+                <button id="clearDateBtn" onclick="clearDateRangeFilter()" class="hidden text-xs bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex-shrink-0 font-bold" title="Quitar fechas">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
-                <button id="clearAllFiltersBtn" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-2 shadow-sm flex-1 sm:flex-initial justify-center font-semibold">
+                <button id="clearAllFiltersBtn" class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition flex items-center gap-2 shadow-sm flex-1 sm:flex-initial justify-center font-bold">
                     <i class="fa-solid fa-filter-circle-xmark text-indigo-600 dark:text-indigo-400"></i>
                     <span>Limpiar Todo</span>
                 </button>
@@ -251,7 +261,7 @@
         <div id="dashboardView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
             <div class="p-3.5 sm:p-4 border-b border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 bg-slate-100 dark:bg-slate-900/40 rounded-t-2xl">
                 <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
-                <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Selecciona una categoría en el menú lateral para interactuar.</span>
+                <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Selecciona una categoría en el menú lateral para interactuar.</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
@@ -272,7 +282,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 flex justify-between items-center rounded-b-2xl font-bold">
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
                 <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
             </div>
         </div>
@@ -289,7 +299,7 @@
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 flex justify-between items-center rounded-b-2xl font-bold">
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
                 <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-700 dark:text-indigo-300">0</strong> en esta categoría</span>
             </div>
         </div>
@@ -300,7 +310,7 @@
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white" id="modalTitle">Nuevo Candidato</h3>
-                <button onclick="closeModal()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-sm">
                 <div>
@@ -337,7 +347,7 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-2 border-t border-slate-300 dark:border-slate-700 pt-3">
-                <button onclick="saveCandidate()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md">
+                <button onclick="saveCandidate()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-floppy-disk text-sm"></i>
                     <span>Guardar en Nube</span>
                 </button>
@@ -352,11 +362,10 @@
                     <i class="fa-brands fa-whatsapp text-emerald-500 text-lg"></i>
                     <span class="truncate">WhatsApp a: <strong id="waCandidateName" class="text-indigo-600 dark:text-indigo-400"></strong></span>
                 </h3>
-                <button onclick="closeWhatsAppModal()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeWhatsAppModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
-                <!-- Creator / Editor Form -->
                 <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
                     <span id="waFormTitleLabel" class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
                     <input type="hidden" id="waEditingTemplateId" value="">
@@ -369,14 +378,13 @@
                         <textarea id="waTemplateMessageInput" rows="3" placeholder="Hola [Nombre], te contactamos de RefiGo..." class="theme-input border rounded-xl p-3 text-xs w-full font-semibold"></textarea>
                     </div>
                     <div class="flex justify-end gap-2">
-                        <button id="waCancelEditBtn" onclick="cancelWhatsAppEdit()" class="hidden bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-semibold px-4 py-2.5 rounded-xl transition shadow-sm text-xs">Cancelar</button>
-                        <button onclick="saveWhatsAppTemplate()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm text-xs flex items-center gap-1.5">
+                        <button id="waCancelEditBtn" onclick="cancelWhatsAppEdit()" class="hidden bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold px-4 py-2.5 rounded-xl transition shadow-sm text-xs">Cancelar</button>
+                        <button onclick="saveWhatsAppTemplate()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm text-xs flex items-center gap-1.5">
                             <i class="fa-solid fa-floppy-disk"></i> <span id="waSaveBtnText">Guardar Plantilla</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Templates Card List -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Plantillas Guardadas</span>
@@ -398,15 +406,15 @@
                 <h4 id="waViewTitle" class="font-bold text-sm text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
                     <i class="fa-solid fa-bookmark text-emerald-500"></i> <span></span>
                 </h4>
-                <button onclick="closeWaViewModal()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeWaViewModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div>
                 <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Mensaje Configurado:</label>
-                <div id="waViewMessageContent" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-300 dark:border-slate-700 font-medium leading-relaxed"></div>
+                <div id="waViewMessageContent" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold leading-relaxed"></div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeWaViewModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-semibold">Cerrar</button>
-                <button id="waViewSendBtn" onclick="" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-xl font-semibold flex items-center gap-1.5">
+                <button onclick="closeWaViewModal()" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-4 py-2.5 rounded-xl font-bold">Cerrar</button>
+                <button id="waViewSendBtn" onclick="" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 shadow-md">
                     <i class="fa-brands fa-whatsapp"></i> Enviar a Candidato
                 </button>
             </div>
@@ -417,7 +425,7 @@
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white"><i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 mr-2"></i>Gestión Global de Pestañas</h3>
-                <button onclick="closeConfigModal()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeConfigModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
@@ -425,7 +433,7 @@
                     <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">Agregar Nueva Pestaña / Categoría</span>
                     <div class="flex flex-col sm:flex-row gap-2">
                         <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
-                        <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Crear</button>
+                        <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Crear</button>
                     </div>
                 </div>
 
@@ -444,7 +452,7 @@
                     <i class="fa-solid fa-folder-open text-indigo-600 dark:text-indigo-400"></i>
                     <span class="truncate">Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
                 </h3>
-                <button onclick="closeTabEditModal()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeTabEditModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
@@ -453,7 +461,7 @@
                     
                     <div class="flex flex-col sm:flex-row gap-2">
                         <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Canal, Región)" class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
-                        <button onclick="addColumnToTab()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Columna</button>
+                        <button onclick="addColumnToTab()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Columna</button>
                     </div>
 
                     <div id="modalTabColumnsList" class="space-y-3 pt-1"></div>
@@ -461,7 +469,7 @@
             </div>
 
             <div class="flex justify-end pt-3 border-t border-slate-300 dark:border-slate-700">
-                <button onclick="closeTabEditModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl transition shadow-sm">Guardar y Cerrar</button>
+                <button onclick="closeTabEditModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-sm">Guardar y Cerrar</button>
             </div>
         </div>
     </div>
@@ -473,7 +481,7 @@
                     <i class="fa-solid fa-file-export text-indigo-600 dark:text-indigo-400"></i>
                     <span>Exportación Personalizada</span>
                 </h3>
-                <button onclick="closeExportModal()" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeExportModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="space-y-4 text-xs">
@@ -521,8 +529,8 @@
             </div>
 
             <div class="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-slate-300 dark:border-slate-700">
-                <button onclick="closeExportModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 text-xs px-4 py-3 rounded-xl transition font-semibold">Cancelar</button>
-                <button onclick="executeExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                <button onclick="closeExportModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 text-xs px-4 py-3 rounded-xl transition font-bold">Cancelar</button>
+                <button onclick="executeExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
                     <i class="fa-solid fa-download"></i>
                     <span>Descargar Archivo</span>
                 </button>
@@ -537,10 +545,10 @@
             </div>
             <div>
                 <h3 id="alertTitle" class="font-bold text-base text-slate-900 dark:text-white">Atención</h3>
-                <p id="alertMessage" class="text-xs text-slate-800 dark:text-slate-200 mt-2 leading-relaxed font-semibold"></p>
+                <p id="alertMessage" class="text-xs text-slate-900 dark:text-slate-100 mt-2 leading-relaxed font-semibold"></p>
             </div>
             <div class="pt-2">
-                <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md">Entendido</button>
+                <button onclick="closeAlertModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-md">Entendido</button>
             </div>
         </div>
     </div>
@@ -552,11 +560,11 @@
             </div>
             <div>
                 <h3 id="confirmTitle" class="font-bold text-base text-slate-900 dark:text-white">¿Confirmar Acción?</h3>
-                <p id="confirmMessage" class="text-xs text-slate-800 dark:text-slate-200 mt-2 leading-relaxed font-semibold"></p>
+                <p id="confirmMessage" class="text-xs text-slate-900 dark:text-slate-100 mt-2 leading-relaxed font-semibold"></p>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
-                <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 font-semibold text-xs py-3 rounded-xl transition">Cancelar</button>
-                <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md shadow-rose-600/30">Sí, Eliminar</button>
+                <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 font-bold text-xs py-3 rounded-xl transition">Cancelar</button>
+                <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-md shadow-rose-600/30">Sí, Eliminar</button>
             </div>
         </div>
     </div>
@@ -565,15 +573,15 @@
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
                 <h3 class="font-bold text-sm text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-indigo-600 dark:text-indigo-400 mr-2"></i>Renombrar Categoría</h3>
-                <button onclick="closeRenameModal(false)" class="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeRenameModal(false)" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-2">
                 <label class="block text-xs text-slate-800 dark:text-slate-200 font-bold">Nuevo Nombre de Pestaña</label>
                 <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-3 py-2.5 rounded-xl transition font-semibold">Cancelar</button>
-                <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-sm">Guardar</button>
+                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-3 py-2.5 rounded-xl transition font-bold">Cancelar</button>
+                <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-sm">Guardar</button>
             </div>
         </div>
     </div>
@@ -723,7 +731,6 @@
             }
         };
 
-        // Snapshot WhatsApp templates
         onSnapshot(templatesCol, (snapshot) => {
             whatsappTemplates = [];
             snapshot.forEach(docSnap => {
@@ -780,7 +787,7 @@
             container.innerHTML = pipelineList.map(item => `
                 <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-white transition" data-sheet="${item.name}">
                     <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-600 dark:text-indigo-400"></i> ${item.name}</span>
-                    <span id="sideCount_${cleanId(item.name)}" class="bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
+                    <span id="sideCount_${cleanId(item.name)}" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
                 </button>
             `).join('');
 
@@ -944,21 +951,27 @@
         };
 
         document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
-        document.getElementById('dateFilterInput').addEventListener('change', (e) => {
-            const val = e.target.value;
-            document.getElementById('clearDateBtn').classList.toggle('hidden', !val);
+        
+        function checkDateRangeVisibility() {
+            const fromVal = document.getElementById('dateFromInput').value;
+            const toVal = document.getElementById('dateToInput').value;
+            document.getElementById('clearDateBtn').classList.toggle('hidden', !fromVal && !toVal);
             applyAllFilters();
-        });
+        }
 
-        window.clearDateFilter = function() {
-            document.getElementById('dateFilterInput').value = '';
+        document.getElementById('dateFromInput').addEventListener('change', checkDateRangeVisibility);
+        document.getElementById('dateToInput').addEventListener('change', checkDateRangeVisibility);
+
+        window.clearDateRangeFilter = function() {
+            document.getElementById('dateFromInput').value = '';
+            document.getElementById('dateToInput').value = '';
             document.getElementById('clearDateBtn').classList.add('hidden');
             applyAllFilters();
         };
 
         document.getElementById('clearAllFiltersBtn').addEventListener('click', () => {
             document.getElementById('globalSearch').value = '';
-            clearDateFilter();
+            clearDateRangeFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
             columnFilters = { status: {} };
             applyAllFilters();
@@ -974,7 +987,7 @@
             return list.sort((a, b) => {
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
-                return timeA - timeB; // Chronological ascending (oldest first, new entries appear at the bottom)
+                return timeA - timeB; // Chronological ascending (oldest at top, new entries appear at the bottom)
             });
         }
 
@@ -1000,7 +1013,8 @@
 
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
-            const selectedDate = document.getElementById('dateFilterInput').value;
+            const dateFrom = document.getElementById('dateFromInput').value;
+            const dateTo = document.getElementById('dateToInput').value;
 
             if (activeTabSheet === 'ALL') {
                 const filtered = allCandidates.filter(c => {
@@ -1009,9 +1023,12 @@
                                           c.phone.toLowerCase().includes(search);
                     
                     let matchesDate = true;
-                    if (selectedDate && c.createdAt) {
+                    if (c.createdAt) {
                         const candDate = c.createdAt.split('T')[0];
-                        matchesDate = candDate === selectedDate;
+                        if (dateFrom && candDate < dateFrom) matchesDate = false;
+                        if (dateTo && candDate > dateTo) matchesDate = false;
+                    } else if (dateFrom || dateTo) {
+                        matchesDate = false;
                     }
 
                     return matchesSearch && matchesDate;
@@ -1047,9 +1064,12 @@
                                           c.notes.toLowerCase().includes(search);
 
                     let matchesDate = true;
-                    if (selectedDate && c.createdAt) {
+                    if (c.createdAt) {
                         const candDate = c.createdAt.split('T')[0];
-                        matchesDate = candDate === selectedDate;
+                        if (dateFrom && candDate < dateFrom) matchesDate = false;
+                        if (dateTo && candDate > dateTo) matchesDate = false;
+                    } else if (dateFrom || dateTo) {
+                        matchesDate = false;
                     }
 
                     return matchesCategory && matchesStatusCol && matchesCustomCols && matchesSearch && matchesDate;
@@ -1245,7 +1265,6 @@
             updateHeaderCheckboxState(data);
         }
 
-        // WhatsApp Modal & Templates Functions (Simplified Card View)
         window.openWhatsAppModal = function(docId) {
             const cand = allCandidates.find(c => c.docId === docId);
             if (!cand) return;
@@ -1335,7 +1354,10 @@
                     <span class="font-bold text-indigo-700 dark:text-indigo-300 text-xs truncate flex items-center gap-2">
                         <i class="fa-solid fa-bookmark text-emerald-500"></i> ${t.title}
                     </span>
-                    <div class="flex items-center gap-1 flex-shrink-0">
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Enviar WhatsApp Web">
+                            <i class="fa-brands fa-whatsapp"></i> <span>Enviar</span>
+                        </button>
                         <button onclick="viewWhatsAppTemplate('${t.id}')" class="bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Ver Mensaje">
                             <i class="fa-solid fa-eye"></i> <span>Ver</span>
                         </button>
@@ -1349,6 +1371,20 @@
                 </div>
             `).join('');
         }
+
+        window.sendTemplateDirect = function(templateId) {
+            const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
+            const template = whatsappTemplates.find(t => t.id === templateId);
+            if (!cand || !template) return;
+
+            let msg = template.message;
+            msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
+
+            const phoneClean = cleanPhone(cand.phone);
+            const url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+            closeWhatsAppModal();
+        };
 
         window.viewWhatsAppTemplate = function(templateId) {
             const template = whatsappTemplates.find(t => t.id === templateId);
@@ -1369,18 +1405,8 @@
         };
 
         window.sendWhatsAppTemplate = function(templateId) {
-            const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
-            const template = whatsappTemplates.find(t => t.id === templateId);
-            if (!cand || !template) return;
-
-            let msg = template.message;
-            msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
-
-            const phoneClean = cleanPhone(cand.phone);
-            const url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
-            window.open(url, '_blank');
+            sendTemplateDirect(templateId);
             closeWaViewModal();
-            closeWhatsAppModal();
         };
 
         window.toggleRowSelection = function(docId, isChecked) {
@@ -1557,21 +1583,13 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ orientation: pdfOrientation });
 
-                doc.setFontSize(16);
-                doc.setTextColor(30, 41, 59);
-                doc.text(`RefiGo Portal - Exportación (${activeTabSheet})`, 14, 15);
-                
-                doc.setFontSize(9);
-                doc.setTextColor(100, 116, 139);
-                doc.text(`Generado: ${new Date().toLocaleString('es-SV')} | Total Registros: ${exportData.length}`, 14, 22);
-
                 const headers = [selectedCols.map(col => colLabels[col])];
                 const rows = exportData.map(row => Object.values(row));
 
                 doc.autoTable({
                     head: headers,
                     body: rows,
-                    startY: 26,
+                    startY: 14,
                     theme: 'striped',
                     styles: { fontSize: 8, cellPadding: 2 },
                     headStyles: { fillColor: [79, 70, 229] }
@@ -1941,7 +1959,7 @@
                                     <span>${st}</span>
                                     <div class="flex items-center gap-1.5">
                                         <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleColorPalette('status_${cleanId(st)}', event)" title="Cambiar Color"></div>
-                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-500 hover:text-rose-500 cursor-pointer ml-1 text-sm"></i>
+                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-500 hover:text-rose-500 cursor-pointer ml-1 text-sm font-bold"></i>
                                     </div>
                                     
                                     <div id="palette_status_${cleanId(st)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
@@ -1979,7 +1997,7 @@
                                         <span>${opt}</span>
                                         <div class="flex items-center gap-1.5">
                                             <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleColorPalette('opt_${cleanId(colName)}_${cleanId(opt)}', event)" title="Cambiar Color"></div>
-                                            <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 text-sm text-slate-500"></i>
+                                            <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 text-sm text-slate-500 font-bold"></i>
                                         </div>
 
                                         <div id="palette_opt_${cleanId(colName)}_${cleanId(opt)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
