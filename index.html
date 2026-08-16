@@ -460,7 +460,7 @@
                     <span class="font-bold uppercase text-indigo-700 dark:text-indigo-400 block tracking-wider">Columnas de esta Pestaña</span>
                     
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Canal, Región)" class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
+                        <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Nuevo Estatus)" class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
                         <button onclick="addColumnToTab()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Columna</button>
                     </div>
 
@@ -621,10 +621,10 @@
         let renameCallback = null;
 
         let pipelineList = [
-            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow': ['Yes', 'No'] } },
-            { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: {} },
-            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: {} },
-            { name: 'No Referred', statuses: ['Pending Audit'], columns: {} }
+            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow': ['Yes', 'No'], 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'No Referred', statuses: ['Pending Audit'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } }
         ];
 
         let statusColorsMap = {
@@ -639,7 +639,9 @@
             'Failed Assessment': '#f43f5e',
             'Pending Audit': '#64748b',
             'Yes': '#10b981',
-            'No': '#f43f5e'
+            'No': '#f43f5e',
+            'Opción 1': '#6366f1',
+            'Opción 2': '#64748b'
         };
 
         const PRESET_SWATCHES = [
@@ -752,7 +754,7 @@
                         let cols = item.columns;
                         if (Array.isArray(cols)) {
                             let obj = {};
-                            cols.forEach(c => obj[c] = ['Option 1', 'Option 2']);
+                            cols.forEach(c => obj[c] = ['Opción 1', 'Opción 2']);
                             cols = obj;
                         }
                         return { ...item, columns: cols || {} };
@@ -1589,7 +1591,7 @@
                 doc.autoTable({
                     head: headers,
                     body: rows,
-                    startY: 14,
+                    startY: 10,
                     theme: 'striped',
                     styles: { fontSize: 8, cellPadding: 2 },
                     headStyles: { fillColor: [79, 70, 229] }
@@ -2195,7 +2197,7 @@
             if (!catName) return;
 
             if (!pipelineList.some(i => i.name === catName)) {
-                pipelineList.push({ name: catName, statuses: ['General'], columns: {} });
+                pipelineList.push({ name: catName, statuses: ['General'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } });
                 await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
                 input.value = '';
                 renderConfigTree();
