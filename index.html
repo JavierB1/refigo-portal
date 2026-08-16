@@ -1432,39 +1432,77 @@
             reader.onload = async function(evt) {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const batch = writeBatch(db);
                 const nowIso = new Date().toISOString();
+                
+                let batch = writeBatch(db);
+                let batchCount = 0;
+                let updatedCount = 0;
+                let addedCount = 0;
 
-                workbook.SheetNames.forEach(sheetName => {
-                    if (['Hoja1', 'Warn'].includes(sheetName)) return;
+                for (const sheetName of workbook.SheetNames) {
+                    if (['Hoja1', 'Warn'].includes(sheetName)) continue;
 
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-                    jsonData.forEach(row => {
+                    for (const row of jsonData) {
                         const name = row['<'] || row['Referidos'] || row['Nombre'] || 'Sin Nombre';
-                        const email = row['Correo'] || '-';
-                        const phone = row['Número'] || row['Numero'] || '-';
-                        const status = row['Estatus'] || '-';
-                        const notes = row['Nota'] || row['Notas'] || '-';
+                        const email = String(row['Correo'] || '-').trim();
+                        const rawPhone = String(row['Número'] || row['Numero'] || '-').trim();
+                        const phone = cleanPhone(rawPhone);
+                        const status = String(row['Estatus'] || '-').trim();
+                        const notes = String(row['Nota'] || row['Notas'] || '-').trim();
 
-                        const newRef = doc(candidatesCol);
-                        batch.set(newRef, {
-                            sheet: sheetName,
-                            name: String(name).trim(),
-                            email: String(email).trim(),
-                            phone: String(phone).trim(),
-                            status: String(status).trim(),
-                            notes: String(notes).trim(),
-                            customFields: {},
-                            createdAt: nowIso,
-                            updatedAt: nowIso
+                        // Verificar si el candidato ya existe por correo o teléfono para actualizar en lugar de duplicar
+                        const existing = allCandidates.find(c => {
+                            const matchEmail = email && email !== '-' && c.email && c.email.toLowerCase() === email.toLowerCase();
+                            const matchPhone = phone && phone !== '503' && c.phone && cleanPhone(c.phone) === phone;
+                            return matchEmail || matchPhone;
                         });
-                    });
-                });
 
-                await batch.commit();
-                showAlert("¡Éxito!", "Excel cargado correctamente en Firebase.", "success");
+                        if (existing) {
+                            const docRef = doc(db, "candidates", existing.docId);
+                            batch.update(docRef, {
+                                sheet: sheetName,
+                                name: String(name).trim(),
+                                email: email,
+                                phone: rawPhone,
+                                status: status,
+                                notes: notes,
+                                updatedAt: nowIso
+                            });
+                            updatedCount++;
+                        } else {
+                            const newRef = doc(candidatesCol);
+                            batch.set(newRef, {
+                                sheet: sheetName,
+                                name: String(name).trim(),
+                                email: email,
+                                phone: rawPhone,
+                                status: status,
+                                notes: notes,
+                                customFields: {},
+                                createdAt: nowIso,
+                                updatedAt: nowIso
+                            });
+                            addedCount++;
+                        }
+
+                        batchCount++;
+                        if (batchCount >= 450) {
+                            await batch.commit();
+                            batch = writeBatch(db);
+                            batchCount = 0;
+                        }
+                    }
+                }
+
+                if (batchCount > 0) {
+                    await batch.commit();
+                }
+
+                showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos existentes y se agregaron ${addedCount} nuevos registros desde el Excel.`, "success");
+                e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
         });
