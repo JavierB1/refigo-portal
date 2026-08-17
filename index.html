@@ -456,6 +456,7 @@
 
         let allCandidates = [];
         let whatsappTemplates = [];
+        let currentVisibleCandidates = []; // Almacena únicamente los registros filtrados y visibles actuales
         let activeWhatsAppCandidateId = null;
         let currentEditingDocId = null;
         let columnFilters = { status: [], language: [] };
@@ -799,7 +800,8 @@
                 return matchesStatusCol && matchesLangCol && matchesSearch && matchesDate;
             });
 
-            renderUnifiedTable(sortCandidatesByCreation(filtered));
+            currentVisibleCandidates = sortCandidatesByCreation(filtered);
+            renderUnifiedTable(currentVisibleCandidates);
         }
 
         function formatDate(isoString) {
@@ -1079,7 +1081,7 @@
         };
 
         window.toggleSelectAllRows = function(isChecked) {
-            allCandidates.forEach(c => {
+            currentVisibleCandidates.forEach(c => {
                 if (isChecked) {
                     selectedCandidateIds.add(c.docId);
                 } else {
