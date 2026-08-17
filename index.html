@@ -329,10 +329,19 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Idioma <span class="text-rose-500">*</span></label>
+                        <select id="inputLanguage" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
+                            <option value="ES">ES (Español)</option>
+                            <option value="EN" selected>EN (Inglés)</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
                         <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
                         </select>
                     </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-1 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus <span class="text-slate-500 dark:text-slate-400 font-normal">(Opcional)</span></label>
                         <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50 font-semibold">
@@ -613,7 +622,7 @@
         let activeWhatsAppCandidateId = null;
         let activeTabSheet = 'ALL';
         let currentEditingDocId = null;
-        let columnFilters = { status: {} };
+        let columnFilters = { status: {}, language: {} };
         let selectedCandidateIds = new Set();
         let editingTabName = null;
 
@@ -621,10 +630,12 @@
         let renameCallback = null;
 
         let pipelineList = [
-            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow': ['Yes', 'No'], 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'New', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'Warn', statuses: ['Pending', 'Review'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
             { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
-            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
-            { name: 'No Referred', statuses: ['Pending Audit'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } }
+            { name: 'Extinguished', statuses: ['Archived', 'Closed'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'No Referred', statuses: ['Pending Audit'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } }
         ];
 
         let statusColorsMap = {
@@ -899,6 +910,24 @@
                 </label>
             `).join('');
 
+            const langContainer = document.getElementById('languageOptions');
+            if (langContainer) {
+                langContainer.innerHTML = `
+                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                        <input type="checkbox" checked onchange="toggleSelectAll('language', this.checked)" class="rounded theme-input">
+                        <strong>(Select All)</strong>
+                    </label>
+                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                        <input type="checkbox" value="ES" class="col-check-language rounded theme-input" checked>
+                        <span>ES</span>
+                    </label>
+                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                        <input type="checkbox" value="EN" class="col-check-language rounded theme-input" checked>
+                        <span>EN</span>
+                    </label>
+                `;
+            }
+
             if (activeTabSheet !== 'ALL' && catObj && catObj.columns) {
                 Object.keys(catObj.columns).forEach(colName => {
                     const colContainer = document.getElementById(`customColOptions_${cleanId(colName)}`);
@@ -989,7 +1018,7 @@
             return list.sort((a, b) => {
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
-                return timeA - timeB; // Chronological ascending (oldest at top, new entries appear at the bottom)
+                return timeA - timeB; 
             });
         }
 
@@ -1046,6 +1075,10 @@
                     const statusFilterList = columnFilters.status['status'];
                     const matchesStatusCol = !statusFilterList || statusFilterList.length === 0 || statusFilterList.includes(c.status);
 
+                    const langFilterList = columnFilters.status['language'];
+                    const candLang = c.language || 'EN';
+                    const matchesLangCol = !langFilterList || langFilterList.length === 0 || langFilterList.includes(candLang);
+
                     let matchesCustomCols = true;
                     if (catObj && catObj.columns) {
                         Object.keys(catObj.columns).forEach(colName => {
@@ -1074,20 +1107,30 @@
                         matchesDate = false;
                     }
 
-                    return matchesCategory && matchesStatusCol && matchesCustomCols && matchesSearch && matchesDate;
+                    return matchesCategory && matchesStatusCol && matchesLangCol && matchesCustomCols && matchesSearch && matchesDate;
                 });
 
                 renderCategoryTable(sortCandidatesByCreation(filtered));
             }
         }
+        function renderOptionBadge(optName) {
+            if (!optName || optName === '-') return '-';
+            const hexColor = statusColorsMap[optName] || '#64748b';
+            return `
+                <span class="inline-flex items-center px-2 py-0.5 text-[11px] font-bold rounded-md border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
+                    ${optName}
+                </span>
+            `;
+        }
 
-        function formatDate(isoString) {
-            if (!isoString) return 'Sin registro';
-            const date = new Date(isoString);
-            if (isNaN(date.getTime())) return 'Sin registro';
-            return date.toLocaleString('es-SV', {
-                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
-            });
+        function renderLanguageBadge(lang) {
+            if (!lang) return '-';
+            const isEs = lang === 'ES';
+            return `
+                <span class="inline-flex items-center px-2 py-0.5 text-xs font-bold rounded-md border shadow-sm ${isEs ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30' : 'bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30'}">
+                    ${lang}
+                </span>
+            `;
         }
 
         function renderDemoDashboard(data) {
@@ -1095,16 +1138,19 @@
             document.getElementById('demoTotalCount').textContent = data.length;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos en la base.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos en la base.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = data.map(c => `
                 <tr class="hover:bg-slate-200/60 dark:hover:bg-slate-700/30 transition border-b border-slate-300 dark:border-slate-700/40 h-[58px]">
-                    <td class="py-3 px-4 font-bold text-slate-900 dark:text-white w-1/4 truncate">${c.name}</td>
-                    <td class="py-3 px-4 text-xs space-y-0.5 w-1/4 truncate">
+                    <td class="py-3 px-4 font-bold text-slate-900 dark:text-white w-1/5 truncate">${c.name}</td>
+                    <td class="py-3 px-4 text-xs space-y-0.5 w-1/5 truncate">
                         <div class="text-slate-900 dark:text-slate-100 font-bold">${c.email}</div>
                         <div class="text-slate-700 dark:text-slate-300 font-semibold">${c.phone}</div>
+                    </td>
+                    <td class="py-3 px-4 w-1/6">
+                        ${renderLanguageBadge(c.language)}
                     </td>
                     <td class="py-3 px-4 w-1/6">
                         <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
@@ -1169,6 +1215,16 @@
                 <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Nombre / Referido</th>
                 <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Contacto</th>
                 <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
+                        <span>Idioma</span>
+                        <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
+                    </div>
+                    <div id="langFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-48 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
+                        <div class="max-h-36 overflow-y-auto space-y-1 text-xs mb-2" id="languageOptions"></div>
+                        <button onclick="applyColumnFilter('language')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
+                    </div>
+                </th>
+                <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -1190,7 +1246,7 @@
             buildFilterMenus();
 
             if (data.length === 0) {
-                const totalCols = 5 + customCols.length;
+                const totalCols = 6 + customCols.length;
                 tbody.innerHTML = `<tr><td colspan="${totalCols}" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
                 return;
             }
@@ -1207,6 +1263,9 @@
                     <td class="py-3.5 px-4 text-xs space-y-0.5">
                         <div class="text-slate-900 dark:text-slate-100 font-bold"><i class="fa-regular fa-envelope mr-1 text-slate-500"></i>${c.email}</div>
                         <div class="text-slate-700 dark:text-slate-300 font-semibold"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        ${renderLanguageBadge(c.language)}
                     </td>
                     <td class="py-3.5 px-4">
                         ${renderStatusBadge(c.status)}
@@ -1671,11 +1730,46 @@
                 let updatedCount = 0;
                 let addedCount = 0;
 
-                for (const sheetName of workbook.SheetNames) {
-                    if (['Hoja1', 'Warn'].includes(sheetName)) continue;
+                for (const rawSheetName of workbook.SheetNames) {
+                    if (['Hoja1', 'Warn'].includes(rawSheetName)) continue;
 
-                    const worksheet = workbook.Sheets[sheetName];
+                    const worksheet = workbook.Sheets[rawSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    const sheetTrim = rawSheetName.trim();
+                    const lowerSheet = sheetTrim.toLowerCase();
+                    
+                    let targetSheet = sheetTrim;
+                    let targetLang = 'EN';
+
+                    if (lowerSheet === 'referidos') {
+                        targetLang = 'ES';
+                        targetSheet = 'New';
+                    } else if (lowerSheet === 'no referidos') {
+                        targetLang = 'ES';
+                        targetSheet = 'New';
+                    } else if (lowerSheet === 'referred') {
+                        targetLang = 'EN';
+                        targetSheet = 'New';
+                    } else if (lowerSheet === 'no referred') {
+                        targetLang = 'EN';
+                        targetSheet = 'No Referred';
+                    } else if (lowerSheet === 'cold') {
+                        targetLang = 'EN';
+                        targetSheet = 'Cold';
+                    } else if (lowerSheet === 'extinguished') {
+                        targetLang = 'EN';
+                        targetSheet = 'Extinguished';
+                    } else if (lowerSheet.includes('reject')) {
+                        targetLang = 'EN';
+                        targetSheet = 'Rejected by CONCENTRIX';
+                    } else {
+                        const matchPipeline = pipelineList.find(p => p.name.toLowerCase() === lowerSheet);
+                        if (!matchPipeline) {
+                            targetSheet = 'New';
+                            targetLang = 'EN';
+                        }
+                    }
 
                     for (const row of jsonData) {
                         const name = row['<'] || row['Referidos'] || row['Nombre'] || 'Sin Nombre';
@@ -1694,7 +1788,8 @@
                         if (existing) {
                             const docRef = doc(db, "candidates", existing.docId);
                             batch.update(docRef, {
-                                sheet: sheetName,
+                                sheet: targetSheet,
+                                language: existing.language || targetLang,
                                 name: String(name).trim(),
                                 email: email,
                                 phone: rawPhone,
@@ -1706,7 +1801,8 @@
                         } else {
                             const newRef = doc(candidatesCol);
                             batch.set(newRef, {
-                                sheet: sheetName,
+                                sheet: targetSheet,
+                                language: targetLang,
                                 name: String(name).trim(),
                                 email: email,
                                 phone: rawPhone,
@@ -1744,6 +1840,7 @@
             document.getElementById('inputName').value = '';
             document.getElementById('inputEmail').value = '';
             document.getElementById('inputPhone').value = '+503 ';
+            document.getElementById('inputLanguage').value = 'EN';
             document.getElementById('inputNotes').value = '';
 
             populateModalCategories();
@@ -1838,6 +1935,7 @@
             document.getElementById('inputName').value = cand.name;
             document.getElementById('inputEmail').value = cand.email;
             document.getElementById('inputPhone').value = cand.phone;
+            document.getElementById('inputLanguage').value = cand.language || 'EN';
             document.getElementById('inputNotes').value = cand.notes;
 
             populateModalCategories(cand.sheet, cand.status, cand.customFields || {});
@@ -1853,6 +1951,7 @@
             const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
             const rawPhone = document.getElementById('inputPhone').value.trim();
             const phoneVal = cleanPhone(rawPhone);
+            const langVal = document.getElementById('inputLanguage').value;
             const sheetVal = document.getElementById('inputSheet').value;
             const statusVal = document.getElementById('inputStatus').value;
 
@@ -1888,6 +1987,7 @@
                 name: nameVal || 'Sin Nombre',
                 email: document.getElementById('inputEmail').value.trim(),
                 phone: rawPhone,
+                language: langVal,
                 sheet: sheetVal,
                 status: statusVal ? statusVal : '-',
                 notes: document.getElementById('inputNotes').value.trim(),
@@ -1918,14 +2018,151 @@
                 }
             );
         };
+        window.openExportModal = function() {
+            if (selectedCandidateIds.size === 0) {
+                showAlert("Sin Selección", "Por favor selecciona al menos un candidato de la tabla usando las casillas.", "warning");
+                return;
+            }
 
-        window.openConfigModal = function() {
-            renderConfigTree();
-            document.getElementById('configModal').classList.remove('hidden');
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+
+            const container = document.getElementById('exportColumnsCheckboxContainer');
+            let html = `
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="name" checked class="export-col-check rounded theme-input">
+                    <span>Nombre Completo</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="email" checked class="export-col-check rounded theme-input">
+                    <span>Correo Electrónico</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="phone" checked class="export-col-check rounded theme-input">
+                    <span>Número Teléfono</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="language" checked class="export-col-check rounded theme-input">
+                    <span>Idioma</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="sheet" checked class="export-col-check rounded theme-input">
+                    <span>Pestaña (Categoría)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="status" checked class="export-col-check rounded theme-input">
+                    <span>Estatus</span>
+                </label>
+            `;
+
+            customCols.forEach(colName => {
+                html += `
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                        <input type="checkbox" value="custom_${colName}" checked class="export-col-check rounded theme-input">
+                        <span>${colName}</span>
+                    </label>
+                `;
+            });
+
+            html += `
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="notes" checked class="export-col-check rounded theme-input">
+                    <span>Notas / Detalles</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 sm:col-span-2 border-t border-slate-300 dark:border-slate-800 pt-2 mt-1 py-1 font-bold">
+                    <input type="checkbox" value="createdAt" checked class="export-col-check rounded theme-input">
+                    <span>Fecha de Registro</span>
+                </label>
+            `;
+
+            container.innerHTML = html;
+            document.getElementById('exportModal').classList.remove('hidden');
         };
+        window.executeExport = function() {
+            const selectedFormat = document.querySelector('input[name="exportFormat"]:checked').value;
+            const pdfOrientation = document.querySelector('input[name="pdfOrientation"]:checked').value;
+            const selectedCols = Array.from(document.querySelectorAll('.export-col-check:checked')).map(cb => cb.value);
 
-        window.closeConfigModal = function() {
-            document.getElementById('configModal').classList.add('hidden');
+            if (selectedCols.length === 0) {
+                showAlert("Columnas Requeridas", "Debes seleccionar al menos una columna para exportar.", "warning");
+                return;
+            }
+
+            const candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+
+            const colLabels = {
+                name: 'Nombre Completo',
+                email: 'Correo Electrónico',
+                phone: 'Número Teléfono',
+                language: 'Idioma',
+                sheet: 'Pestaña (Categoría)',
+                status: 'Estatus',
+                notes: 'Notas / Detalles',
+                createdAt: 'Fecha de Registro'
+            };
+
+            customCols.forEach(colName => {
+                colLabels[`custom_${colName}`] = colName;
+            });
+
+            const exportData = candidatesToExport.map(c => {
+                const row = {};
+                selectedCols.forEach(col => {
+                    const label = colLabels[col] || col;
+                    if (col === 'createdAt') {
+                        row[label] = formatDate(c[col]);
+                    } else if (col === 'language') {
+                        row[label] = c.language || 'EN';
+                    } else if (col.startsWith('custom_')) {
+                        const originalColName = col.replace('custom_', '');
+                        row[label] = c.customFields?.[originalColName] || '-';
+                    } else {
+                        row[label] = c[col] || '-';
+                    }
+                });
+                return row;
+            });
+
+            const fileName = `RefiGo_Export_${activeTabSheet}_${new Date().toISOString().split('T')[0]}`;
+
+            if (selectedFormat === 'xlsx') {
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Candidatos");
+                XLSX.writeFile(workbook, `${fileName}.xlsx`);
+            } else if (selectedFormat === 'csv') {
+                const worksheet = XLSX.utils.json_to_sheet(exportData);
+                const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
+                const blob = new Blob([csvOutput], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", `${fileName}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (selectedFormat === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: pdfOrientation });
+
+                const headers = [selectedCols.map(col => colLabels[col])];
+                const rows = exportData.map(row => Object.values(row));
+
+                doc.autoTable({
+                    head: headers,
+                    body: rows,
+                    startY: 10,
+                    theme: 'striped',
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    headStyles: { fillColor: [79, 70, 229] }
+                });
+
+                doc.save(`${fileName}.pdf`);
+            }
+
+            closeExportModal();
+            showAlert("¡Exportación Completada!", `Se han exportado ${exportData.length} registros en formato ${selectedFormat.toUpperCase()}.`, "success");
         };
 
         window.openTabEditModal = function(tabName) {
@@ -2003,26 +2240,26 @@
                                         </div>
 
                                         <div id="palette_opt_${cleanId(colName)}_${cleanId(opt)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
-                                            <div class="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Paleta de Colores</div>
-                                            <div class="grid grid-cols-6 gap-2 mb-2">
-                                                ${PRESET_SWATCHES.map(hex => `
-                                                    <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${opt}', '${hex}')"></div>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                        <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-300 dark:border-slate-800">
-                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full font-semibold">
-                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-bold shadow-sm">+ Opción</button>
-                        </div>
-                    </div>
-                `;
-            });
+        function updateMetrics() {
+            const total = allCandidates.length;
+            const newCount = allCandidates.filter(c => c.sheet === 'New').length;
+            const warnCount = allCandidates.filter(c => c.sheet === 'Warn').length;
+            const coldCount = allCandidates.filter(c => c.sheet === 'Cold').length;
+            const extCount = allCandidates.filter(c => c.sheet === 'Extinguished').length;
 
-            columnsContainer.innerHTML = html;
+            document.getElementById('metricTotal').textContent = total;
+            document.getElementById('metricReferred').textContent = newCount;
+            document.getElementById('metricCold').textContent = coldCount;
+            document.getElementById('metricOther').textContent = extCount + warnCount;
+
+            document.getElementById('sideCountAll').textContent = total;
+            
+            pipelineList.forEach(item => {
+                const el = document.getElementById(`sideCount_${cleanId(item.name)}`);
+                if (el) {
+                    el.textContent = allCandidates.filter(c => c.sheet === item.name).length;
+                }
+            });
         }
 
         window.addStatusToTab = async function() {
