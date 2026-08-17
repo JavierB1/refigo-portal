@@ -237,7 +237,7 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus</label>
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus (Opcional)</label>
                         <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
                         </select>
                     </div>
@@ -339,7 +339,7 @@
             <div class="space-y-4 text-xs">
                 <div class="theme-card border p-3.5 rounded-xl space-y-2">
                     <span class="font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block">Gestión de Estatus Maestro</span>
-                    <p class="text-slate-700 dark:text-slate-300 font-semibold">El sistema maneja los estatus estándar: <strong class="text-slate-900 dark:text-white">New, Warn, Cold, Extinguished, No referred, Rejected by Concentrix</strong>.</p>
+                    <p class="text-slate-700 dark:text-slate-300 font-semibold">El sistema unificado maneja los 6 estatus estándar: <strong class="text-slate-900 dark:text-white">New, Warn, Cold, Extinguished, No referred, Rejected by Concentrix</strong>.</p>
                 </div>
                 <div class="theme-card border p-3.5 rounded-xl space-y-2">
                     <span class="font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block">Clasificación de Idioma</span>
@@ -585,6 +585,8 @@
                         st = 'New';
                     } else if (data.sheet === 'Cold' || ['Callback', 'No respond', 'Hold'].includes(st)) {
                         st = 'Cold';
+                    } else if (data.sheet === 'Extinguished' || st === 'Extinguished') {
+                        st = 'Extinguished';
                     } else if (data.sheet === 'Rejected by CONCENTRIX' || ['Rejected', 'Failed Assessment'].includes(st)) {
                         st = 'Rejected by Concentrix';
                     } else if (data.sheet === 'No Referred' || st === 'Pending Audit') {
@@ -1265,6 +1267,7 @@
                         if (!MASTER_STATUSES.includes(rawStatus)) {
                             if (['Submitted', 'In Review', 'Scheduled', 'Hired'].includes(rawStatus)) rawStatus = 'New';
                             else if (['Callback', 'No respond', 'Hold'].includes(rawStatus)) rawStatus = 'Cold';
+                            else if (rawStatus === 'Extinguished') rawStatus = 'Extinguished';
                             else if (['Rejected', 'Failed Assessment'].includes(rawStatus)) rawStatus = 'Rejected by Concentrix';
                             else rawStatus = 'New';
                         }
@@ -1339,11 +1342,11 @@
 
         function populateModalStatus(selectedStatus = null) {
             const statusSelect = document.getElementById('inputStatus');
-            statusSelect.innerHTML = MASTER_STATUSES.map(st => `<option value="${st}">${st}</option>`).join('');
+            statusSelect.innerHTML = `<option value="">-- Sin Estatus Específico --</option>` + MASTER_STATUSES.map(st => `<option value="${st}">${st}</option>`).join('');
             if (selectedStatus && MASTER_STATUSES.includes(selectedStatus)) {
                 statusSelect.value = selectedStatus;
             } else {
-                statusSelect.value = 'New';
+                statusSelect.value = '';
             }
         }
 
@@ -1371,7 +1374,7 @@
             const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
             const rawPhone = document.getElementById('inputPhone').value.trim();
             const phoneVal = cleanPhone(rawPhone);
-            const statusVal = document.getElementById('inputStatus').value;
+            const statusVal = document.getElementById('inputStatus').value || 'New';
             const idiomaVal = document.getElementById('inputIdioma').value;
 
             if (!emailVal || !rawPhone || rawPhone === '+503') {
