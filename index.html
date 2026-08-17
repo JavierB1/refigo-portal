@@ -95,7 +95,6 @@
         }
     </script>
 
-    <!-- Header Principal -->
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
@@ -195,7 +194,7 @@
         <!-- Tabla Principal Unificada -->
         <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
             <div class="overflow-x-auto min-h-[400px]">
-                <table class="w-full text-left border-collapse text-sm">
+                <table class="w-full table-fixed text-left border-collapse text-sm">
                     <thead>
                         <tr id="unifiedTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                         </tr>
@@ -452,7 +451,6 @@
         </div>
     </div>
 
-    <!-- Scripts Firebase y Lógica -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -777,7 +775,7 @@
 
         function sortCandidatesByLanguageAndCreation(list) {
             return list.sort((a, b) => {
-                // Priority 1: EN always before ES
+                // Priority 1: EN always before ES (EN first, then ES)
                 const langA = (a.language || '').toUpperCase();
                 const langB = (b.language || '').toUpperCase();
                 if (langA !== langB) {
@@ -785,7 +783,7 @@
                     if (langB === 'EN') return 1;
                     return langA < langB ? -1 : 1;
                 }
-                // Priority 2: Creation time
+                // Priority 2: Creation time ascending (oldest first, newer additions placed at the bottom)
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
                 return timeA - timeB;
@@ -805,7 +803,7 @@
         function renderLanguageBadge(lang) {
             const hexColor = statusColorsMap[lang] || '#3b82f6';
             return `
-                <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-bold rounded-md border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
+                <span class="inline-flex items-center px-2 py-0.5 text-xs font-bold rounded-md border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
                     ${lang}
                 </span>
             `;
@@ -872,13 +870,23 @@
             document.getElementById('totalCandidateCount').textContent = allCandidates.length;
 
             thead.innerHTML = `
-                <th class="py-3 px-4 w-10 text-center">
+                <th class="py-3 px-2.5 w-10 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer" title="Seleccionar filtrados visibles">
                 </th>
-                <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
-                <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
-                <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
-                <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 w-[24%]">Nombre Completo</th>
+                <th class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 w-[26%]">Correo Electrónico</th>
+                <th class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 w-[16%]">Número Teléfono</th>
+                <th class="py-3 px-2.5 relative font-bold text-slate-900 dark:text-slate-100 w-[7%]">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
+                        <span>Idioma</span>
+                        <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
+                    </div>
+                    <div id="langFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-48 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
+                        <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="languageOptions"></div>
+                        <button onclick="applyColumnFilter('language')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
+                    </div>
+                </th>
+                <th class="py-3 px-2.5 relative font-bold text-slate-900 dark:text-slate-100 w-[13%]">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -892,19 +900,9 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
-                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
-                        <span>Idioma</span>
-                        <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
-                    </div>
-                    <div id="langFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-48 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
-                        <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="languageOptions"></div>
-                        <button onclick="applyColumnFilter('language')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
-                    </div>
-                </th>
-                <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-2.5 relative font-bold text-slate-900 dark:text-slate-100 w-[14%]">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
-                        <span>Notas / Seguimiento</span>
+                        <span>Notas</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
                     </div>
                     <div id="notesFilter" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-52 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
@@ -912,7 +910,7 @@
                         <button onclick="applyColumnFilter('notes')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-4 text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
+                <th class="py-3 px-2.5 text-center font-bold text-slate-900 dark:text-slate-100 w-[7%]">Acciones</th>
             `;
 
             buildFilterMenus();
@@ -927,30 +925,30 @@
                 const candHasNotes = hasNotes(c);
                 return `
                 <tr class="hover:bg-slate-200/60 dark:hover:bg-slate-700/35 transition border-b border-slate-300 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/70 dark:bg-indigo-900/30' : ''}">
-                    <td class="py-3.5 px-4 text-center">
+                    <td class="py-3 px-2.5 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">${c.name}</td>
-                    <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-slate-100">${c.email}</td>
-                    <td class="py-3.5 px-4 font-semibold text-slate-800 dark:text-slate-200">${c.phone}</td>
-                    <td class="py-3.5 px-4">
-                        ${renderStatusBadge(c.status)}
-                    </td>
-                    <td class="py-3.5 px-4">
+                    <td class="py-3 px-2.5 font-bold text-slate-900 dark:text-white truncate" title="${c.name}">${c.name}</td>
+                    <td class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 truncate" title="${c.email}">${c.email}</td>
+                    <td class="py-3 px-2.5 font-semibold text-slate-800 dark:text-slate-200 truncate" title="${c.phone}">${c.phone}</td>
+                    <td class="py-3 px-2.5 truncate">
                         ${renderLanguageBadge(c.language)}
                     </td>
-                    <td class="py-3.5 px-4 text-xs text-slate-800 dark:text-slate-200 font-semibold max-w-xs truncate" title="${c.notes}">
+                    <td class="py-3 px-2.5 truncate">
+                        ${renderStatusBadge(c.status)}
+                    </td>
+                    <td class="py-3 px-2.5 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
-                    <td class="py-3.5 px-4 text-center">
-                        <div class="inline-flex items-center justify-center space-x-2">
-                            <button onclick="openWhatsAppModal('${c.docId}')" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="Enviar WhatsApp">
-                                <i class="fa-brands fa-whatsapp text-base"></i>
+                    <td class="py-3 px-2.5 text-center">
+                        <div class="inline-flex items-center justify-center space-x-1.5">
+                            <button onclick="openWhatsAppModal('${c.docId}')" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="Enviar WhatsApp">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
                             </button>
 
                             <div class="relative">
-                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700/60 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
-                                    <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+                                <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700/60 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
+                                    <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
                                 </button>
 
                                 <div id="actionMenu_${c.docId}" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-2xl shadow-2xl p-3 w-64 z-50 text-left normal-case font-semibold text-slate-900 dark:text-slate-100">
@@ -1289,19 +1287,19 @@
                 
                 selectedCols.forEach((col, index) => {
                     if (col === 'notes') {
-                        columnStyles[index] = { cellWidth: isLandscape ? 130 : 95 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 120 : 85 };
                     } else if (col === 'name') {
-                        columnStyles[index] = { cellWidth: 34 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 45 : 36 };
                     } else if (col === 'email') {
-                        columnStyles[index] = { cellWidth: 42 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 55 : 44 };
                     } else if (col === 'phone') {
-                        columnStyles[index] = { cellWidth: 28 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 34 : 27 };
                     } else if (col === 'language') {
-                        columnStyles[index] = { cellWidth: 20 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 18 : 16 };
                     } else if (col === 'status') {
-                        columnStyles[index] = { cellWidth: 28 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 35 : 28 };
                     } else if (col === 'createdAt') {
-                        columnStyles[index] = { cellWidth: 30 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 38 : 30 };
                     } else {
                         columnStyles[index] = { cellWidth: 'auto' };
                     }
@@ -1312,7 +1310,7 @@
                     body: rows,
                     startY: 10,
                     theme: 'striped',
-                    styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                    styles: { fontSize: 8, cellPadding: 2.5, overflow: 'linebreak' },
                     headStyles: { fillColor: [79, 70, 229] },
                     columnStyles: columnStyles
                 });
@@ -1395,13 +1393,14 @@
             if (!pendingExcelData || pendingExcelData.length === 0) return;
             document.getElementById('excelLangModal').classList.add('hidden');
 
-            const nowIso = new Date().toISOString();
+            const baseTime = Date.now();
             let batch = writeBatch(db);
             let batchCount = 0;
             let updatedCount = 0;
             let addedCount = 0;
 
-            for (const row of pendingExcelData) {
+            for (let i = 0; i < pendingExcelData.length; i++) {
+                const row = pendingExcelData[i];
                 let targetStatus = 'New';
                 let rawStatus = row.status.toLowerCase();
                 
@@ -1435,6 +1434,8 @@
                     return matchEmail || matchPhone;
                 });
 
+                const rowTimestamp = new Date(baseTime + i).toISOString();
+
                 if (existing) {
                     const docRef = doc(db, "candidates", existing.docId);
                     batch.update(docRef, {
@@ -1444,7 +1445,7 @@
                         email: normalized.email,
                         phone: normalized.phone,
                         notes: normalized.notes,
-                        updatedAt: nowIso
+                        updatedAt: rowTimestamp
                     });
                     updatedCount++;
                 } else {
@@ -1456,8 +1457,8 @@
                         email: normalized.email,
                         phone: normalized.phone,
                         notes: normalized.notes,
-                        createdAt: nowIso,
-                        updatedAt: nowIso
+                        createdAt: rowTimestamp,
+                        updatedAt: rowTimestamp
                     });
                     addedCount++;
                 }
@@ -1475,7 +1476,7 @@
             }
 
             pendingExcelData = null;
-            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado.`, "success");
+            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado, manteniendo el orden de tu archivo al final.`, "success");
         };
 
         window.openAddModal = function() {
