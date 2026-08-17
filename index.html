@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RefiGo Portal - Sistema de Gestión Maestro</title>
+    <title>RefiGo Portal - Sistema de Gestión</title>
     <link rel="icon" href="https://lh3.googleusercontent.com/d/1OQYupc95-FhH2LhTM6tcI21xn9K-fT7u">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,6 +22,7 @@
             --bg-main: #f8fafc;
             --bg-card: #ffffff;
             --bg-header: #ffffff;
+            --bg-sidebar: #ffffff;
             --border-color: #cbd5e1;
             --text-main: #0f172a;
             --text-muted: #334155;
@@ -33,6 +34,7 @@
             --bg-main: #0f172a;
             --bg-card: #1e293b;
             --bg-header: #1e293b;
+            --bg-sidebar: #1e293b;
             --border-color: #334155;
             --text-main: #f8fafc;
             --text-muted: #cbd5e1;
@@ -59,6 +61,12 @@
             color: var(--text-main);
         }
 
+        .theme-sidebar {
+            background-color: var(--bg-sidebar);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+
         .theme-input {
             background-color: var(--bg-input);
             border-color: var(--border-color);
@@ -67,7 +75,18 @@
 
         .dropdown-menu { display: none; }
         .dropdown-menu.active { display: block; }
+        .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
+        .carousel-viewport {
+            max-height: 295px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        .carousel-viewport::-webkit-scrollbar {
+            display: none;
+        }
+
         .overflow-x-auto, .overflow-y-auto {
             scrollbar-width: none;
         }
@@ -80,6 +99,24 @@
         }
         input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
+        }
+
+        .color-swatch {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            border: 2px solid transparent;
+            flex-shrink: 0;
+        }
+        .color-swatch:hover {
+            transform: scale(1.15);
+        }
+        .color-swatch.selected {
+            border-color: #ffffff;
+            box-shadow: 0 0 0 2px #4f46e5;
+            transform: scale(1.1);
         }
     </style>
     <script>
@@ -95,15 +132,58 @@
         }
     </script>
 
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 max-w-[85vw] theme-sidebar border-r z-50 transform -translate-x-full sidebar-transition flex flex-col justify-between p-4 sm:p-5 shadow-2xl">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b pb-4 border-slate-300 dark:border-slate-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
+                        <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
+                    </div>
+                    <div class="min-w-0">
+                        <h2 class="font-bold text-base truncate text-slate-900 dark:text-white">RefiGo Portal</h2>
+                        <span class="text-xs font-semibold text-slate-700 dark:text-slate-300 block truncate">Gestión de Talento</span>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white text-xl p-2 font-bold">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-1.5" id="sidebarCategoriesContainer">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 px-3 block mb-1">Segmentación</span>
+                
+                <button onclick="selectCategory('ALL')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 active" data-sheet="ALL">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group"></i> Dashboard General</span>
+                    <span id="sideCountAll" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <div id="dynamicSidebarCategories" class="space-y-1.5"></div>
+            </div>
+        </div>
+
+        <div class="space-y-3 pt-4 border-t border-slate-300 dark:border-slate-700">
+            <button onclick="openConfigModal()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 transition font-bold shadow-sm">
+                <i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                <span>⚙️ Gestión Global de Pestañas</span>
+            </button>
+            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 text-center pb-2">
+                RefiGo Cloud DB • Sincronizado
+            </div>
+        </div>
+    </aside>
+
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-            <div class="flex items-center space-x-3 min-w-0">
-                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
-                    <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
-                </div>
+            <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
+                <button onclick="toggleSidebar()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white p-2.5 sm:px-3 sm:py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600 flex-shrink-0" title="Abrir Menú">
+                    <i class="fa-solid fa-bars text-indigo-600 dark:text-indigo-400 text-base"></i>
+                    <span class="hidden md:inline">Categorías</span>
+                </button>
+
                 <div class="min-w-0">
                     <h1 class="text-sm sm:text-base font-bold tracking-wide text-slate-900 dark:text-white truncate">RefiGo Portal</h1>
-                    <p class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate">Dashboard Maestro</p>
+                    <p class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate" id="currentCategoryLabel">Dashboard General</p>
                 </div>
             </div>
             
@@ -123,45 +203,28 @@
                     <span class="hidden md:inline">Excel</span>
                     <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden">
                 </label>
-
-                <button onclick="openConfigModal()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 p-2.5 sm:px-3 sm:py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition border border-slate-300 dark:border-slate-600" title="Configuración y Filtros">
-                    <i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 text-sm"></i>
-                    <span class="hidden xl:inline">Configuración</span>
-                </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 sm:gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total Candidatos</span>
                 <div id="metricTotal" class="text-xl sm:text-2xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">New</span>
-                <div id="metricNew" class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Warn</span>
-                <div id="metricWarn" class="text-xl sm:text-2xl font-bold text-amber-500 dark:text-amber-400 mt-1">0</div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Referred</span>
+                <div id="metricReferred" class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Cold</span>
                 <div id="metricCold" class="text-xl sm:text-2xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
             </div>
             <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Extinguished</span>
-                <div id="metricExtinguished" class="text-xl sm:text-2xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No referred</span>
-                <div id="metricNoReferred" class="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3.5 sm:p-4 shadow-sm">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Rejected</span>
-                <div id="metricRejected" class="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Rejected / Other</span>
+                <div id="metricOther" class="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
             </div>
         </div>
 
@@ -195,20 +258,49 @@
             </div>
         </div>
 
-        <div id="masterView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
-            <div class="overflow-x-auto min-h-[400px]">
+        <div id="dashboardView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
+            <div class="p-3.5 sm:p-4 border-b border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 bg-slate-100 dark:bg-slate-900/40 rounded-t-2xl">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400"><i class="fa-solid fa-display mr-2"></i>Demostración de Actividad Global</span>
+                <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Selecciona una categoría en el menú lateral para interactuar.</span>
+            </div>
+            <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr id="masterTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
+                        <tr class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
+                            <th class="py-3 px-4">Nombre / Referido</th>
+                            <th class="py-3 px-4">Contacto</th>
+                            <th class="py-3 px-4">Pestaña</th>
+                            <th class="py-3 px-4">Estatus</th>
+                            <th class="py-3 px-4">Notas / Seguimiento</th>
                         </tr>
                     </thead>
-                    <tbody id="masterTableBody" class="divide-y divide-slate-300 dark:divide-slate-700/50">
+                </table>
+            </div>
+            <div id="carouselContainer" class="carousel-viewport overflow-x-auto" onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()">
+                <table class="w-full text-left border-collapse text-sm">
+                    <tbody id="demoTableBody" class="divide-y divide-slate-300 dark:divide-slate-700/50">
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
+                <span>Total en base de datos: <strong id="demoTotalCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
+            </div>
+        </div>
+
+        <div id="categoryView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative hidden">
+            <div class="overflow-x-auto min-h-[350px]">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr id="categoryTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody" class="divide-y divide-slate-300 dark:divide-slate-700/50">
                     </tbody>
                 </table>
             </div>
 
             <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
-                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCount" class="text-indigo-700 dark:text-indigo-300">0</strong> en total</span>
+                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCategoryCount" class="text-indigo-700 dark:text-indigo-300">0</strong> en esta categoría</span>
             </div>
         </div>
 
@@ -237,18 +329,18 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus (Opcional)</label>
-                        <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Pestaña (Categoría) <span class="text-rose-500">*</span></label>
+                        <select id="inputSheet" onchange="onModalSheetChange()" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Idioma <span class="text-rose-500">*</span></label>
-                        <select id="inputIdioma" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
-                            <option value="ES">ES (Español)</option>
-                            <option value="EN">EN (Inglés)</option>
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus <span class="text-slate-500 dark:text-slate-400 font-normal">(Opcional)</span></label>
+                        <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 disabled:opacity-50 font-semibold">
                         </select>
                     </div>
                 </div>
+                <div id="modalCustomFieldsContainer" class="space-y-3 pt-1 border-t border-slate-300 dark:border-slate-700"></div>
+
                 <div>
                     <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Notas / Detalle</label>
                     <textarea id="inputNotes" rows="3" class="w-full theme-input border rounded-xl p-3 focus:outline-none focus:border-indigo-500 text-sm font-semibold"></textarea>
@@ -274,7 +366,7 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
-                <div class="theme-card border p-3.5 sm:p-4 rounded-xl space-y-3 shadow-sm">
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
                     <span id="waFormTitleLabel" class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
                     <input type="hidden" id="waEditingTemplateId" value="">
                     <div>
@@ -318,7 +410,7 @@
             </div>
             <div>
                 <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Mensaje Configurado:</label>
-                <div id="waViewMessageContent" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap theme-input border p-3 rounded-xl font-semibold leading-relaxed"></div>
+                <div id="waViewMessageContent" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold leading-relaxed"></div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
                 <button onclick="closeWaViewModal()" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-4 py-2.5 rounded-xl font-bold">Cerrar</button>
@@ -330,25 +422,54 @@
     </div>
 
     <div id="configModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
-        <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
+        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h3 class="font-bold text-base text-slate-900 dark:text-white"><i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 mr-2"></i>Configuración & Ajustes</h3>
+                <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white"><i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 mr-2"></i>Gestión Global de Pestañas</h3>
                 <button onclick="closeConfigModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <div class="space-y-4 text-xs">
-                <div class="theme-card border p-3.5 rounded-xl space-y-2">
-                    <span class="font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block">Gestión de Estatus Maestro</span>
-                    <p class="text-slate-700 dark:text-slate-300 font-semibold">El sistema unificado maneja los 6 estatus estándar: <strong class="text-slate-900 dark:text-white">New, Warn, Cold, Extinguished, No referred, Rejected by Concentrix</strong>.</p>
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/60 space-y-2">
+                    <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">Agregar Nueva Pestaña / Categoría</span>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="newCategoryName" placeholder="Nombre de pestaña (ej. Interview)" class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
+                        <button onclick="addCategoryConfig()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Crear</button>
+                    </div>
                 </div>
-                <div class="theme-card border p-3.5 rounded-xl space-y-2">
-                    <span class="font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider block">Clasificación de Idioma</span>
-                    <p class="text-slate-700 dark:text-slate-300 font-semibold">Todos los registros se clasifican mediante la columna de idioma <strong class="text-slate-900 dark:text-white">ES</strong> o <strong class="text-slate-900 dark:text-white">EN</strong>.</p>
+
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Estructura & Pestañas Actuales</span>
+                    <div id="configPipelineTree" class="space-y-2 text-xs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tabEditModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate text-slate-900 dark:text-white">
+                    <i class="fa-solid fa-folder-open text-indigo-600 dark:text-indigo-400"></i>
+                    <span class="truncate">Configurar Pestaña: <strong id="modalTabNameTitle"></strong></span>
+                </h3>
+                <button onclick="closeTabEditModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs max-h-[65vh] overflow-y-auto pr-1">
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
+                    <span class="font-bold uppercase text-indigo-700 dark:text-indigo-400 block tracking-wider">Columnas de esta Pestaña</span>
+                    
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="modalNewColumnInput" placeholder="Añadir columna (ej. Nuevo Estatus)" class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
+                        <button onclick="addColumnToTab()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-3 rounded-xl transition whitespace-nowrap shadow-sm">+ Columna</button>
+                    </div>
+
+                    <div id="modalTabColumnsList" class="space-y-3 pt-1"></div>
                 </div>
             </div>
 
             <div class="flex justify-end pt-3 border-t border-slate-300 dark:border-slate-700">
-                <button onclick="closeConfigModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm">Entendido</button>
+                <button onclick="closeTabEditModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-sm">Guardar y Cerrar</button>
             </div>
         </div>
     </div>
@@ -402,7 +523,7 @@
                         <button onclick="toggleAllExportCols(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[11px] font-bold">Marcar Todas</button>
                     </div>
                     
-                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 theme-input border p-3 rounded-xl max-h-48 overflow-y-auto font-semibold text-slate-900 dark:text-slate-100">
+                    <div id="exportColumnsCheckboxContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-900/60 p-3 border border-slate-300 dark:border-slate-700/80 rounded-xl max-h-48 overflow-y-auto font-semibold text-slate-900 dark:text-slate-100">
                     </div>
                 </div>
             </div>
@@ -448,6 +569,23 @@
         </div>
     </div>
 
+    <div id="renameModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-sm text-slate-900 dark:text-white"><i class="fa-solid fa-pen-to-square text-indigo-600 dark:text-indigo-400 mr-2"></i>Renombrar Categoría</h3>
+                <button onclick="closeRenameModal(false)" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-xs text-slate-800 dark:text-slate-200 font-bold">Nuevo Nombre de Pestaña</label>
+                <input type="text" id="renameCategoryInput" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeRenameModal(false)" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-3 py-2.5 rounded-xl transition font-bold">Cancelar</button>
+                <button onclick="closeRenameModal(true)" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-sm">Guardar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -468,35 +606,54 @@
         const db = getFirestore(app);
         const candidatesCol = collection(db, "candidates");
         const templatesCol = collection(db, "whatsapp_templates");
+        const configDocRef = doc(db, "pipeline_config", "structure");
 
         let allCandidates = [];
         let whatsappTemplates = [];
         let activeWhatsAppCandidateId = null;
+        let activeTabSheet = 'ALL';
         let currentEditingDocId = null;
-        let columnFilters = { status: {}, idioma: {} };
+        let columnFilters = { status: {} };
         let selectedCandidateIds = new Set();
+        let editingTabName = null;
 
         let confirmCallback = null;
+        let renameCallback = null;
 
-        const MASTER_STATUSES = [
-            'New',
-            'Warn',
-            'Cold',
-            'Extinguished',
-            'No referred',
-            'Rejected by Concentrix'
+        let pipelineList = [
+            { name: 'Referred', statuses: ['Submitted', 'In Review', 'Scheduled', 'Hired'], columns: { 'Follow': ['Yes', 'No'], 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'Cold', statuses: ['Callback', 'No respond', 'Hold'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'Rejected by CONCENTRIX', statuses: ['Rejected', 'Failed Assessment'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } },
+            { name: 'No Referred', statuses: ['Pending Audit'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } }
         ];
 
         let statusColorsMap = {
-            'New': '#10b981',
-            'Warn': '#f59e0b',
-            'Cold': '#0ea5e9',
-            'Extinguished': '#64748b',
-            'No referred': '#8b5cf6',
-            'Rejected by Concentrix': '#f43f5e',
-            'ES': '#6366f1',
-            'EN': '#14b8a6'
+            'Submitted': '#10b981',
+            'In Review': '#f59e0b',
+            'Scheduled': '#6366f1',
+            'Hired': '#a855f7',
+            'Callback': '#0ea5e9',
+            'No respond': '#f97316',
+            'Hold': '#14b8a6',
+            'Rejected': '#f43f5e',
+            'Failed Assessment': '#f43f5e',
+            'Pending Audit': '#64748b',
+            'Yes': '#10b981',
+            'No': '#f43f5e',
+            'Opción 1': '#6366f1',
+            'Opción 2': '#64748b'
         };
+
+        const PRESET_SWATCHES = [
+            '#10b981', '#059669', '#6366f1', '#4f46e5', '#0ea5e9', 
+            '#0284c7', '#f59e0b', '#d97706', '#f97316', '#ea580c', 
+            '#f43f5e', '#e11d48', '#a855f7', '#9333ea', '#14b8a6', 
+            '#0d9488', '#64748b', '#475569'
+        ];
+
+        let carouselTimer = null;
+        let isCarouselPaused = false;
+        const ROW_HEIGHT = 58;
 
         const savedTheme = localStorage.getItem('refigo_theme') || 'light';
         if (savedTheme === 'dark') {
@@ -561,6 +718,21 @@
             }
         };
 
+        window.showRenameModal = function(oldName, callback) {
+            document.getElementById('renameCategoryInput').value = oldName;
+            renameCallback = callback;
+            document.getElementById('renameModal').classList.remove('hidden');
+        };
+
+        window.closeRenameModal = function(isSave) {
+            document.getElementById('renameModal').classList.add('hidden');
+            const newName = document.getElementById('renameCategoryInput').value.trim();
+            if (renameCallback) {
+                renameCallback(isSave ? newName : null);
+                renameCallback = null;
+            }
+        };
+
         onSnapshot(templatesCol, (snapshot) => {
             whatsappTemplates = [];
             snapshot.forEach(docSnap => {
@@ -574,38 +746,104 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
+        onSnapshot(configDocRef, (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.items) {
+                    pipelineList = data.items.map(item => {
+                        let cols = item.columns;
+                        if (Array.isArray(cols)) {
+                            let obj = {};
+                            cols.forEach(c => obj[c] = ['Opción 1', 'Opción 2']);
+                            cols = obj;
+                        }
+                        return { ...item, columns: cols || {} };
+                    });
+                }
+                if (data.statusColors) statusColorsMap = data.statusColors;
+            } else {
+                setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+            }
+            renderSidebarCategories();
+            renderConfigTree();
+            buildFilterMenus();
+            applyAllFilters();
+        });
+
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        function renderSidebarCategories() {
+            const container = document.getElementById('dynamicSidebarCategories');
+            
+            container.innerHTML = pipelineList.map(item => `
+                <button onclick="selectCategory('${item.name}')" class="sidebar-cat-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-white transition" data-sheet="${item.name}">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-folder text-indigo-600 dark:text-indigo-400"></i> ${item.name}</span>
+                    <span id="sideCount_${cleanId(item.name)}" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
+                </button>
+            `).join('');
+
+            updateMetrics();
+        }
+
+        window.selectCategory = function(sheet) {
+            activeTabSheet = sheet;
+            columnFilters = { status: {} };
+            selectedCandidateIds.clear();
+            updateExportBtnVisibility();
+
+            document.querySelectorAll('.sidebar-cat-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20', 'active', 'font-semibold');
+                btn.classList.add('text-slate-800', 'dark:text-slate-200', 'font-semibold');
+            });
+
+            const activeBtn = document.querySelector(`.sidebar-cat-btn[data-sheet="${sheet}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('text-indigo-600', 'dark:text-indigo-400', 'bg-indigo-500/10', 'border', 'border-indigo-500/20', 'active', 'font-semibold');
+                activeBtn.classList.remove('text-slate-800', 'dark:text-slate-200');
+            }
+
+            const dashboardView = document.getElementById('dashboardView');
+            const categoryView = document.getElementById('categoryView');
+
+            if (sheet === 'ALL') {
+                document.getElementById('currentCategoryLabel').textContent = `Dashboard General`;
+                dashboardView.classList.remove('hidden');
+                categoryView.classList.add('hidden');
+            } else {
+                document.getElementById('currentCategoryLabel').textContent = `Categoría: ${sheet}`;
+                dashboardView.classList.add('hidden');
+                categoryView.classList.remove('hidden');
+            }
+
+            toggleSidebar();
+            buildFilterMenus();
+            applyAllFilters();
+        };
+
         onSnapshot(candidatesCol, (snapshot) => {
             allCandidates = [];
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
-                
-                let st = data.status || 'New';
-                if (!MASTER_STATUSES.includes(st)) {
-                    if (data.sheet === 'Referred' || ['Submitted', 'In Review', 'Scheduled', 'Hired'].includes(st)) {
-                        st = 'New';
-                    } else if (data.sheet === 'Cold' || ['Callback', 'No respond', 'Hold'].includes(st)) {
-                        st = 'Cold';
-                    } else if (data.sheet === 'Extinguished' || st === 'Extinguished') {
-                        st = 'Extinguished';
-                    } else if (data.sheet === 'Rejected by CONCENTRIX' || ['Rejected', 'Failed Assessment'].includes(st)) {
-                        st = 'Rejected by Concentrix';
-                    } else if (data.sheet === 'No Referred' || st === 'Pending Audit') {
-                        st = 'No referred';
-                    } else {
-                        st = 'New';
-                    }
-                }
-
-                const idioma = data.idioma || 'ES';
-
                 allCandidates.push({
                     docId: docSnap.id,
+                    sheet: data.sheet || 'No Referred',
                     name: data.name || 'Sin Nombre',
                     email: data.email || '-',
                     phone: data.phone || '-',
-                    status: st,
-                    idioma: idioma,
+                    status: data.status || '-',
                     notes: data.notes || '-',
+                    customFields: data.customFields || {},
                     createdAt: data.createdAt || data.updatedAt || null,
                     updatedAt: data.updatedAt || null
                 });
@@ -638,37 +876,49 @@
         };
 
         function buildFilterMenus() {
-            const statusContainer = document.getElementById('statusOptions');
-            if (statusContainer) {
-                statusContainer.innerHTML = `
-                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" checked onchange="toggleSelectAll('status', this.checked)" class="rounded theme-input">
-                        <strong>(Select All)</strong>
-                    </label>
-                ` + MASTER_STATUSES.map(val => `
-                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" checked>
-                        <span>${val}</span>
-                    </label>
-                `).join('');
+            const container = document.getElementById('statusOptions');
+            if (!container) return;
+
+            let allowedStatuses = [];
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            if (activeTabSheet !== 'ALL' && catObj) {
+                allowedStatuses = catObj.statuses;
+            } else {
+                allowedStatuses = [...new Set(allCandidates.map(c => c.status))].filter(Boolean).sort();
             }
 
-            const idiomaContainer = document.getElementById('idiomaOptions');
-            if (idiomaContainer) {
-                idiomaContainer.innerHTML = `
-                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" checked onchange="toggleSelectAll('idioma', this.checked)" class="rounded theme-input">
-                        <strong>(Select All)</strong>
-                    </label>
-                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" value="ES" class="col-check-idioma rounded theme-input" checked>
-                        <span>ES</span>
-                    </label>
-                    <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" value="EN" class="col-check-idioma rounded theme-input" checked>
-                        <span>EN</span>
-                    </label>
-                `;
+            container.innerHTML = `
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                    <input type="checkbox" checked onchange="toggleSelectAll('status', this.checked)" class="rounded theme-input">
+                    <strong>(Select All)</strong>
+                </label>
+            ` + allowedStatuses.map(val => `
+                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                    <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" checked>
+                    <span>${val}</span>
+                </label>
+            `).join('');
+
+            if (activeTabSheet !== 'ALL' && catObj && catObj.columns) {
+                Object.keys(catObj.columns).forEach(colName => {
+                    const colContainer = document.getElementById(`customColOptions_${cleanId(colName)}`);
+                    if (colContainer) {
+                        const uniqueVals = catObj.columns[colName] || [];
+                        if (uniqueVals.length > 0) {
+                            colContainer.innerHTML = `
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                                    <input type="checkbox" checked onchange="toggleSelectAll('custom_${cleanId(colName)}', this.checked)" class="rounded theme-input">
+                                    <strong>(Select All)</strong>
+                                </label>
+                            ` + uniqueVals.map(val => `
+                                <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
+                                    <input type="checkbox" value="${val}" class="col-check-custom_${cleanId(colName)} rounded theme-input" checked>
+                                    <span>${val}</span>
+                                </label>
+                            `).join('');
+                        }
+                    }
+                });
             }
         }
 
@@ -683,10 +933,17 @@
             applyAllFilters();
         };
 
-        window.sortData = function(colKey, direction) {
+        window.sortData = function(colKey, direction, isCustom = false) {
             allCandidates.sort((a, b) => {
-                let valA = (a[colKey] || '').toLowerCase();
-                let valB = (b[colKey] || '').toLowerCase();
+                let valA = '';
+                let valB = '';
+                if (isCustom) {
+                    valA = (a.customFields?.[colKey] || '').toLowerCase();
+                    valB = (b.customFields?.[colKey] || '').toLowerCase();
+                } else {
+                    valA = (a[colKey] || '').toLowerCase();
+                    valB = (b[colKey] || '').toLowerCase();
+                }
                 if (valA < valB) return direction === 'asc' ? -1 : 1;
                 if (valA > valB) return direction === 'asc' ? 1 : -1;
                 return 0;
@@ -718,7 +975,7 @@
             document.getElementById('globalSearch').value = '';
             clearDateRangeFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
-            columnFilters = { status: {}, idioma: {} };
+            columnFilters = { status: {} };
             applyAllFilters();
         });
 
@@ -732,16 +989,26 @@
             return list.sort((a, b) => {
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
-                return timeA - timeB; // Cronológico ascendente (nuevos al final)
+                return timeA - timeB; // Chronological ascending (oldest at top, new entries appear at the bottom)
             });
         }
 
-        function renderBadge(name, isIdioma = false) {
-            if (!name || name === '-') return '-';
-            const hexColor = statusColorsMap[name] || (isIdioma ? '#6366f1' : '#64748b');
+        function renderStatusBadge(statusName) {
+            if (!statusName || statusName === '-') return '-';
+            const hexColor = statusColorsMap[statusName] || '#6366f1';
             return `
                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
-                    ${name}
+                    ${statusName}
+                </span>
+            `;
+        }
+
+        function renderOptionBadge(optName) {
+            if (!optName || optName === '-') return '-';
+            const hexColor = statusColorsMap[optName] || '#64748b';
+            return `
+                <span class="inline-flex items-center px-2 py-0.5 text-[11px] font-bold rounded-md border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
+                    ${optName}
                 </span>
             `;
         }
@@ -751,31 +1018,67 @@
             const dateFrom = document.getElementById('dateFromInput').value;
             const dateTo = document.getElementById('dateToInput').value;
 
-            const statusFilterList = columnFilters.status['status'];
-            const idiomaFilterList = columnFilters.status['idioma'];
+            if (activeTabSheet === 'ALL') {
+                const filtered = allCandidates.filter(c => {
+                    const matchesSearch = c.name.toLowerCase().includes(search) || 
+                                          c.email.toLowerCase().includes(search) || 
+                                          c.phone.toLowerCase().includes(search);
+                    
+                    let matchesDate = true;
+                    if (c.createdAt) {
+                        const candDate = c.createdAt.split('T')[0];
+                        if (dateFrom && candDate < dateFrom) matchesDate = false;
+                        if (dateTo && candDate > dateTo) matchesDate = false;
+                    } else if (dateFrom || dateTo) {
+                        matchesDate = false;
+                    }
 
-            const filtered = allCandidates.filter(c => {
-                const matchesStatus = !statusFilterList || statusFilterList.length === 0 || statusFilterList.includes(c.status);
-                const matchesIdioma = !idiomaFilterList || idiomaFilterList.length === 0 || idiomaFilterList.includes(c.idioma);
-                
-                const matchesSearch = c.name.toLowerCase().includes(search) || 
-                                      c.email.toLowerCase().includes(search) || 
-                                      c.phone.toLowerCase().includes(search) ||
-                                      c.notes.toLowerCase().includes(search);
+                    return matchesSearch && matchesDate;
+                });
 
-                let matchesDate = true;
-                if (c.createdAt) {
-                    const candDate = c.createdAt.split('T')[0];
-                    if (dateFrom && candDate < dateFrom) matchesDate = false;
-                    if (dateTo && candDate > dateTo) matchesDate = false;
-                } else if (dateFrom || dateTo) {
-                    matchesDate = false;
-                }
+                renderDemoDashboard(sortCandidatesByCreation(filtered));
+                restartCarouselLoop();
+            } else {
+                const catObj = pipelineList.find(c => c.name === activeTabSheet);
+                const filtered = allCandidates.filter(c => {
+                    const matchesCategory = c.sheet === activeTabSheet;
+                    
+                    const statusFilterList = columnFilters.status['status'];
+                    const matchesStatusCol = !statusFilterList || statusFilterList.length === 0 || statusFilterList.includes(c.status);
 
-                return matchesStatus && matchesIdioma && matchesSearch && matchesDate;
-            });
+                    let matchesCustomCols = true;
+                    if (catObj && catObj.columns) {
+                        Object.keys(catObj.columns).forEach(colName => {
+                            const options = catObj.columns[colName] || [];
+                            if (options.length > 0) {
+                                const filterList = columnFilters.status[`custom_${cleanId(colName)}`];
+                                const val = c.customFields?.[colName] || '-';
+                                if (filterList && filterList.length > 0 && !filterList.includes(val)) {
+                                    matchesCustomCols = false;
+                                }
+                            }
+                        });
+                    }
 
-            renderMasterTable(sortCandidatesByCreation(filtered));
+                    const matchesSearch = c.name.toLowerCase().includes(search) || 
+                                          c.email.toLowerCase().includes(search) || 
+                                          c.phone.toLowerCase().includes(search) ||
+                                          c.notes.toLowerCase().includes(search);
+
+                    let matchesDate = true;
+                    if (c.createdAt) {
+                        const candDate = c.createdAt.split('T')[0];
+                        if (dateFrom && candDate < dateFrom) matchesDate = false;
+                        if (dateTo && candDate > dateTo) matchesDate = false;
+                    } else if (dateFrom || dateTo) {
+                        matchesDate = false;
+                    }
+
+                    return matchesCategory && matchesStatusCol && matchesCustomCols && matchesSearch && matchesDate;
+                });
+
+                renderCategoryTable(sortCandidatesByCreation(filtered));
+            }
         }
 
         function formatDate(isoString) {
@@ -787,18 +1090,83 @@
             });
         }
 
-        function renderMasterTable(data) {
-            const thead = document.getElementById('masterTableHead');
-            const tbody = document.getElementById('masterTableBody');
+        function renderDemoDashboard(data) {
+            const tbody = document.getElementById('demoTableBody');
+            document.getElementById('demoTotalCount').textContent = data.length;
 
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos en la base.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(c => `
+                <tr class="hover:bg-slate-200/60 dark:hover:bg-slate-700/30 transition border-b border-slate-300 dark:border-slate-700/40 h-[58px]">
+                    <td class="py-3 px-4 font-bold text-slate-900 dark:text-white w-1/4 truncate">${c.name}</td>
+                    <td class="py-3 px-4 text-xs space-y-0.5 w-1/4 truncate">
+                        <div class="text-slate-900 dark:text-slate-100 font-bold">${c.email}</div>
+                        <div class="text-slate-700 dark:text-slate-300 font-semibold">${c.phone}</div>
+                    </td>
+                    <td class="py-3 px-4 w-1/6">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
+                            ${c.sheet}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 w-1/6">
+                        ${renderStatusBadge(c.status)}
+                    </td>
+                    <td class="py-3 px-4 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate" title="${c.notes}">
+                        ${hasNotes(c) ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderCategoryTable(data) {
+            const thead = document.getElementById('categoryTableHead');
+            const tbody = document.getElementById('categoryTableBody');
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+
+            const totalInCat = allCandidates.filter(c => c.sheet === activeTabSheet).length;
             document.getElementById('visibleCount').textContent = data.length;
-            document.getElementById('totalCount').textContent = allCandidates.length;
+            document.getElementById('totalCategoryCount').textContent = totalInCat;
+
+            let customHeadersHtml = '';
+            customCols.forEach(colName => {
+                const options = catObj.columns[colName] || [];
+                const hasOptions = options.length > 0;
+
+                if (hasOptions) {
+                    customHeadersHtml += `
+                        <th class="py-3 px-4 relative">
+                            <div class="flex items-center justify-between cursor-pointer font-bold text-slate-900 dark:text-slate-100" onclick="toggleDropdown('colFilter_${cleanId(colName)}')">
+                                <span>${colName}</span>
+                                <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
+                            </div>
+                            <div id="colFilter_${cleanId(colName)}" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-60 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
+                                <button onclick="sortData('${colName}', 'asc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block font-bold"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
+                                <button onclick="sortData('${colName}', 'desc', true)" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block mb-2 font-bold"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
+                                <hr class="border-slate-300 dark:border-slate-700 my-2">
+                                <input type="text" onkeyup="filterMenuOptions('colFilter_${cleanId(colName)}', this.value)" placeholder="Buscar..." class="w-full theme-input border rounded-lg p-2 text-xs mb-2 font-semibold">
+                                <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="customColOptions_${cleanId(colName)}"></div>
+                                <button onclick="applyColumnFilter('custom_${cleanId(colName)}')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
+                            </div>
+                        </th>
+                    `;
+                } else {
+                    customHeadersHtml += `
+                        <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
+                            <span>${colName}</span>
+                        </th>
+                    `;
+                }
+            });
 
             thead.innerHTML = `
                 <th class="py-3 px-4 w-10 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer">
                 </th>
-                <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Nombre / Candidato</th>
+                <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Nombre / Referido</th>
                 <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Contacto</th>
                 <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
@@ -814,19 +1182,7 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
-                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('idiomaFilter')">
-                        <span>Idioma</span>
-                        <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
-                    </div>
-                    <div id="idiomaFilter" class="dropdown-menu absolute left-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-48 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
-                        <button onclick="sortData('idioma', 'asc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block font-bold"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> Orden A a Z</button>
-                        <button onclick="sortData('idioma', 'desc')" class="w-full text-left text-xs py-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 block mb-2 font-bold"><i class="fa-solid fa-arrow-up-z-a mr-1"></i> Orden Z a A</button>
-                        <hr class="border-slate-300 dark:border-slate-700 my-2">
-                        <div class="max-h-36 overflow-y-auto space-y-1 text-xs" id="idiomaOptions"></div>
-                        <button onclick="applyColumnFilter('idioma')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
-                    </div>
-                </th>
+                ${customHeadersHtml}
                 <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Notas / Seguimiento</th>
                 <th class="py-3 px-4 text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
             `;
@@ -834,7 +1190,8 @@
             buildFilterMenus();
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos que coincidan con la búsqueda.</td></tr>`;
+                const totalCols = 5 + customCols.length;
+                tbody.innerHTML = `<tr><td colspan="${totalCols}" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos en la categoría "${activeTabSheet}".</td></tr>`;
                 return;
             }
 
@@ -852,11 +1209,18 @@
                         <div class="text-slate-700 dark:text-slate-300 font-semibold"><i class="fa-solid fa-phone mr-1 text-slate-500"></i>${c.phone}</div>
                     </td>
                     <td class="py-3.5 px-4">
-                        ${renderBadge(c.status)}
+                        ${renderStatusBadge(c.status)}
                     </td>
-                    <td class="py-3.5 px-4">
-                        ${renderBadge(c.idioma, true)}
-                    </td>
+                    ${customCols.map(colName => {
+                        const val = c.customFields?.[colName] || '-';
+                        const options = catObj.columns[colName] || [];
+                        const hasOpts = options.length > 0;
+                        return `
+                            <td class="py-3.5 px-4 text-xs text-slate-800 dark:text-slate-200 font-semibold">
+                                ${hasOpts ? renderOptionBadge(val) : val}
+                            </td>
+                        `;
+                    }).join('')}
                     <td class="py-3.5 px-4 text-xs text-slate-800 dark:text-slate-200 font-semibold max-w-xs truncate" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
@@ -1058,7 +1422,8 @@
         };
 
         window.toggleSelectAllRows = function(isChecked) {
-            allCandidates.forEach(c => {
+            const currentCatCandidates = allCandidates.filter(c => c.sheet === activeTabSheet);
+            currentCatCandidates.forEach(c => {
                 if (isChecked) {
                     selectedCandidateIds.add(c.docId);
                 } else {
@@ -1096,8 +1461,11 @@
                 return;
             }
 
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
+
             const container = document.getElementById('exportColumnsCheckboxContainer');
-            container.innerHTML = `
+            let html = `
                 <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
                     <input type="checkbox" value="name" checked class="export-col-check rounded theme-input">
                     <span>Nombre Completo</span>
@@ -1111,13 +1479,25 @@
                     <span>Número Teléfono</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="sheet" checked class="export-col-check rounded theme-input">
+                    <span>Pestaña (Categoría)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
                     <input type="checkbox" value="status" checked class="export-col-check rounded theme-input">
                     <span>Estatus</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
-                    <input type="checkbox" value="idioma" checked class="export-col-check rounded theme-input">
-                    <span>Idioma</span>
-                </label>
+            `;
+
+            customCols.forEach(colName => {
+                html += `
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                        <input type="checkbox" value="custom_${colName}" checked class="export-col-check rounded theme-input">
+                        <span>${colName}</span>
+                    </label>
+                `;
+            });
+
+            html += `
                 <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
                     <input type="checkbox" value="notes" checked class="export-col-check rounded theme-input">
                     <span>Notas / Detalles</span>
@@ -1128,6 +1508,7 @@
                 </label>
             `;
 
+            container.innerHTML = html;
             document.getElementById('exportModal').classList.remove('hidden');
         };
 
@@ -1150,16 +1531,22 @@
             }
 
             const candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
+            const catObj = pipelineList.find(c => c.name === activeTabSheet);
+            const customCols = catObj && catObj.columns ? Object.keys(catObj.columns) : [];
 
             const colLabels = {
                 name: 'Nombre Completo',
                 email: 'Correo Electrónico',
                 phone: 'Número Teléfono',
+                sheet: 'Pestaña (Categoría)',
                 status: 'Estatus',
-                idioma: 'Idioma',
                 notes: 'Notas / Detalles',
                 createdAt: 'Fecha de Registro'
             };
+
+            customCols.forEach(colName => {
+                colLabels[`custom_${colName}`] = colName;
+            });
 
             const exportData = candidatesToExport.map(c => {
                 const row = {};
@@ -1167,6 +1554,9 @@
                     const label = colLabels[col] || col;
                     if (col === 'createdAt') {
                         row[label] = formatDate(c[col]);
+                    } else if (col.startsWith('custom_')) {
+                        const originalColName = col.replace('custom_', '');
+                        row[label] = c.customFields?.[originalColName] || '-';
                     } else {
                         row[label] = c[col] || '-';
                     }
@@ -1174,7 +1564,7 @@
                 return row;
             });
 
-            const fileName = `RefiGo_Master_Export_${new Date().toISOString().split('T')[0]}`;
+            const fileName = `RefiGo_Export_${activeTabSheet}_${new Date().toISOString().split('T')[0]}`;
 
             if (selectedFormat === 'xlsx') {
                 const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -1214,22 +1604,52 @@
             showAlert("¡Exportación Completada!", `Se han exportado ${exportData.length} registros en formato ${selectedFormat.toUpperCase()}.`, "success");
         };
 
+        function restartCarouselLoop() {
+            if (carouselTimer) clearInterval(carouselTimer);
+            if (activeTabSheet !== 'ALL') return;
+
+            const container = document.getElementById('carouselContainer');
+            container.scrollTop = 0;
+
+            carouselTimer = setInterval(() => {
+                if (isCarouselPaused) return;
+
+                const maxScroll = container.scrollHeight - container.clientHeight;
+                if (container.scrollTop >= maxScroll - 10) {
+                    container.scrollTop = 0;
+                } else {
+                    container.scrollTop += ROW_HEIGHT;
+                }
+            }, 3000);
+        }
+
+        window.pauseCarousel = function() { isCarouselPaused = true; };
+        window.resumeCarousel = function() { isCarouselPaused = false; };
+
         function updateMetrics() {
             const total = allCandidates.length;
-            const newCount = allCandidates.filter(c => c.status === 'New').length;
-            const warnCount = allCandidates.filter(c => c.status === 'Warn').length;
-            const coldCount = allCandidates.filter(c => c.status === 'Cold').length;
-            const extCount = allCandidates.filter(c => c.status === 'Extinguished').length;
-            const noRefCount = allCandidates.filter(c => c.status === 'No referred').length;
-            const rejCount = allCandidates.filter(c => c.status === 'Rejected by Concentrix').length;
+            const refCount = allCandidates.filter(c => c.sheet === 'Referred').length;
+            const coldCount = allCandidates.filter(c => c.sheet === 'Cold').length;
+            const rejCount = allCandidates.filter(c => c.sheet === 'Rejected by CONCENTRIX').length;
+            const noRefCount = allCandidates.filter(c => c.sheet === 'No Referred').length;
 
             document.getElementById('metricTotal').textContent = total;
-            document.getElementById('metricNew').textContent = newCount;
-            document.getElementById('metricWarn').textContent = warnCount;
+            document.getElementById('metricReferred').textContent = refCount;
             document.getElementById('metricCold').textContent = coldCount;
-            document.getElementById('metricExtinguished').textContent = extCount;
-            document.getElementById('metricNoReferred').textContent = noRefCount;
-            document.getElementById('metricRejected').textContent = rejCount;
+            document.getElementById('metricOther').textContent = rejCount + noRefCount;
+
+            document.getElementById('sideCountAll').textContent = total;
+            
+            pipelineList.forEach(item => {
+                const el = document.getElementById(`sideCount_${cleanId(item.name)}`);
+                if (el) {
+                    el.textContent = allCandidates.filter(c => c.sheet === item.name).length;
+                }
+            });
+        }
+
+        function cleanId(str) {
+            return str.replace(/[^a-zA-Z0-9]/g, '');
         }
 
         function cleanPhone(phone) {
@@ -1252,7 +1672,7 @@
                 let addedCount = 0;
 
                 for (const sheetName of workbook.SheetNames) {
-                    if (['Hoja1'].includes(sheetName)) continue;
+                    if (['Hoja1', 'Warn'].includes(sheetName)) continue;
 
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -1262,17 +1682,7 @@
                         const email = String(row['Correo'] || '-').trim();
                         const rawPhone = String(row['Número'] || row['Numero'] || '-').trim();
                         const phone = cleanPhone(rawPhone);
-                        
-                        let rawStatus = String(row['Estatus'] || 'New').trim();
-                        if (!MASTER_STATUSES.includes(rawStatus)) {
-                            if (['Submitted', 'In Review', 'Scheduled', 'Hired'].includes(rawStatus)) rawStatus = 'New';
-                            else if (['Callback', 'No respond', 'Hold'].includes(rawStatus)) rawStatus = 'Cold';
-                            else if (rawStatus === 'Extinguished') rawStatus = 'Extinguished';
-                            else if (['Rejected', 'Failed Assessment'].includes(rawStatus)) rawStatus = 'Rejected by Concentrix';
-                            else rawStatus = 'New';
-                        }
-                        
-                        const idioma = String(row['Idioma'] || 'ES').trim().toUpperCase() === 'EN' ? 'EN' : 'ES';
+                        const status = String(row['Estatus'] || '-').trim();
                         const notes = String(row['Nota'] || row['Notas'] || '-').trim();
 
                         const existing = allCandidates.find(c => {
@@ -1284,11 +1694,11 @@
                         if (existing) {
                             const docRef = doc(db, "candidates", existing.docId);
                             batch.update(docRef, {
+                                sheet: sheetName,
                                 name: String(name).trim(),
                                 email: email,
                                 phone: rawPhone,
-                                status: rawStatus,
-                                idioma: idioma,
+                                status: status,
                                 notes: notes,
                                 updatedAt: nowIso
                             });
@@ -1296,12 +1706,13 @@
                         } else {
                             const newRef = doc(candidatesCol);
                             batch.set(newRef, {
+                                sheet: sheetName,
                                 name: String(name).trim(),
                                 email: email,
                                 phone: rawPhone,
-                                status: rawStatus,
-                                idioma: idioma,
+                                status: status,
                                 notes: notes,
+                                customFields: {},
                                 createdAt: nowIso,
                                 updatedAt: nowIso
                             });
@@ -1334,20 +1745,89 @@
             document.getElementById('inputEmail').value = '';
             document.getElementById('inputPhone').value = '+503 ';
             document.getElementById('inputNotes').value = '';
-            document.getElementById('inputIdioma').value = 'ES';
 
-            populateModalStatus();
+            populateModalCategories();
             document.getElementById('candidateModal').classList.remove('hidden');
         };
 
-        function populateModalStatus(selectedStatus = null) {
+        function populateModalCategories(selectedSheet = null, selectedStatus = null, customFields = {}) {
+            const sheetSelect = document.getElementById('inputSheet');
+            
+            sheetSelect.innerHTML = `<option value="" disabled selected>-- Seleccionar Pestaña --</option>` + 
+                pipelineList.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+
+            if (selectedSheet && pipelineList.some(i => i.name === selectedSheet)) {
+                sheetSelect.value = selectedSheet;
+                updateModalStatusDropdown(selectedStatus);
+                renderModalCustomFields(selectedSheet, customFields);
+            } else {
+                const statusSelect = document.getElementById('inputStatus');
+                statusSelect.innerHTML = `<option value="" selected>-- Seleccionar Estatus (Opcional) --</option>`;
+                statusSelect.disabled = true;
+                document.getElementById('modalCustomFieldsContainer').innerHTML = '';
+            }
+        }
+
+        window.onModalSheetChange = function() {
+            updateModalStatusDropdown();
+            const sheetVal = document.getElementById('inputSheet').value;
+            renderModalCustomFields(sheetVal, {});
+        };
+
+        window.updateModalStatusDropdown = function(selectedStatus = null) {
+            const currentSheet = document.getElementById('inputSheet').value;
             const statusSelect = document.getElementById('inputStatus');
-            statusSelect.innerHTML = `<option value="">-- Sin Estatus Específico --</option>` + MASTER_STATUSES.map(st => `<option value="${st}">${st}</option>`).join('');
-            if (selectedStatus && MASTER_STATUSES.includes(selectedStatus)) {
+
+            if (!currentSheet) {
+                statusSelect.innerHTML = `<option value="" selected>-- Seleccionar Estatus (Opcional) --</option>`;
+                statusSelect.disabled = true;
+                return;
+            }
+
+            const catObj = pipelineList.find(i => i.name === currentSheet);
+            const statuses = catObj ? catObj.statuses : ['General'];
+
+            statusSelect.disabled = false;
+            statusSelect.innerHTML = `<option value="">-- Sin Estatus Específico --</option>` + 
+                statuses.map(st => `<option value="${st}">${st}</option>`).join('');
+
+            if (selectedStatus && statuses.includes(selectedStatus)) {
                 statusSelect.value = selectedStatus;
             } else {
-                statusSelect.value = '';
+                statusSelect.value = "";
             }
+        };
+
+        function renderModalCustomFields(sheetName, existingCustomFields = {}) {
+            const container = document.getElementById('modalCustomFieldsContainer');
+            const catObj = pipelineList.find(i => i.name === sheetName);
+            if (!catObj || !catObj.columns || Object.keys(catObj.columns).length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = Object.keys(catObj.columns).map(colName => {
+                const options = catObj.columns[colName] || [];
+                const val = existingCustomFields[colName] || '';
+                if (options.length > 0) {
+                    return `
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">${colName}</label>
+                            <select id="customField_${cleanId(colName)}" class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold" data-colname="${colName}">
+                                <option value="" disabled ${!val ? 'selected' : ''}>-- Seleccionar ${colName} --</option>
+                                ${options.map(opt => `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">${colName}</label>
+                            <input type="text" id="customField_${cleanId(colName)}" value="${val}" placeholder="Escribe ${colName}..." class="modal-custom-input w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold" data-colname="${colName}">
+                        </div>
+                    `;
+                }
+            }).join('');
         }
 
         window.openEditModal = function(docId) {
@@ -1359,9 +1839,8 @@
             document.getElementById('inputEmail').value = cand.email;
             document.getElementById('inputPhone').value = cand.phone;
             document.getElementById('inputNotes').value = cand.notes;
-            document.getElementById('inputIdioma').value = cand.idioma || 'ES';
 
-            populateModalStatus(cand.status);
+            populateModalCategories(cand.sheet, cand.status, cand.customFields || {});
             document.getElementById('candidateModal').classList.remove('hidden');
         };
 
@@ -1374,11 +1853,11 @@
             const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
             const rawPhone = document.getElementById('inputPhone').value.trim();
             const phoneVal = cleanPhone(rawPhone);
-            const statusVal = document.getElementById('inputStatus').value || 'New';
-            const idiomaVal = document.getElementById('inputIdioma').value;
+            const sheetVal = document.getElementById('inputSheet').value;
+            const statusVal = document.getElementById('inputStatus').value;
 
-            if (!emailVal || !rawPhone || rawPhone === '+503') {
-                showAlert("Campos Obligatorios", "Es obligatorio ingresar el <strong>correo electrónico</strong> y el <strong>número de teléfono</strong> para guardar el registro.", "warning");
+            if (!emailVal || !rawPhone || rawPhone === '+503' || !sheetVal) {
+                showAlert("Campos Obligatorios", "Es obligatorio ingresar el <strong>correo electrónico</strong>, el <strong>número de teléfono</strong> y la <strong>pestaña</strong> para guardar el registro.", "warning");
                 return;
             }
 
@@ -1392,20 +1871,27 @@
             if (existingDuplicate) {
                 showAlert(
                     "¡Candidato Ya Registrado!",
-                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong> con el estatus <strong>${existingDuplicate.status}</strong>.`,
+                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente se encuentra registrado en la categoría <span class="text-indigo-600 dark:text-indigo-400 font-bold">${existingDuplicate.sheet}</span> con el estatus <strong>${existingDuplicate.status}</strong>.`,
                     "danger"
                 );
                 return;
             }
+
+            const customFieldsData = {};
+            document.querySelectorAll('.modal-custom-input').forEach(input => {
+                const colName = input.getAttribute('data-colname');
+                customFieldsData[colName] = input.value;
+            });
 
             const nowIso = new Date().toISOString();
             const dataPayload = {
                 name: nameVal || 'Sin Nombre',
                 email: document.getElementById('inputEmail').value.trim(),
                 phone: rawPhone,
-                status: statusVal,
-                idioma: idiomaVal,
+                sheet: sheetVal,
+                status: statusVal ? statusVal : '-',
                 notes: document.getElementById('inputNotes').value.trim(),
+                customFields: customFieldsData,
                 updatedAt: nowIso
             };
 
@@ -1434,11 +1920,304 @@
         };
 
         window.openConfigModal = function() {
+            renderConfigTree();
             document.getElementById('configModal').classList.remove('hidden');
         };
 
         window.closeConfigModal = function() {
             document.getElementById('configModal').classList.add('hidden');
+        };
+
+        window.openTabEditModal = function(tabName) {
+            editingTabName = tabName;
+            document.getElementById('modalTabNameTitle').textContent = tabName;
+            renderTabEditModalContents();
+            document.getElementById('tabEditModal').classList.remove('hidden');
+        };
+
+        window.closeTabEditModal = function() {
+            document.getElementById('tabEditModal').classList.add('hidden');
+            editingTabName = null;
+        };
+
+        function renderTabEditModalContents() {
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (!catObj) return;
+
+            const columnsContainer = document.getElementById('modalTabColumnsList');
+            const cols = catObj.columns || {};
+            const colNames = Object.keys(cols);
+
+            let html = `
+                <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2 bg-indigo-500/5 border-indigo-500/25">
+                    <div class="flex items-center justify-between font-bold text-indigo-700 dark:text-indigo-400">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-tag"><span>Estatus</span></i> <span class="text-[10px] bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full font-bold">Columna Principal</span></span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        ${catObj.statuses.map(st => {
+                            const currentColor = statusColorsMap[st] || '#6366f1';
+                            return `
+                                <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative font-semibold">
+                                    <span>${st}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleColorPalette('status_${cleanId(st)}', event)" title="Cambiar Color"></div>
+                                        <i onclick="removeStatusFromTab('${st}')" class="fa-solid fa-xmark text-slate-500 hover:text-rose-500 cursor-pointer ml-1 text-sm font-bold"></i>
+                                    </div>
+                                    
+                                    <div id="palette_status_${cleanId(st)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
+                                        <div class="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Paleta de Colores</div>
+                                        <div class="grid grid-cols-6 gap-2 mb-2">
+                                            ${PRESET_SWATCHES.map(hex => `
+                                                <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${st}', '${hex}')"></div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-300 dark:border-slate-800">
+                        <input type="text" id="modalNewStatusInput" placeholder="Añadir estatus (ej. Pending)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full font-semibold">
+                        <button onclick="addStatusToTab()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-bold shadow-sm">+ Estatus</button>
+                    </div>
+                </div>
+            `;
+
+            colNames.forEach(colName => {
+                const options = cols[colName] || [];
+                html += `
+                    <div class="theme-card border rounded-xl p-3 sm:p-4 space-y-2">
+                        <div class="flex items-center justify-between font-bold text-indigo-700 dark:text-indigo-400">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-columns"></i><span>${colName}</span></span>
+                            <button onclick="removeColumnFromTab('${colName}')" class="text-rose-600 dark:text-rose-400 hover:underline text-[11px] font-bold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 items-center pt-1">
+                            ${options.length === 0 ? `<span class="text-slate-600 dark:text-slate-400 text-[11px] italic font-semibold">Añade opciones para filtrar (ej. Yes, No)</span>` : options.map(opt => {
+                                const currentColor = statusColorsMap[opt] || '#64748b';
+                                return `
+                                    <div class="inline-flex items-center gap-2 theme-card border px-2.5 py-1.5 rounded-xl text-xs shadow-sm relative font-semibold">
+                                        <span>${opt}</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="color-swatch" style="background-color: ${currentColor};" onclick="toggleColorPalette('opt_${cleanId(colName)}_${cleanId(opt)}', event)" title="Cambiar Color"></div>
+                                            <i onclick="removeOptionFromColumn('${colName}', '${opt}')" class="fa-solid fa-xmark cursor-pointer hover:text-rose-500 text-sm text-slate-500 font-bold"></i>
+                                        </div>
+
+                                        <div id="palette_opt_${cleanId(colName)}_${cleanId(opt)}" class="hidden fixed sm:absolute right-4 sm:right-auto sm:left-0 top-auto sm:top-full mt-2 theme-card border rounded-2xl p-3 shadow-2xl z-[100] w-56">
+                                            <div class="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase mb-2">Paleta de Colores</div>
+                                            <div class="grid grid-cols-6 gap-2 mb-2">
+                                                ${PRESET_SWATCHES.map(hex => `
+                                                    <div class="color-swatch ${currentColor === hex ? 'selected' : ''}" style="background-color: ${hex};" onclick="selectStatusColor('${opt}', '${hex}')"></div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-slate-300 dark:border-slate-800">
+                            <input type="text" id="newOptInput_${cleanId(colName)}" placeholder="Añadir opción (ej. Yes, No)" class="theme-input border rounded-xl px-3 py-2 text-xs w-full font-semibold">
+                            <button onclick="addOptionToColumn('${colName}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs whitespace-nowrap font-bold shadow-sm">+ Opción</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            columnsContainer.innerHTML = html;
+        }
+
+        window.addStatusToTab = async function() {
+            const input = document.getElementById('modalNewStatusInput');
+            const stName = input.value.trim();
+            if (!editingTabName || !stName) return;
+
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (catObj && !catObj.statuses.includes(stName)) {
+                catObj.statuses.push(stName);
+                if (!statusColorsMap[stName]) statusColorsMap[stName] = '#6366f1';
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                input.value = '';
+                renderTabEditModalContents();
+            }
+        };
+
+        window.removeStatusFromTab = async function(stName) {
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (catObj) {
+                catObj.statuses = catObj.statuses.filter(s => s !== stName);
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                renderTabEditModalContents();
+            }
+        };
+
+        window.addColumnToTab = async function() {
+            const input = document.getElementById('modalNewColumnInput');
+            const colName = input.value.trim();
+            if (!editingTabName || !colName) return;
+
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (catObj) {
+                if (!catObj.columns) catObj.columns = {};
+                if (!catObj.columns[colName]) {
+                    catObj.columns[colName] = []; 
+                    await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                    input.value = '';
+                    renderTabEditModalContents();
+                } else {
+                    showAlert("Columna Existente", "Esta columna ya existe en la pestaña.", "warning");
+                }
+            }
+        };
+
+        window.removeColumnFromTab = async function(colName) {
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (catObj && catObj.columns) {
+                delete catObj.columns[colName];
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                renderTabEditModalContents();
+            }
+        };
+
+        window.addOptionToColumn = async function(colName) {
+            const input = document.getElementById(`newOptInput_${cleanId(colName)}`);
+            const optVal = input ? input.value.trim() : '';
+            if (!optVal) return;
+
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (catObj && catObj.columns && catObj.columns[colName]) {
+                if (!catObj.columns[colName].includes(optVal)) {
+                    catObj.columns[colName].push(optVal);
+                    if (!statusColorsMap[optVal]) statusColorsMap[optVal] = '#64748b';
+                    await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                    if (input) input.value = '';
+                    renderTabEditModalContents();
+                }
+            }
+        };
+
+        window.removeOptionFromColumn = async function(colName, optVal) {
+            const catObj = pipelineList.find(i => i.name === editingTabName);
+            if (catObj && catObj.columns && catObj.columns[colName]) {
+                catObj.columns[colName] = catObj.columns[colName].filter(o => o !== optVal);
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                renderTabEditModalContents();
+            }
+        };
+
+        function renderConfigTree() {
+            const treeContainer = document.getElementById('configPipelineTree');
+            treeContainer.innerHTML = pipelineList.map((item, index) => `
+                <div class="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700/80 rounded-xl p-3.5 space-y-2">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="flex flex-col gap-0.5">
+                                <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-600 dark:hover:text-indigo-400 text-xs p-1 font-bold"'} title="Subir">▲</button>
+                                <button onclick="moveCategoryOrder(${index}, 1)" ${index === pipelineList.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="hover:text-indigo-600 dark:hover:text-indigo-400 text-xs p-1 font-bold"'} title="Bajar">▼</button>
+                            </div>
+                            <span class="font-bold text-indigo-700 dark:text-indigo-300 text-sm"><i class="fa-solid fa-folder-tree mr-1.5"></i>${item.name}</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto justify-end">
+                            <button onclick="openTabEditModal('${item.name}')" class="text-sky-700 dark:text-sky-400 hover:text-sky-900 text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/10 font-bold"><i class="fa-solid fa-sliders mr-1"></i>Configurar</button>
+                            <button onclick="editCategoryName('${item.name}')" class="text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 text-xs px-2.5 py-1.5 rounded-lg bg-indigo-500/10 font-bold"><i class="fa-solid fa-pen-to-square mr-1"></i>Renombrar</button>
+                            <button onclick="removeCategoryConfig('${item.name}')" class="text-rose-600 dark:text-rose-400 hover:text-rose-800 text-xs px-2.5 py-1.5 rounded-lg bg-rose-500/10 font-bold"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.toggleColorPalette = function(paletteIdSuffix, event) {
+            event.stopPropagation();
+            const paletteEl = document.getElementById(`palette_${paletteIdSuffix}`);
+            document.querySelectorAll('[id^="palette_"]').forEach(el => {
+                if (el !== paletteEl) el.classList.add('hidden');
+            });
+            if(paletteEl) paletteEl.classList.toggle('hidden');
+        };
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('[id^="palette_"]').forEach(el => el.classList.add('hidden'));
+        });
+
+        window.selectStatusColor = async function(statusName, hexColor) {
+            statusColorsMap[statusName] = hexColor;
+            await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+            renderConfigTree();
+            if(editingTabName) renderTabEditModalContents();
+            applyAllFilters();
+        };
+
+        window.moveCategoryOrder = async function(currentIndex, direction) {
+            const targetIndex = currentIndex + direction;
+            if (targetIndex < 0 || targetIndex >= pipelineList.length) return;
+
+            const temp = pipelineList[currentIndex];
+            pipelineList[currentIndex] = pipelineList[targetIndex];
+            pipelineList[targetIndex] = temp;
+
+            await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+        };
+
+        window.editCategoryName = function(oldName) {
+            showRenameModal(oldName, async (newName) => {
+                if (!newName || newName === oldName) return;
+
+                if (pipelineList.some(i => i.name === newName)) {
+                    showAlert("Atención", "Ya existe una categoría con ese nombre.", "warning");
+                    return;
+                }
+
+                const item = pipelineList.find(i => i.name === oldName);
+                if (item) item.name = newName;
+
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+
+                const batch = writeBatch(db);
+                let updatedCount = 0;
+                allCandidates.forEach(cand => {
+                    if (cand.sheet === oldName) {
+                        const docRef = doc(db, "candidates", cand.docId);
+                        batch.update(docRef, { sheet: newName });
+                        updatedCount++;
+                    }
+                });
+
+                if (updatedCount > 0) {
+                    await batch.commit();
+                }
+
+                if (activeTabSheet === oldName) {
+                    activeTabSheet = newName;
+                }
+            });
+        };
+
+        window.addCategoryConfig = async function() {
+            const input = document.getElementById('newCategoryName');
+            const catName = input.value.trim();
+            if (!catName) return;
+
+            if (!pipelineList.some(i => i.name === catName)) {
+                pipelineList.push({ name: catName, statuses: ['General'], columns: { 'Nuevo Estatus': ['Opción 1', 'Opción 2'] } });
+                await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                input.value = '';
+                renderConfigTree();
+            } else {
+                showAlert("Categoría Existente", "Ya existe una categoría con ese nombre.", "warning");
+            }
+        };
+
+        window.removeCategoryConfig = function(catName) {
+            showConfirm(
+                "Eliminar Categoría", 
+                `¿Deseas eliminar la categoría <strong>${catName}</strong> y todos sus datos asociados?`, 
+                async (confirmed) => {
+                    if (confirmed) {
+                        pipelineList = pipelineList.filter(i => i.name !== catName);
+                        await setDoc(configDocRef, { items: pipelineList, statusColors: statusColorsMap });
+                        showAlert("Categoría Eliminada", `Se ha eliminado la categoría "${catName}".`, "success");
+                    }
+                }
+            );
         };
     </script>
 </body>
