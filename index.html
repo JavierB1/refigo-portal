@@ -456,7 +456,7 @@
 
         let allCandidates = [];
         let whatsappTemplates = [];
-        let currentVisibleCandidates = []; // Almacena únicamente los registros filtrados y visibles actuales
+        let currentVisibleCandidates = []; 
         let activeWhatsAppCandidateId = null;
         let currentEditingDocId = null;
         let columnFilters = { status: [], language: [] };
@@ -822,7 +822,7 @@
 
             thead.innerHTML = `
                 <th class="py-3 px-4 w-10 text-center">
-                    <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer">
+                    <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer" title="Seleccionar filtrados visibles">
                 </th>
                 <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Nombre / Referido</th>
                 <th class="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">Contacto</th>
@@ -1094,7 +1094,10 @@
 
         function updateHeaderCheckboxState(visibleData) {
             const headerCheck = document.getElementById('selectAllRowsCheck');
-            if (!headerCheck || visibleData.length === 0) return;
+            if (!headerCheck || visibleData.length === 0) {
+                if(headerCheck) headerCheck.checked = false;
+                return;
+            }
 
             const allVisibleSelected = visibleData.every(c => selectedCandidateIds.has(c.docId));
             headerCheck.checked = allVisibleSelected;
@@ -1344,7 +1347,7 @@
                     await batch.commit();
                 }
 
-                showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos existentes y se agregaron ${addedCount} nuevos registros desde el Excel aplicando la migración automática.`, "success");
+                showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos existentes y se agregaron ${addedCount} nuevos registros desde el Excel aplicando la migración automática de estatus e idioma.`, "success");
                 e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
