@@ -479,16 +479,12 @@
         let currentVisibleCandidates = []; 
         let activeWhatsAppCandidateId = null;
         let currentEditingDocId = null;
-        let columnFilters = { status: [], language: [], notes: [] };
+        let columnFilters = { status: [], language: [], notes: ['with_notes', 'without_notes'] };
         let selectedCandidateIds = new Set();
         let confirmCallback = null;
         let pendingExcelData = null;
 
         const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX'];
-
-        const ES_NAMES_LIST = [
-            "Jaime Ernesto Cañas Ruiz", "Alexanderperez_8", "Esmeralda Cerón", "Paola Silva", "García K'ny", "Victor Miguel de", "Harold Melvin Nieto Hernandez", "Kat Ascencio", "Enrique", "Camila romero", "Vanny Rivera", "Fatima Mejía", "Cristhian Torres", "Maria Jose Abrego Abrego", "Sarai Ascencio", "Edwin Alejandro murcia vaquiz", "Xenia leonor lino", "Pedro Francisco Hernandez Benavides", "Carlos♡", "Michell", "wendi de perez", "Sara Diaz", "Silvia Basilio", "Fátima Merino", "Diego Alejandro Battlle Abarca", "Vnne", "Jasen Aaron avila cruz", "oswaldo palacios", "Hector Ayala", "Anna Cruz", "Yanci Beatriz Alfaro Parada", "Fernanda Soriano", "Marcela Chevez", "emi_diarium", "Carlos Guillen", "Ruben Alfonso Rivas Alfaro", "Jose Abarca", "Alisson Valeria Gonzalez Mayén", "Elizabeth Morataya", "Ruth Noemi Martinez castillo", "thamy polanco", "Alejandrina Morales", "Erick Zelaya", "David Bonilla", "Alexis Rivera", "Griselda Carolina Roldan Doñan", "Ricardo Antonio Deras López", "Lucia Gamero Maldonado", "Gisela Fernanda Amaya Guerra", "Antonio Alvarado", "Karen Beatriz mariona Amaya", "Xenia", "Luz Maria Hernández Guzmán", "Ruth Daniela Villegas Mejia", "Juan Carlos Hernandez", "Michael Vladimir Ramirez Najarro", "Andrea Luna", "Maria Lizbeth García Rivera", "Catalina Garcia", "Tatiana Avalos", "Oscar Jimenez", "Ernesto Galileo Bonilla Alemán", "Cesar Reyes", "Daniela Marroquin", "Astrid guadalupe robles gamez", "Arely Lopez", "ABeatriz Campos", "Jairo Gomez", "Mario Ricardo Duran Orellana", "Carlos Martinez", "Bryan Hernández", "Abigail Linares", "Evelyn Esmeralda González Linares", "Ivin Ramos", "Mónica Ivania Najarro", "Manuel Rivera", "Eduardo José Alfaro Peña", "César Daniel Martinez Hernandez", "Ana Rivas González", "Katherine Arely Amaya Canizales", "Ronald Alvarez", "Albo Andre Bo", "A L EX HRnandez", "Jonathan Enrique Ayala Palma", "josue david Ramirez Ramirez", "Steven Molina", "Alejandra Linnette Aguilar", "Ingrid Menjivar", "Elizabeth", "Rina Ester Hernandez Escobar", "irving melara", "Kathya Cruz", "Richard Chavez", "Mario Alexander López", "Diana Patricia Custodio Sierra", "Emily Hernández", "S★", "Douglas Ramírez", "Josue Cañas", "Kevin Sigfredo Hernandez Hernandez", "André", "Steve Jaco", "Gerson Peñate", "Bryan Molina", "Luis Enrique Cartagena Martínez", "Sergio Andino", "Liss Rodriguez", "Anderson Antonio Gomez Jerez", "Pedro José Arias Rivera", "Martinez Lopez", "Carlitos Cornejo", "Abigail", "Carolina de Echeverria", "Gabriela Chanta", "Jazmin suleym santos ramirez", "Karla Elizabeth Elías Hernández", "Luka Mateo Jimenez Navarro", "freydel Aldemaro Castillo", "Luis Linarezz", "Dennis Palacios", "Joceline", "Fabio VN", "Christian Alexander Rodriguez Franco", "Edgar Alexander Ramírez saes", "Eduardo", "Jorge luis henriquez cornejo", "Oscar Alonso Martinez Morales", "vladimir olmedo", "Yany Suleyma Lara de Garcia", "Alexandra Renderos", "Jose Henriquez", "Stephany Abigail Pineda Juarez", "Adriana Alvarado", "Nicole Martínez", "Lobato Alexander", "Luis Torres", "Pamela Marroquin", "Roberto de Jesús García Guillén", "Diego Alexis Viera Flores", "Jacob peralta", "Elizabeth Hernández", "Sandra Carolina Hernández Anaya", "Hazel Guisselle Hernández Godoy", "Rafael Lopez", "Alexi Danie", "Geovanny Jr.", "Kathya Jazmin Hernandez", "Silvia Morena Aguilar Perez", "Nancy Beatriz Aguiar Raymundo", "Luis Vasquez"
-        ].map(n => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim());
 
         let statusColorsMap = {
             'New': '#10b981',
@@ -580,17 +576,12 @@
         function normalizeCandidateData(data) {
             let rawSheet = String(data.sheet || '').toLowerCase().trim();
             let rawStatus = String(data.status || '').toLowerCase().trim();
-            let nameStr = String(data.name || '').trim();
-            let nameNormalized = nameStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
-
             let targetStatus = 'New';
             
             let explicitLang = String(data.language || data.Idioma || '').toUpperCase().trim();
-            let targetLang = 'EN';
+            let targetLang = 'ES';
             if (explicitLang === 'ES' || explicitLang === 'EN') {
                 targetLang = explicitLang;
-            } else if (ES_NAMES_LIST.includes(nameNormalized)) {
-                targetLang = 'ES';
             }
 
             if (rawSheet === 'referidos' || rawSheet === 'referido') {
@@ -617,7 +608,7 @@
             return {
                 ...data,
                 status: targetStatus,
-                language: targetLang === 'ES' ? 'ES' : 'EN'
+                language: targetLang === 'EN' ? 'EN' : 'ES'
             };
         }
 
@@ -913,7 +904,7 @@
                 </th>
                 <th class="py-3 px-4 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
-                        <span>Notas / Detalles</span>
+                        <span>Notas / Seguimiento</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
                     </div>
                     <div id="notesFilter" class="dropdown-menu absolute right-0 top-full mt-1 theme-card border rounded-xl shadow-2xl p-3 w-52 z-50 normal-case font-semibold text-slate-900 dark:text-slate-100">
@@ -1205,12 +1196,12 @@
                     <span>Número Teléfono</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
-                    <input type="checkbox" value="status" checked class="export-col-check rounded theme-input">
-                    <span>Estatus</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
                     <input type="checkbox" value="language" checked class="export-col-check rounded theme-input">
                     <span>Idioma</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
+                    <input type="checkbox" value="status" checked class="export-col-check rounded theme-input">
+                    <span>Estatus</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
                     <input type="checkbox" value="notes" checked class="export-col-check rounded theme-input">
@@ -1250,8 +1241,8 @@
                 name: 'Nombre Completo',
                 email: 'Correo Electrónico',
                 phone: 'Número Teléfono',
-                status: 'Estatus',
                 language: 'Idioma',
+                status: 'Estatus',
                 notes: 'Notas / Detalles',
                 createdAt: 'Fecha de Registro'
             };
@@ -1306,7 +1297,7 @@
                     } else if (col === 'phone') {
                         columnStyles[index] = { cellWidth: 28 };
                     } else if (col === 'language') {
-                        columnStyles[index] = { cellWidth: 16 };
+                        columnStyles[index] = { cellWidth: 20 };
                     } else if (col === 'status') {
                         columnStyles[index] = { cellWidth: 28 };
                     } else if (col === 'createdAt') {
@@ -1373,7 +1364,6 @@
                         const name = row['<'] || row['Referidos'] || row['Nombre'] || row['Nombre Completo'] || 'Sin Nombre';
                         const email = String(row['Correo'] || row['Email'] || '-').trim();
                         const rawPhone = String(row['Número'] || row['Numero'] || row['Telefono'] || '-').trim();
-                        const phone = cleanPhone(rawPhone);
                         const statusCol = String(row['Estatus'] || sheetName).trim();
                         const notes = String(row['Nota'] || row['Notas'] || '-').trim();
                         
