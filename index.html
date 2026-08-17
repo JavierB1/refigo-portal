@@ -89,12 +89,6 @@
     </script>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
-    <script>
-        if (localStorage.getItem('refigo_theme') === 'dark') {
-            document.body.classList.add('dark');
-        }
-    </script>
-
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
@@ -128,7 +122,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
-        <!-- Métricas Superiores de Estatus -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
@@ -160,7 +153,6 @@
             </div>
         </div>
 
-        <!-- Controles de Búsqueda y Filtros -->
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             <div class="relative w-full lg:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 dark:text-slate-400 text-sm"></i>
@@ -191,7 +183,6 @@
             </div>
         </div>
 
-        <!-- Tabla Principal Unificada con table-auto para ocupar todo el ancho disponible -->
         <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
             <div class="overflow-x-auto min-h-[400px]">
                 <table class="w-full table-auto text-left border-collapse text-sm">
@@ -571,62 +562,21 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
-        function normalizeCandidateData(data) {
-            let rawSheet = String(data.sheet || '').toLowerCase().trim();
-            let rawStatus = String(data.status || '').toLowerCase().trim();
-            let targetStatus = 'New';
-            
-            let explicitLang = String(data.language || data.Idioma || '').toUpperCase().trim();
-            let targetLang = 'ES';
-            if (explicitLang === 'ES' || explicitLang === 'EN') {
-                targetLang = explicitLang;
-            }
-
-            if (rawSheet === 'referidos' || rawSheet === 'referido') {
-                targetStatus = 'New';
-            } else if (rawSheet === 'no referidos' || rawSheet === 'no referido') {
-                targetStatus = 'No Referred';
-            } else if (rawSheet === 'referred') {
-                targetStatus = 'New';
-            } else if (rawSheet === 'no referred' || rawSheet === 'no-referred') {
-                targetStatus = 'No Referred';
-            } else if (rawSheet === 'cold') {
-                targetStatus = 'Cold';
-            } else if (rawSheet === 'extinguished') {
-                targetStatus = 'Extinguished';
-            } else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) {
-                targetStatus = 'Rejected by CONCENTRIX';
-            } else {
-                const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus || s.toLowerCase() === rawSheet);
-                if (found) {
-                    targetStatus = found;
-                }
-            }
-
-            return {
-                ...data,
-                status: targetStatus,
-                language: targetLang === 'EN' ? 'EN' : 'ES',
-                contacted: !!data.contacted
-            };
-        }
-
         onSnapshot(candidatesCol, (snapshot) => {
             allCandidates = [];
             snapshot.forEach(docSnap => {
                 const raw = docSnap.data();
-                const data = normalizeCandidateData(raw);
                 allCandidates.push({
                     docId: docSnap.id,
-                    language: data.language,
-                    status: data.status,
-                    name: data.name || 'Sin Nombre',
-                    email: data.email || '-',
-                    phone: data.phone || '-',
-                    notes: data.notes || '-',
-                    contacted: data.contacted,
-                    createdAt: data.createdAt || data.updatedAt || null,
-                    updatedAt: data.updatedAt || null
+                    language: raw.language === 'EN' ? 'EN' : 'ES',
+                    status: raw.status || 'New',
+                    name: raw.name || 'Sin Nombre',
+                    email: raw.email || '-',
+                    phone: raw.phone || '-',
+                    notes: raw.notes || '-',
+                    contacted: !!raw.contacted,
+                    createdAt: raw.createdAt || raw.updatedAt || null,
+                    updatedAt: raw.updatedAt || null
                 });
             });
 
@@ -777,7 +727,7 @@
 
         function sortCandidatesByLanguageAndCreation(list) {
             return list.sort((a, b) => {
-                // Priority 1: EN always before ES (EN first, then ES)
+                // Priority 1: EN first, then ES
                 const langA = (a.language || '').toUpperCase();
                 const langB = (b.language || '').toUpperCase();
                 if (langA !== langB) {
@@ -1123,7 +1073,7 @@
             msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
 
             const phoneClean = cleanPhone(cand.phone);
-            const url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            const url = `https://web.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
             
             try {
                 await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
