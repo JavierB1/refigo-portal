@@ -191,10 +191,10 @@
             </div>
         </div>
 
-        <!-- Tabla Principal Unificada -->
+        <!-- Tabla Principal Unificada con table-auto para ocupar todo el ancho disponible -->
         <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
             <div class="overflow-x-auto min-h-[400px]">
-                <table class="w-full table-fixed text-left border-collapse text-sm">
+                <table class="w-full table-auto text-left border-collapse text-sm">
                     <thead>
                         <tr id="unifiedTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                         </tr>
@@ -783,7 +783,7 @@
                     if (langB === 'EN') return 1;
                     return langA < langB ? -1 : 1;
                 }
-                // Priority 2: Creation time ascending (oldest first, newer additions placed at the bottom)
+                // Priority 2: Creation time ascending (oldest first, newer additions placed at the bottom within the language group)
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
                 return timeA - timeB;
@@ -870,13 +870,13 @@
             document.getElementById('totalCandidateCount').textContent = allCandidates.length;
 
             thead.innerHTML = `
-                <th class="py-3 px-2.5 w-10 text-center">
+                <th class="py-3 px-3 w-12 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer" title="Seleccionar filtrados visibles">
                 </th>
-                <th class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 w-[24%]">Nombre Completo</th>
-                <th class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 w-[26%]">Correo Electrónico</th>
-                <th class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 w-[16%]">Número Teléfono</th>
-                <th class="py-3 px-2.5 relative font-bold text-slate-900 dark:text-slate-100 w-[7%]">
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
                         <span>Idioma</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -886,7 +886,7 @@
                         <button onclick="applyColumnFilter('language')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-2.5 relative font-bold text-slate-900 dark:text-slate-100 w-[13%]">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -900,7 +900,7 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-2.5 relative font-bold text-slate-900 dark:text-slate-100 w-[14%]">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
                         <span>Notas</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -910,7 +910,7 @@
                         <button onclick="applyColumnFilter('notes')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-2.5 text-center font-bold text-slate-900 dark:text-slate-100 w-[7%]">Acciones</th>
+                <th class="py-3 px-3 text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
             `;
 
             buildFilterMenus();
@@ -925,22 +925,22 @@
                 const candHasNotes = hasNotes(c);
                 return `
                 <tr class="hover:bg-slate-200/60 dark:hover:bg-slate-700/35 transition border-b border-slate-300 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/70 dark:bg-indigo-900/30' : ''}">
-                    <td class="py-3 px-2.5 text-center">
+                    <td class="py-3 px-3 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3 px-2.5 font-bold text-slate-900 dark:text-white truncate" title="${c.name}">${c.name}</td>
-                    <td class="py-3 px-2.5 font-bold text-slate-900 dark:text-slate-100 truncate" title="${c.email}">${c.email}</td>
-                    <td class="py-3 px-2.5 font-semibold text-slate-800 dark:text-slate-200 truncate" title="${c.phone}">${c.phone}</td>
-                    <td class="py-3 px-2.5 truncate">
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white" title="${c.name}">${c.name}</td>
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100" title="${c.email}">${c.email}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200" title="${c.phone}">${c.phone}</td>
+                    <td class="py-3 px-3">
                         ${renderLanguageBadge(c.language)}
                     </td>
-                    <td class="py-3 px-2.5 truncate">
+                    <td class="py-3 px-3">
                         ${renderStatusBadge(c.status)}
                     </td>
-                    <td class="py-3 px-2.5 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate" title="${c.notes}">
+                    <td class="py-3 px-3 text-xs text-slate-800 dark:text-slate-200 font-semibold" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
-                    <td class="py-3 px-2.5 text-center">
+                    <td class="py-3 px-3 text-center">
                         <div class="inline-flex items-center justify-center space-x-1.5">
                             <button onclick="openWhatsAppModal('${c.docId}')" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="Enviar WhatsApp">
                                 <i class="fa-brands fa-whatsapp text-sm"></i>
@@ -1288,14 +1288,14 @@
                 selectedCols.forEach((col, index) => {
                     if (col === 'notes') {
                         columnStyles[index] = { cellWidth: isLandscape ? 120 : 85 };
+                    } else if (col === 'language') {
+                        columnStyles[index] = { cellWidth: isLandscape ? 22 : 18 };
                     } else if (col === 'name') {
                         columnStyles[index] = { cellWidth: isLandscape ? 45 : 36 };
                     } else if (col === 'email') {
                         columnStyles[index] = { cellWidth: isLandscape ? 55 : 44 };
                     } else if (col === 'phone') {
                         columnStyles[index] = { cellWidth: isLandscape ? 34 : 27 };
-                    } else if (col === 'language') {
-                        columnStyles[index] = { cellWidth: isLandscape ? 18 : 16 };
                     } else if (col === 'status') {
                         columnStyles[index] = { cellWidth: isLandscape ? 35 : 28 };
                     } else if (col === 'createdAt') {
