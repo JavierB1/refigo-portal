@@ -8,7 +8,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></script>
     <!-- SheetJS para Excel / CSV -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- jsPDF + AutoTable para PDF -->
@@ -95,6 +95,7 @@
         }
     </script>
 
+    <!-- Header Principal -->
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
@@ -128,8 +129,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
-
-        <!-- Metrics Cards for each Status -->
+        <!-- Métricas Superiores de Estatus -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
@@ -161,6 +161,7 @@
             </div>
         </div>
 
+        <!-- Controles de Búsqueda y Filtros -->
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             <div class="relative w-full lg:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 dark:text-slate-400 text-sm"></i>
@@ -191,6 +192,7 @@
             </div>
         </div>
 
+        <!-- Tabla Principal Unificada -->
         <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
             <div class="overflow-x-auto min-h-[400px]">
                 <table class="w-full text-left border-collapse text-sm">
@@ -207,10 +209,9 @@
                 <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
             </div>
         </div>
-
     </main>
 
-    <!-- Modals -->
+    <!-- Modal de Candidato (Nuevo / Editar) -->
     <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -234,13 +235,6 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Idioma <span class="text-rose-500">*</span></label>
-                        <select id="inputLanguage" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
-                            <option value="ES">ES (Español)</option>
-                            <option value="EN">EN (Inglés)</option>
-                        </select>
-                    </div>
-                    <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus <span class="text-rose-500">*</span></label>
                         <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
                             <option value="New">New</option>
@@ -249,6 +243,13 @@
                             <option value="Extinguished">Extinguished</option>
                             <option value="No Referred">No Referred</option>
                             <option value="Rejected by CONCENTRIX">Rejected by CONCENTRIX</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Idioma <span class="text-rose-500">*</span></label>
+                        <select id="inputLanguage" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
+                            <option value="ES">ES (Español)</option>
+                            <option value="EN">EN (Inglés)</option>
                         </select>
                     </div>
                 </div>
@@ -266,7 +267,26 @@
         </div>
     </div>
 
-    <!-- WhatsApp Modal -->
+    <!-- Modal de Confirmación de Idioma al Subir Excel -->
+    <div id="excelLangModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[90] p-4">
+        <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
+            <div class="w-14 h-14 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center mx-auto text-2xl border border-indigo-500/30">
+                <i class="fa-solid fa-language"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-base text-slate-900 dark:text-white">Idioma de Importación</h3>
+                <p class="text-xs text-slate-900 dark:text-slate-100 mt-2 leading-relaxed font-semibold">
+                    ¿Qué idioma deseas asignar a todos los candidatos de este archivo Excel?
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="confirmExcelImport('ES')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-md">Español (ES)</button>
+                <button onclick="confirmExcelImport('EN')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-md">Inglés (EN)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de WhatsApp -->
     <div id="whatsappModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -312,7 +332,7 @@
         </div>
     </div>
 
-    <!-- WhatsApp View Modal -->
+    <!-- Modal de Visualización de Plantilla WhatsApp -->
     <div id="waViewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-3 sm:p-4">
         <div class="theme-card border rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -334,7 +354,7 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
+    <!-- Modal de Exportación -->
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -399,7 +419,7 @@
         </div>
     </div>
 
-    <!-- Alert Modal -->
+    <!-- Modal de Alerta -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -415,7 +435,7 @@
         </div>
     </div>
 
-    <!-- Confirm Modal -->
+    <!-- Modal de Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -432,7 +452,7 @@
         </div>
     </div>
 
-    <!-- Firebase & App Script -->
+    <!-- Scripts Firebase y Lógica -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -462,13 +482,13 @@
         let columnFilters = { status: [], language: [] };
         let selectedCandidateIds = new Set();
         let confirmCallback = null;
+        let pendingExcelData = null;
 
         const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX'];
 
-        // Exact list of ES names provided by user
         const ES_NAMES_LIST = [
             "Jaime Ernesto Cañas Ruiz", "Alexanderperez_8", "Esmeralda Cerón", "Paola Silva", "García K'ny", "Victor Miguel de", "Harold Melvin Nieto Hernandez", "Kat Ascencio", "Enrique", "Camila romero", "Vanny Rivera", "Fatima Mejía", "Cristhian Torres", "Maria Jose Abrego Abrego", "Sarai Ascencio", "Edwin Alejandro murcia vaquiz", "Xenia leonor lino", "Pedro Francisco Hernandez Benavides", "Carlos♡", "Michell", "wendi de perez", "Sara Diaz", "Silvia Basilio", "Fátima Merino", "Diego Alejandro Battlle Abarca", "Vnne", "Jasen Aaron avila cruz", "oswaldo palacios", "Hector Ayala", "Anna Cruz", "Yanci Beatriz Alfaro Parada", "Fernanda Soriano", "Marcela Chevez", "emi_diarium", "Carlos Guillen", "Ruben Alfonso Rivas Alfaro", "Jose Abarca", "Alisson Valeria Gonzalez Mayén", "Elizabeth Morataya", "Ruth Noemi Martinez castillo", "thamy polanco", "Alejandrina Morales", "Erick Zelaya", "David Bonilla", "Alexis Rivera", "Griselda Carolina Roldan Doñan", "Ricardo Antonio Deras López", "Lucia Gamero Maldonado", "Gisela Fernanda Amaya Guerra", "Antonio Alvarado", "Karen Beatriz mariona Amaya", "Xenia", "Luz Maria Hernández Guzmán", "Ruth Daniela Villegas Mejia", "Juan Carlos Hernandez", "Michael Vladimir Ramirez Najarro", "Andrea Luna", "Maria Lizbeth García Rivera", "Catalina Garcia", "Tatiana Avalos", "Oscar Jimenez", "Ernesto Galileo Bonilla Alemán", "Cesar Reyes", "Daniela Marroquin", "Astrid guadalupe robles gamez", "Arely Lopez", "ABeatriz Campos", "Jairo Gomez", "Mario Ricardo Duran Orellana", "Carlos Martinez", "Bryan Hernández", "Abigail Linares", "Evelyn Esmeralda González Linares", "Ivin Ramos", "Mónica Ivania Najarro", "Manuel Rivera", "Eduardo José Alfaro Peña", "César Daniel Martinez Hernandez", "Ana Rivas González", "Katherine Arely Amaya Canizales", "Ronald Alvarez", "Albo Andre Bo", "A L EX HRnandez", "Jonathan Enrique Ayala Palma", "josue david Ramirez Ramirez", "Steven Molina", "Alejandra Linnette Aguilar", "Ingrid Menjivar", "Elizabeth", "Rina Ester Hernandez Escobar", "irving melara", "Kathya Cruz", "Richard Chavez", "Mario Alexander López", "Diana Patricia Custodio Sierra", "Emily Hernández", "S★", "Douglas Ramírez", "Josue Cañas", "Kevin Sigfredo Hernandez Hernandez", "André", "Steve Jaco", "Gerson Peñate", "Bryan Molina", "Luis Enrique Cartagena Martínez", "Sergio Andino", "Liss Rodriguez", "Anderson Antonio Gomez Jerez", "Pedro José Arias Rivera", "Martinez Lopez", "Carlitos Cornejo", "Abigail", "Carolina de Echeverria", "Gabriela Chanta", "Jazmin suleym santos ramirez", "Karla Elizabeth Elías Hernández", "Luka Mateo Jimenez Navarro", "freydel Aldemaro Castillo", "Luis Linarezz", "Dennis Palacios", "Joceline", "Fabio VN", "Christian Alexander Rodriguez Franco", "Edgar Alexander Ramírez saes", "Eduardo", "Jorge luis henriquez cornejo", "Oscar Alonso Martinez Morales", "vladimir olmedo", "Yany Suleyma Lara de Garcia", "Alexandra Renderos", "Jose Henriquez", "Stephany Abigail Pineda Juarez", "Adriana Alvarado", "Nicole Martínez", "Lobato Alexander", "Luis Torres", "Pamela Marroquin", "Roberto de Jesús García Guillén", "Diego Alexis Viera Flores", "Jacob peralta", "Elizabeth Hernández", "Sandra Carolina Hernández Anaya", "Hazel Guisselle Hernández Godoy", "Rafael Lopez", "Alexi Danie", "Geovanny Jr.", "Kathya Jazmin Hernandez", "Silvia Morena Aguilar Perez", "Nancy Beatriz Aguiar Raymundo", "Luis Vasquez"
-        ].map(n => n.trim().toLowerCase());
+        ].map(n => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim());
 
         let statusColorsMap = {
             'New': '#10b981',
@@ -557,26 +577,18 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
-        // Migration logic with ES names list check
         function normalizeCandidateData(data) {
             let rawSheet = String(data.sheet || '').toLowerCase().trim();
             let rawStatus = String(data.status || '').toLowerCase().trim();
             let nameStr = String(data.name || '').trim();
-            let nameLower = nameStr.toLowerCase();
+            let nameNormalized = nameStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
 
             let targetStatus = 'New';
-            let targetLang = 'EN';
-
-            // Check if name is in ES list
-            if (ES_NAMES_LIST.includes(nameLower)) {
-                targetLang = 'ES';
-            }
+            let targetLang = data.language || (ES_NAMES_LIST.includes(nameNormalized) ? 'ES' : 'EN');
 
             if (rawSheet === 'referidos' || rawSheet === 'referido') {
-                targetLang = 'ES';
                 targetStatus = 'New';
             } else if (rawSheet === 'no referidos' || rawSheet === 'no referido') {
-                targetLang = 'ES';
                 targetStatus = 'No Referred';
             } else if (rawSheet === 'referred') {
                 targetStatus = 'New';
@@ -593,11 +605,6 @@
                 if (found) {
                     targetStatus = found;
                 }
-            }
-
-            // If name is explicitly in ES list, force language to ES
-            if (ES_NAMES_LIST.includes(nameLower)) {
-                targetLang = 'ES';
             }
 
             return {
@@ -656,16 +663,14 @@
             const langCont = document.getElementById('languageOptions');
             if (!statusCont) return;
 
-            let allowedStatuses = VALID_STATUSES;
-
             statusCont.innerHTML = `
                 <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                    <input type="checkbox" checked onchange="toggleSelectAll('status', this.checked)" class="rounded theme-input">
+                    <input type="checkbox" checked onchange="toggleSelectAllFilter('status', this.checked)" class="rounded theme-input">
                     <strong>(Select All)</strong>
                 </label>
-            ` + allowedStatuses.map(val => `
+            ` + VALID_STATUSES.map(val => `
                 <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                    <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" checked>
+                    <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" ${columnFilters.status.includes(val) ? 'checked' : ''}>
                     <span>${val}</span>
                 </label>
             `).join('');
@@ -673,22 +678,29 @@
             if (langCont) {
                 langCont.innerHTML = `
                     <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" checked onchange="toggleSelectAll('language', this.checked)" class="rounded theme-input">
+                        <input type="checkbox" checked onchange="toggleSelectAllFilter('language', this.checked)" class="rounded theme-input">
                         <strong>(Select All)</strong>
                     </label>
                     <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" value="ES" class="col-check-language rounded theme-input" checked>
+                        <input type="checkbox" value="ES" class="col-check-language rounded theme-input" ${columnFilters.language.includes('ES') ? 'checked' : ''}>
                         <span>ES</span>
                     </label>
                     <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
-                        <input type="checkbox" value="EN" class="col-check-language rounded theme-input" checked>
+                        <input type="checkbox" value="EN" class="col-check-language rounded theme-input" ${columnFilters.language.includes('EN') ? 'checked' : ''}>
                         <span>EN</span>
                     </label>
                 `;
             }
+
+            if (!columnFilters.status || columnFilters.status.length === 0) {
+                columnFilters.status = VALID_STATUSES.slice();
+            }
+            if (!columnFilters.language || columnFilters.language.length === 0) {
+                columnFilters.language = ['ES', 'EN'];
+            }
         }
 
-        window.toggleSelectAll = function(colKey, isChecked) {
+        window.toggleSelectAllFilter = function(colKey, isChecked) {
             document.querySelectorAll(`.col-check-${colKey}`).forEach(cb => cb.checked = isChecked);
         };
 
@@ -734,7 +746,7 @@
             document.getElementById('globalSearch').value = '';
             clearDateRangeFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
-            columnFilters = { status: [], language: [] };
+            columnFilters = { status: VALID_STATUSES.slice(), language: ['ES', 'EN'] };
             applyAllFilters();
         });
 
@@ -776,12 +788,16 @@
             const dateFrom = document.getElementById('dateFromInput').value;
             const dateTo = document.getElementById('dateToInput').value;
 
-            const filtered = allCandidates.filter(c => {
-                const statusFilterList = columnFilters['status'];
-                const matchesStatusCol = !statusFilterList || statusFilterList.length === 0 || statusFilterList.includes(c.status);
+            if (!Array.isArray(columnFilters.status) || columnFilters.status.length === 0) {
+                columnFilters.status = VALID_STATUSES.slice();
+            }
+            if (!Array.isArray(columnFilters.language) || columnFilters.language.length === 0) {
+                columnFilters.language = ['ES', 'EN'];
+            }
 
-                const langFilterList = columnFilters['language'];
-                const matchesLangCol = !langFilterList || langFilterList.length === 0 || langFilterList.includes(c.language);
+            const filtered = allCandidates.filter(c => {
+                const matchesStatusCol = columnFilters.status.includes(c.status);
+                const matchesLangCol = columnFilters.language.includes(c.language);
 
                 const matchesSearch = c.name.toLowerCase().includes(search) || 
                                       c.email.toLowerCase().includes(search) || 
@@ -1262,6 +1278,7 @@
             return phone.replace(/[^0-9]/g, '');
         }
 
+        // Lector de Excel con Confirmación de Idioma
         document.getElementById('excelInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1270,88 +1287,130 @@
             reader.onload = async function(evt) {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const nowIso = new Date().toISOString();
                 
-                let batch = writeBatch(db);
-                let batchCount = 0;
-                let updatedCount = 0;
-                let addedCount = 0;
-
+                let parsedRows = [];
                 for (const sheetName of workbook.SheetNames) {
                     if (['Hoja1'].includes(sheetName)) continue;
-
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
                     for (const row of jsonData) {
-                        const name = row['<'] || row['Referidos'] || row['Nombre'] || 'Sin Nombre';
-                        const email = String(row['Correo'] || '-').trim();
-                        const rawPhone = String(row['Número'] || row['Numero'] || '-').trim();
+                        const name = row['<'] || row['Referidos'] || row['Nombre'] || row['Nombre Completo'] || 'Sin Nombre';
+                        const email = String(row['Correo'] || row['Email'] || '-').trim();
+                        const rawPhone = String(row['Número'] || row['Numero'] || row['Telefono'] || '-').trim();
                         const phone = cleanPhone(rawPhone);
                         const statusCol = String(row['Estatus'] || sheetName).trim();
                         const notes = String(row['Nota'] || row['Notas'] || '-').trim();
-
-                        const rawPayload = {
+                        
+                        parsedRows.push({
                             sheet: sheetName,
                             status: statusCol,
                             name: String(name).trim(),
                             email: email,
                             phone: rawPhone,
                             notes: notes
-                        };
-                        const normalized = normalizeCandidateData(rawPayload);
-
-                        const existing = allCandidates.find(c => {
-                            const matchEmail = email && email !== '-' && c.email && c.email.toLowerCase() === email.toLowerCase();
-                            const matchPhone = phone && phone !== '503' && c.phone && cleanPhone(c.phone) === phone;
-                            return matchEmail || matchPhone;
                         });
-
-                        if (existing) {
-                            const docRef = doc(db, "candidates", existing.docId);
-                            batch.update(docRef, {
-                                status: normalized.status,
-                                language: normalized.language,
-                                name: normalized.name,
-                                email: normalized.email,
-                                phone: normalized.phone,
-                                notes: normalized.notes,
-                                updatedAt: nowIso
-                            });
-                            updatedCount++;
-                        } else {
-                            const newRef = doc(candidatesCol);
-                            batch.set(newRef, {
-                                status: normalized.status,
-                                language: normalized.language,
-                                name: normalized.name,
-                                email: normalized.email,
-                                phone: normalized.phone,
-                                notes: normalized.notes,
-                                createdAt: nowIso,
-                                updatedAt: nowIso
-                            });
-                            addedCount++;
-                        }
-
-                        batchCount++;
-                        if (batchCount >= 450) {
-                            await batch.commit();
-                            batch = writeBatch(db);
-                            batchCount = 0;
-                        }
                     }
                 }
 
-                if (batchCount > 0) {
-                    await batch.commit();
+                if (parsedRows.length === 0) {
+                    showAlert("Archivo Vacío", "No se encontraron registros válidos en el archivo Excel.", "warning");
+                    e.target.value = '';
+                    return;
                 }
 
-                showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos existentes y se agregaron ${addedCount} nuevos registros desde el Excel aplicando la migración automática de estatus e idioma.`, "success");
+                pendingExcelData = parsedRows;
+                document.getElementById('excelLangModal').classList.remove('hidden');
                 e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
         });
+
+        window.confirmExcelImport = async function(forcedLang) {
+            if (!pendingExcelData || pendingExcelData.length === 0) return;
+            document.getElementById('excelLangModal').classList.add('hidden');
+
+            const nowIso = new Date().toISOString();
+            let batch = writeBatch(db);
+            let batchCount = 0;
+            let updatedCount = 0;
+            let addedCount = 0;
+
+            for (const row of pendingExcelData) {
+                let targetStatus = 'New';
+                let rawStatus = row.status.toLowerCase();
+                
+                if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
+                    targetStatus = 'No Referred';
+                } else if (rawStatus.includes('cold')) {
+                    targetStatus = 'Cold';
+                } else if (rawStatus.includes('extinguish')) {
+                    targetStatus = 'Extinguished';
+                } else if (rawStatus.includes('warn')) {
+                    targetStatus = 'Warn';
+                } else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) {
+                    targetStatus = 'Rejected by CONCENTRIX';
+                } else {
+                    const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus);
+                    if (found) targetStatus = found;
+                }
+
+                const normalized = {
+                    status: targetStatus,
+                    language: forcedLang,
+                    name: row.name,
+                    email: row.email,
+                    phone: row.phone,
+                    notes: row.notes
+                };
+
+                const existing = allCandidates.find(c => {
+                    const matchEmail = row.email && row.email !== '-' && c.email && c.email.toLowerCase() === row.email.toLowerCase();
+                    const matchPhone = cleanPhone(row.phone) && cleanPhone(row.phone) !== '503' && c.phone && cleanPhone(c.phone) === cleanPhone(row.phone);
+                    return matchEmail || matchPhone;
+                });
+
+                if (existing) {
+                    const docRef = doc(db, "candidates", existing.docId);
+                    batch.update(docRef, {
+                        status: normalized.status,
+                        language: normalized.language,
+                        name: normalized.name,
+                        email: normalized.email,
+                        phone: normalized.phone,
+                        notes: normalized.notes,
+                        updatedAt: nowIso
+                    });
+                    updatedCount++;
+                } else {
+                    const newRef = doc(candidatesCol);
+                    batch.set(newRef, {
+                        status: normalized.status,
+                        language: normalized.language,
+                        name: normalized.name,
+                        email: normalized.email,
+                        phone: normalized.phone,
+                        notes: normalized.notes,
+                        createdAt: nowIso,
+                        updatedAt: nowIso
+                    });
+                    addedCount++;
+                }
+
+                batchCount++;
+                if (batchCount >= 450) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                    batchCount = 0;
+                }
+            }
+
+            if (batchCount > 0) {
+                await batch.commit();
+            }
+
+            pendingExcelData = null;
+            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado.`, "success");
+        };
 
         window.openAddModal = function() {
             currentEditingDocId = null;
@@ -1359,8 +1418,8 @@
             document.getElementById('inputName').value = '';
             document.getElementById('inputEmail').value = '';
             document.getElementById('inputPhone').value = '+503 ';
-            document.getElementById('inputLanguage').value = 'ES';
             document.getElementById('inputStatus').value = 'New';
+            document.getElementById('inputLanguage').value = 'ES';
             document.getElementById('inputNotes').value = '';
 
             document.getElementById('candidateModal').classList.remove('hidden');
@@ -1374,8 +1433,8 @@
             document.getElementById('inputName').value = cand.name;
             document.getElementById('inputEmail').value = cand.email;
             document.getElementById('inputPhone').value = cand.phone;
-            document.getElementById('inputLanguage').value = cand.language || 'ES';
             document.getElementById('inputStatus').value = cand.status || 'New';
+            document.getElementById('inputLanguage').value = cand.language || 'ES';
             document.getElementById('inputNotes').value = cand.notes;
 
             document.getElementById('candidateModal').classList.remove('hidden');
@@ -1390,8 +1449,8 @@
             const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
             const rawPhone = document.getElementById('inputPhone').value.trim();
             const phoneVal = cleanPhone(rawPhone);
-            const langVal = document.getElementById('inputLanguage').value;
             const statusVal = document.getElementById('inputStatus').value;
+            const langVal = document.getElementById('inputLanguage').value;
 
             if (!emailVal || !rawPhone || rawPhone === '+503') {
                 showAlert("Campos Obligatorios", "Es obligatorio ingresar el <strong>correo electrónico</strong> y el <strong>número de teléfono</strong> para guardar el registro.", "warning");
@@ -1419,8 +1478,8 @@
                 name: nameVal || 'Sin Nombre',
                 email: document.getElementById('inputEmail').value.trim(),
                 phone: rawPhone,
-                language: langVal,
                 status: statusVal,
+                language: langVal,
                 notes: document.getElementById('inputNotes').value.trim(),
                 updatedAt: nowIso
             };
