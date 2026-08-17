@@ -606,7 +606,8 @@
             return {
                 ...data,
                 status: targetStatus,
-                language: targetLang === 'EN' ? 'EN' : 'ES'
+                language: targetLang === 'EN' ? 'EN' : 'ES',
+                contacted: !!data.contacted
             };
         }
 
@@ -623,6 +624,7 @@
                     email: data.email || '-',
                     phone: data.phone || '-',
                     notes: data.notes || '-',
+                    contacted: data.contacted,
                     createdAt: data.createdAt || data.updatedAt || null,
                     updatedAt: data.updatedAt || null
                 });
@@ -809,6 +811,17 @@
             `;
         }
 
+        window.toggleContacted = async function(docId, currentStatus) {
+            try {
+                await updateDoc(doc(db, "candidates", docId), {
+                    contacted: !currentStatus,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (err) {
+                console.error("Error toggling contacted status:", err);
+            }
+        };
+
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
             const dateFrom = document.getElementById('dateFromInput').value;
@@ -876,7 +889,7 @@
                 <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
                 <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
                 <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
-                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-24">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
                         <span>Idioma</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -928,10 +941,21 @@
                     <td class="py-3 px-3 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white" title="${c.name}">${c.name}</td>
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white" title="${c.name}">
+                        <div class="flex items-center flex-wrap gap-1.5">
+                            <span>${c.name}</span>
+                            ${c.contacted ? `
+                            <span onclick="toggleContacted('${c.docId}', true)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 shadow-sm transition hover:bg-emerald-500/30" title="Contactado por WhatsApp (Click para cambiar)">
+                                <i class="fa-solid fa-check mr-1"></i> Contactado
+                            </span>` : `
+                            <span onclick="toggleContacted('${c.docId}', false)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20 shadow-sm transition hover:bg-emerald-500/20 hover:text-emerald-500" title="No contactado (Click para marcar)">
+                                <i class="fa-regular fa-circle mr-1"></i> Pendiente
+                            </span>`}
+                        </div>
+                    </td>
                     <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100" title="${c.email}">${c.email}</td>
                     <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200" title="${c.phone}">${c.phone}</td>
-                    <td class="py-3 px-3">
+                    <td class="py-3 px-3 w-24">
                         ${renderLanguageBadge(c.language)}
                     </td>
                     <td class="py-3 px-3">
@@ -1090,7 +1114,7 @@
             `).join('');
         }
 
-        window.sendTemplateDirect = function(templateId) {
+        window.sendTemplateDirect = async function(templateId) {
             const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
             const template = whatsappTemplates.find(t => t.id === templateId);
             if (!cand || !template) return;
@@ -1100,6 +1124,16 @@
 
             const phoneClean = cleanPhone(cand.phone);
             const url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            
+            try {
+                await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
+                    contacted: true,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (err) {
+                console.error("Error setting contacted status:", err);
+            }
+
             window.open(url, '_blank');
             closeWhatsAppModal();
         };
@@ -1457,6 +1491,7 @@
                         email: normalized.email,
                         phone: normalized.phone,
                         notes: normalized.notes,
+                        contacted: false,
                         createdAt: rowTimestamp,
                         updatedAt: rowTimestamp
                     });
@@ -1554,6 +1589,7 @@
             if (currentEditingDocId) {
                 await updateDoc(doc(db, "candidates", currentEditingDocId), dataPayload);
             } else {
+                dataPayload.contacted = false;
                 dataPayload.createdAt = nowIso;
                 await addDoc(candidatesCol, dataPayload);
             }
