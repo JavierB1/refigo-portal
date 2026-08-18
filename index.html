@@ -93,7 +93,7 @@
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
-                    <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
+                    <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo" onerror="this.src='https://placehold.co/40x40/4f46e5/ffffff?text=RF'">
                 </div>
                 <div class="min-w-0">
                     <h1 class="text-sm sm:text-base font-bold tracking-wide text-slate-900 dark:text-white truncate">RefiGo Portal</h1>
@@ -185,7 +185,7 @@
 
         <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative w-full">
             <div class="overflow-x-auto min-h-[400px] w-full">
-                <table class="w-full table-fixed text-left border-collapse text-sm">
+                <table class="w-full table-auto text-left border-collapse text-sm">
                     <thead>
                         <tr id="unifiedTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                         </tr>
@@ -195,8 +195,10 @@
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
+            <!-- Pagination Bar -->
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-2xl font-bold">
                 <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
+                <div id="paginationControls" class="flex items-center space-x-1.5 flex-wrap"></div>
             </div>
         </div>
     </main>
@@ -466,6 +468,10 @@
         let confirmCallback = null;
         let pendingExcelData = null;
 
+        // Pagination variables
+        let currentPage = 1;
+        const rowsPerPage = 100;
+
         const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX'];
 
         let statusColorsMap = {
@@ -671,6 +677,7 @@
             const checkboxes = document.querySelectorAll(`.col-check-${colKey}:checked`);
             columnFilters[colKey] = Array.from(checkboxes).map(cb => cb.value);
             document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            currentPage = 1;
             applyAllFilters();
         };
 
@@ -683,15 +690,20 @@
                 return 0;
             });
             document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            currentPage = 1;
             applyAllFilters();
         };
 
-        document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
+        document.getElementById('globalSearch').addEventListener('input', () => {
+            currentPage = 1;
+            applyAllFilters();
+        });
 
         function checkDateRangeVisibility() {
             const fromVal = document.getElementById('dateFromInput').value;
             const toVal = document.getElementById('dateToInput').value;
             document.getElementById('clearDateBtn').classList.toggle('hidden', !fromVal && !toVal);
+            currentPage = 1;
             applyAllFilters();
         }
 
@@ -702,6 +714,7 @@
             document.getElementById('dateFromInput').value = '';
             document.getElementById('dateToInput').value = '';
             document.getElementById('clearDateBtn').classList.add('hidden');
+            currentPage = 1;
             applyAllFilters();
         };
 
@@ -710,6 +723,7 @@
             clearDateRangeFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
             columnFilters = { status: VALID_STATUSES.slice(), language: ['ES', 'EN'], notes: ['with_notes', 'without_notes'] };
+            currentPage = 1;
             applyAllFilters();
         });
 
@@ -721,7 +735,6 @@
 
         function sortCandidatesByLanguageAndCreation(list) {
             return list.sort((a, b) => {
-                // Priority 1: EN first, then ES
                 const langA = (a.language || '').toUpperCase();
                 const langB = (b.language || '').toUpperCase();
                 if (langA !== langB) {
@@ -729,7 +742,6 @@
                     if (langB === 'EN') return 1;
                     return langA < langB ? -1 : 1;
                 }
-                // Priority 2: Creation time ascending (oldest first, newer additions placed at the bottom within the language group)
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
                 return timeA - timeB;
@@ -764,6 +776,11 @@
             } catch (err) {
                 console.error("Error toggling contacted status:", err);
             }
+        };
+
+        window.goToPage = function(page) {
+            currentPage = page;
+            applyAllFilters();
         };
 
         function applyAllFilters() {
@@ -807,7 +824,53 @@
             });
 
             currentVisibleCandidates = sortCandidatesByLanguageAndCreation(filtered);
-            renderUnifiedTable(currentVisibleCandidates);
+            
+            // Pagination slice
+            const totalPages = Math.ceil(currentVisibleCandidates.length / rowsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const paginatedData = currentVisibleCandidates.slice(startIndex, startIndex + rowsPerPage);
+
+            renderUnifiedTable(paginatedData);
+            renderPaginationControls(totalPages);
+        }
+
+        function renderPaginationControls(totalPages) {
+            const container = document.getElementById('paginationControls');
+            if (!container) return;
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed"' : ''} class="px-2.5 py-1.5 rounded-lg theme-card border text-xs font-bold hover:bg-indigo-600 hover:text-white transition">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `
+                        <button onclick="goToPage(${i})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${i === currentPage ? 'bg-indigo-600 text-white shadow-md' : 'theme-card border hover:bg-indigo-600 hover:text-white'}">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<span class="px-1 text-slate-500">...</span>`;
+                }
+            }
+
+            html += `
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed"' : ''} class="px-2.5 py-1.5 rounded-lg theme-card border text-xs font-bold hover:bg-indigo-600 hover:text-white transition">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
         }
 
         function formatDate(isoString) {
@@ -819,11 +882,11 @@
             });
         }
 
-        function renderUnifiedTable(data) {
+        function renderUnifiedTable(paginatedData) {
             const thead = document.getElementById('unifiedTableHead');
             const tbody = document.getElementById('unifiedTableBody');
 
-            document.getElementById('visibleCount').textContent = data.length;
+            document.getElementById('visibleCount').textContent = currentVisibleCandidates.length;
             document.getElementById('totalCandidateCount').textContent = allCandidates.length;
 
             thead.innerHTML = `
@@ -872,12 +935,12 @@
 
             buildFilterMenus();
 
-            if (data.length === 0) {
+            if (paginatedData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos registrados con los filtros actuales.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = data.map(c => {
+            tbody.innerHTML = paginatedData.map(c => {
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
                 return `
@@ -948,7 +1011,7 @@
                 </tr>
             `}).join('');
 
-            updateHeaderCheckboxState(data);
+            updateHeaderCheckboxState(paginatedData);
         }
 
         window.openWhatsAppModal = function(docId) {
@@ -1124,7 +1187,10 @@
         };
 
         window.toggleSelectAllRows = function(isChecked) {
-            currentVisibleCandidates.forEach(c => {
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const paginatedData = currentVisibleCandidates.slice(startIndex, startIndex + rowsPerPage);
+            
+            paginatedData.forEach(c => {
                 if (isChecked) {
                     selectedCandidateIds.add(c.docId);
                 } else {
@@ -1135,15 +1201,15 @@
             applyAllFilters();
         };
 
-        function updateHeaderCheckboxState(visibleData) {
+        function updateHeaderCheckboxState(paginatedData) {
             const headerCheck = document.getElementById('selectAllRowsCheck');
-            if (!headerCheck || visibleData.length === 0) {
+            if (!headerCheck || paginatedData.length === 0) {
                 if(headerCheck) headerCheck.checked = false;
                 return;
             }
 
-            const allVisibleSelected = visibleData.every(c => selectedCandidateIds.has(c.docId));
-            headerCheck.checked = allVisibleSelected;
+            const allPageSelected = paginatedData.every(c => selectedCandidateIds.has(c.docId));
+            headerCheck.checked = allPageSelected;
         }
 
         window.updateExportBtnVisibility = function() {
