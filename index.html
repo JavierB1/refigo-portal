@@ -1432,6 +1432,7 @@
             let batchCount = 0;
             let updatedCount = 0;
             let addedCount = 0;
+            let protectedNewCount = 0;
 
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
@@ -1471,6 +1472,12 @@
                 const rowTimestamp = new Date(baseTime + i).toISOString();
 
                 if (existing) {
+                    // Si ya está registrado y se encuentra en estatus 'New', se protege y no se modifica
+                    if (existing.status === 'New') {
+                        protectedNewCount++;
+                        continue;
+                    }
+
                     const docRef = doc(db, "candidates", existing.docId);
                     batch.update(docRef, {
                         status: normalized.status,
@@ -1511,7 +1518,11 @@
             }
 
             pendingExcelData = null;
-            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado, manteniendo el orden de tu archivo al final.`, "success");
+            showAlert(
+                "¡Importación Exitosa!", 
+                `Se actualizaron ${updatedCount} candidatos, se agregaron ${addedCount} nuevos y se protegieron <strong>${protectedNewCount}</strong> candidatos que ya se encontraban en estatus <strong>'New'</strong>.`, 
+                "success"
+            );
         };
 
         window.openAddModal = function() {
