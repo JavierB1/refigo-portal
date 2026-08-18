@@ -556,14 +556,31 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
-        onSnapshot(candidatesCol, (snapshot) => {
+        onSnapshot(candidatesCol, async (snapshot) => {
             allCandidates = [];
+            let batch = writeBatch(db);
+            let hasBatchUpdates = false;
+
             snapshot.forEach(docSnap => {
                 const raw = docSnap.data();
-                const st = (raw.status && raw.status !== '-' && raw.status.trim() !== '') ? raw.status : 'New';
+                let st = (raw.status && raw.status !== '-' && raw.status.trim() !== '') ? raw.status : 'New';
+                let lang = raw.language === 'EN' ? 'EN' : 'ES';
+
+                // Automatically migrate existing "Submitted" candidates to New and EN
+                if (st.toLowerCase() === 'submitted') {
+                    st = 'New';
+                    lang = 'EN';
+                    batch.update(doc(db, "candidates", docSnap.id), {
+                        status: 'New',
+                        language: 'EN',
+                        updatedAt: new Date().toISOString()
+                    });
+                    hasBatchUpdates = true;
+                }
+
                 allCandidates.push({
                     docId: docSnap.id,
-                    language: raw.language === 'EN' ? 'EN' : 'ES',
+                    language: lang,
                     status: st,
                     name: raw.name || 'Sin Nombre',
                     email: raw.email || '-',
@@ -574,6 +591,14 @@
                     updatedAt: raw.updatedAt || null
                 });
             });
+
+            if (hasBatchUpdates) {
+                try {
+                    await batch.commit();
+                } catch (err) {
+                    console.error("Migration batch error:", err);
+                }
+            }
 
             updateMetrics();
             buildFilterMenus();
@@ -1392,6 +1417,9 @@
                 
                 if (!rawStatus || rawStatus === '-') {
                     targetStatus = 'New';
+                } else if (rawStatus === 'submitted') {
+                    targetStatus = 'New';
+                    forcedLang = 'EN';
                 } else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
                     targetStatus = 'No Referred';
                 } else if (rawStatus.includes('cold')) {
