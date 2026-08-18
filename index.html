@@ -195,10 +195,9 @@
                 </table>
             </div>
 
-            <!-- Pagination Bar -->
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-2xl font-bold">
-                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
-                <div id="paginationControls" class="flex items-center space-x-1.5 flex-wrap"></div>
+            <!-- Single table count bar -->
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
+                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong> en total</span>
             </div>
         </div>
     </main>
@@ -468,10 +467,6 @@
         let confirmCallback = null;
         let pendingExcelData = null;
 
-        // Pagination variables
-        let currentPage = 1;
-        const rowsPerPage = 100;
-
         const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX'];
 
         let statusColorsMap = {
@@ -677,7 +672,6 @@
             const checkboxes = document.querySelectorAll(`.col-check-${colKey}:checked`);
             columnFilters[colKey] = Array.from(checkboxes).map(cb => cb.value);
             document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
-            currentPage = 1;
             applyAllFilters();
         };
 
@@ -690,12 +684,10 @@
                 return 0;
             });
             document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
-            currentPage = 1;
             applyAllFilters();
         };
 
         document.getElementById('globalSearch').addEventListener('input', () => {
-            currentPage = 1;
             applyAllFilters();
         });
 
@@ -703,7 +695,6 @@
             const fromVal = document.getElementById('dateFromInput').value;
             const toVal = document.getElementById('dateToInput').value;
             document.getElementById('clearDateBtn').classList.toggle('hidden', !fromVal && !toVal);
-            currentPage = 1;
             applyAllFilters();
         }
 
@@ -714,7 +705,6 @@
             document.getElementById('dateFromInput').value = '';
             document.getElementById('dateToInput').value = '';
             document.getElementById('clearDateBtn').classList.add('hidden');
-            currentPage = 1;
             applyAllFilters();
         };
 
@@ -723,7 +713,6 @@
             clearDateRangeFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
             columnFilters = { status: VALID_STATUSES.slice(), language: ['ES', 'EN'], notes: ['with_notes', 'without_notes'] };
-            currentPage = 1;
             applyAllFilters();
         });
 
@@ -778,11 +767,6 @@
             }
         };
 
-        window.goToPage = function(page) {
-            currentPage = page;
-            applyAllFilters();
-        };
-
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
             const dateFrom = document.getElementById('dateFromInput').value;
@@ -824,53 +808,7 @@
             });
 
             currentVisibleCandidates = sortCandidatesByLanguageAndCreation(filtered);
-            
-            // Pagination slice
-            const totalPages = Math.ceil(currentVisibleCandidates.length / rowsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-            if (currentPage < 1) currentPage = 1;
-
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const paginatedData = currentVisibleCandidates.slice(startIndex, startIndex + rowsPerPage);
-
-            renderUnifiedTable(paginatedData);
-            renderPaginationControls(totalPages);
-        }
-
-        function renderPaginationControls(totalPages) {
-            const container = document.getElementById('paginationControls');
-            if (!container) return;
-
-            if (totalPages <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-
-            let html = `
-                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed"' : ''} class="px-2.5 py-1.5 rounded-lg theme-card border text-xs font-bold hover:bg-indigo-600 hover:text-white transition">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-            `;
-
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-                    html += `
-                        <button onclick="goToPage(${i})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${i === currentPage ? 'bg-indigo-600 text-white shadow-md' : 'theme-card border hover:bg-indigo-600 hover:text-white'}">
-                            ${i}
-                        </button>
-                    `;
-                } else if (i === currentPage - 3 || i === currentPage + 3) {
-                    html += `<span class="px-1 text-slate-500">...</span>`;
-                }
-            }
-
-            html += `
-                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed"' : ''} class="px-2.5 py-1.5 rounded-lg theme-card border text-xs font-bold hover:bg-indigo-600 hover:text-white transition">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-            `;
-
-            container.innerHTML = html;
+            renderUnifiedTable(currentVisibleCandidates);
         }
 
         function formatDate(isoString) {
@@ -882,11 +820,11 @@
             });
         }
 
-        function renderUnifiedTable(paginatedData) {
+        function renderUnifiedTable(dataList) {
             const thead = document.getElementById('unifiedTableHead');
             const tbody = document.getElementById('unifiedTableBody');
 
-            document.getElementById('visibleCount').textContent = currentVisibleCandidates.length;
+            document.getElementById('visibleCount').textContent = dataList.length;
             document.getElementById('totalCandidateCount').textContent = allCandidates.length;
 
             thead.innerHTML = `
@@ -935,12 +873,12 @@
 
             buildFilterMenus();
 
-            if (paginatedData.length === 0) {
+            if (dataList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos registrados con los filtros actuales.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = paginatedData.map(c => {
+            tbody.innerHTML = dataList.map(c => {
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
                 return `
@@ -1011,7 +949,7 @@
                 </tr>
             `}).join('');
 
-            updateHeaderCheckboxState(paginatedData);
+            updateHeaderCheckboxState(dataList);
         }
 
         window.openWhatsAppModal = function(docId) {
@@ -1131,7 +1069,6 @@
 
             const phoneClean = cleanPhone(cand.phone);
             
-            // Automatic Device Detection: opens App on mobile, Web on computer
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
             let url;
             if (isMobile) {
@@ -1187,10 +1124,7 @@
         };
 
         window.toggleSelectAllRows = function(isChecked) {
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const paginatedData = currentVisibleCandidates.slice(startIndex, startIndex + rowsPerPage);
-            
-            paginatedData.forEach(c => {
+            currentVisibleCandidates.forEach(c => {
                 if (isChecked) {
                     selectedCandidateIds.add(c.docId);
                 } else {
@@ -1201,15 +1135,15 @@
             applyAllFilters();
         };
 
-        function updateHeaderCheckboxState(paginatedData) {
+        function updateHeaderCheckboxState(dataList) {
             const headerCheck = document.getElementById('selectAllRowsCheck');
-            if (!headerCheck || paginatedData.length === 0) {
+            if (!headerCheck || dataList.length === 0) {
                 if(headerCheck) headerCheck.checked = false;
                 return;
             }
 
-            const allPageSelected = paginatedData.every(c => selectedCandidateIds.has(c.docId));
-            headerCheck.checked = allPageSelected;
+            const allSelected = dataList.every(c => selectedCandidateIds.has(c.docId));
+            headerCheck.checked = allSelected;
         }
 
         window.updateExportBtnVisibility = function() {
@@ -1492,7 +1426,6 @@
 
                 if (existing) {
                     const docRef = doc(db, "candidates", existing.docId);
-                    // Protect 'New' status: if existing candidate is already 'New', do not overwrite status with Excel's status
                     const finalStatus = (existing.status === 'New') ? 'New' : normalized.status;
                     batch.update(docRef, {
                         status: finalStatus,
