@@ -89,11 +89,17 @@
     </script>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
+    <script>
+        if (localStorage.getItem('refigo_theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+    </script>
+
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
-                    <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo" onerror="this.src='https://placehold.co/40x40/4f46e5/ffffff?text=RF'">
+                    <img src="https://lh3.googleusercontent.com/d/1fIqBnMNSPhfGBJxI1BSNRDH3p6qIznig" class="w-full h-full object-cover" alt="Logo">
                 </div>
                 <div class="min-w-0">
                     <h1 class="text-sm sm:text-base font-bold tracking-wide text-slate-900 dark:text-white truncate">RefiGo Portal</h1>
@@ -122,6 +128,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
+        <!-- Métricas Superiores de Estatus -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
@@ -153,6 +160,7 @@
             </div>
         </div>
 
+        <!-- Controles de Búsqueda y Filtros -->
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             <div class="relative w-full lg:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 dark:text-slate-400 text-sm"></i>
@@ -183,8 +191,9 @@
             </div>
         </div>
 
-        <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative w-full">
-            <div class="overflow-x-auto min-h-[400px] w-full">
+        <!-- Tabla Principal Unificada con table-auto para ocupar todo el ancho disponible -->
+        <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
+            <div class="overflow-x-auto min-h-[400px]">
                 <table class="w-full table-auto text-left border-collapse text-sm">
                     <thead>
                         <tr id="unifiedTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
@@ -195,13 +204,13 @@
                 </table>
             </div>
 
-            <!-- Single table count bar -->
             <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
-                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong> en total</span>
+                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
             </div>
         </div>
     </main>
 
+    <!-- Modal de Candidato (Nuevo / Editar) -->
     <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -257,6 +266,7 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación de Idioma al Subir Excel -->
     <div id="excelLangModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[90] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center mx-auto text-2xl border border-indigo-500/30">
@@ -275,6 +285,7 @@
         </div>
     </div>
 
+    <!-- Modal de WhatsApp -->
     <div id="whatsappModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -320,6 +331,7 @@
         </div>
     </div>
 
+    <!-- Modal de Visualización de Plantilla WhatsApp -->
     <div id="waViewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-3 sm:p-4">
         <div class="theme-card border rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -341,6 +353,7 @@
         </div>
     </div>
 
+    <!-- Modal de Exportación -->
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -405,6 +418,7 @@
         </div>
     </div>
 
+    <!-- Modal de Alerta -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -420,6 +434,7 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -556,49 +571,64 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
-        onSnapshot(candidatesCol, async (snapshot) => {
-            allCandidates = [];
-            let batch = writeBatch(db);
-            let hasBatchUpdates = false;
+        function normalizeCandidateData(data) {
+            let rawSheet = String(data.sheet || '').toLowerCase().trim();
+            let rawStatus = String(data.status || '').toLowerCase().trim();
+            let targetStatus = 'New';
+            
+            let explicitLang = String(data.language || data.Idioma || '').toUpperCase().trim();
+            let targetLang = 'ES';
+            if (explicitLang === 'ES' || explicitLang === 'EN') {
+                targetLang = explicitLang;
+            }
 
-            snapshot.forEach(docSnap => {
-                const raw = docSnap.data();
-                let st = (raw.status && raw.status !== '-' && raw.status.trim() !== '') ? raw.status : 'New';
-                let lang = raw.language === 'EN' ? 'EN' : 'ES';
-
-                // Automatically migrate existing "Submitted" candidates to New and EN
-                if (st.toLowerCase() === 'submitted') {
-                    st = 'New';
-                    lang = 'EN';
-                    batch.update(doc(db, "candidates", docSnap.id), {
-                        status: 'New',
-                        language: 'EN',
-                        updatedAt: new Date().toISOString()
-                    });
-                    hasBatchUpdates = true;
-                }
-
-                allCandidates.push({
-                    docId: docSnap.id,
-                    language: lang,
-                    status: st,
-                    name: raw.name || 'Sin Nombre',
-                    email: raw.email || '-',
-                    phone: raw.phone || '-',
-                    notes: raw.notes || '-',
-                    contacted: !!raw.contacted,
-                    createdAt: raw.createdAt || raw.updatedAt || null,
-                    updatedAt: raw.updatedAt || null
-                });
-            });
-
-            if (hasBatchUpdates) {
-                try {
-                    await batch.commit();
-                } catch (err) {
-                    console.error("Migration batch error:", err);
+            if (rawSheet === 'referidos' || rawSheet === 'referido') {
+                targetStatus = 'New';
+            } else if (rawSheet === 'no referidos' || rawSheet === 'no referido') {
+                targetStatus = 'No Referred';
+            } else if (rawSheet === 'referred') {
+                targetStatus = 'New';
+            } else if (rawSheet === 'no referred' || rawSheet === 'no-referred') {
+                targetStatus = 'No Referred';
+            } else if (rawSheet === 'cold') {
+                targetStatus = 'Cold';
+            } else if (rawSheet === 'extinguished') {
+                targetStatus = 'Extinguished';
+            } else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) {
+                targetStatus = 'Rejected by CONCENTRIX';
+            } else {
+                const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus || s.toLowerCase() === rawSheet);
+                if (found) {
+                    targetStatus = found;
                 }
             }
+
+            return {
+                ...data,
+                status: targetStatus,
+                language: targetLang === 'EN' ? 'EN' : 'ES',
+                contacted: !!data.contacted
+            };
+        }
+
+        onSnapshot(candidatesCol, (snapshot) => {
+            allCandidates = [];
+            snapshot.forEach(docSnap => {
+                const raw = docSnap.data();
+                const data = normalizeCandidateData(raw);
+                allCandidates.push({
+                    docId: docSnap.id,
+                    language: data.language,
+                    status: data.status,
+                    name: data.name || 'Sin Nombre',
+                    email: data.email || '-',
+                    phone: data.phone || '-',
+                    notes: data.notes || '-',
+                    contacted: data.contacted,
+                    createdAt: data.createdAt || data.updatedAt || null,
+                    updatedAt: data.updatedAt || null
+                });
+            });
 
             updateMetrics();
             buildFilterMenus();
@@ -712,9 +742,7 @@
             applyAllFilters();
         };
 
-        document.getElementById('globalSearch').addEventListener('input', () => {
-            applyAllFilters();
-        });
+        document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
 
         function checkDateRangeVisibility() {
             const fromVal = document.getElementById('dateFromInput').value;
@@ -749,6 +777,7 @@
 
         function sortCandidatesByLanguageAndCreation(list) {
             return list.sort((a, b) => {
+                // Priority 1: EN always before ES (EN first, then ES)
                 const langA = (a.language || '').toUpperCase();
                 const langB = (b.language || '').toUpperCase();
                 if (langA !== langB) {
@@ -756,6 +785,7 @@
                     if (langB === 'EN') return 1;
                     return langA < langB ? -1 : 1;
                 }
+                // Priority 2: Creation time ascending (oldest first, newer additions placed at the bottom within the language group)
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
                 return timeA - timeB;
@@ -763,11 +793,11 @@
         }
 
         function renderStatusBadge(statusName) {
-            const st = (!statusName || statusName === '-') ? 'New' : statusName;
-            const hexColor = statusColorsMap[st] || '#6366f1';
+            if (!statusName || statusName === '-') return '-';
+            const hexColor = statusColorsMap[statusName] || '#6366f1';
             return `
                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
-                    ${st}
+                    ${statusName}
                 </span>
             `;
         }
@@ -845,20 +875,20 @@
             });
         }
 
-        function renderUnifiedTable(dataList) {
+        function renderUnifiedTable(data) {
             const thead = document.getElementById('unifiedTableHead');
             const tbody = document.getElementById('unifiedTableBody');
 
-            document.getElementById('visibleCount').textContent = dataList.length;
+            document.getElementById('visibleCount').textContent = data.length;
             document.getElementById('totalCandidateCount').textContent = allCandidates.length;
 
             thead.innerHTML = `
                 <th class="py-3 px-3 w-12 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer" title="Seleccionar filtrados visibles">
                 </th>
-                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 w-auto">Nombre Completo</th>
-                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 w-auto">Correo Electrónico</th>
-                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 w-36">Número Teléfono</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
                 <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-24">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
                         <span>Idioma</span>
@@ -869,7 +899,7 @@
                         <button onclick="applyColumnFilter('language')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-36">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -883,7 +913,7 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-44">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
                         <span>Notas</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -893,17 +923,17 @@
                         <button onclick="applyColumnFilter('notes')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 text-center font-bold text-slate-900 dark:text-slate-100 w-24">Acciones</th>
+                <th class="py-3 px-3 text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
             `;
 
             buildFilterMenus();
 
-            if (dataList.length === 0) {
+            if (data.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos registrados con los filtros actuales.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = dataList.map(c => {
+            tbody.innerHTML = data.map(c => {
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
                 return `
@@ -911,27 +941,27 @@
                     <td class="py-3 px-3 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white truncate" title="${c.name}">
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white" title="${c.name}">
                         <div class="flex items-center flex-wrap gap-1.5">
-                            <span class="truncate">${c.name}</span>
+                            <span>${c.name}</span>
                             ${c.contacted ? `
-                            <span onclick="toggleContacted('${c.docId}', true)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 shadow-sm transition hover:bg-emerald-500/30 flex-shrink-0" title="Contactado por WhatsApp (Click para cambiar)">
+                            <span onclick="toggleContacted('${c.docId}', true)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 shadow-sm transition hover:bg-emerald-500/30" title="Contactado por WhatsApp (Click para cambiar)">
                                 <i class="fa-solid fa-check mr-1"></i> Contactado
                             </span>` : `
-                            <span onclick="toggleContacted('${c.docId}', false)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20 shadow-sm transition hover:bg-emerald-500/20 hover:text-emerald-500 flex-shrink-0" title="No contactado (Click para marcar)">
+                            <span onclick="toggleContacted('${c.docId}', false)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20 shadow-sm transition hover:bg-emerald-500/20 hover:text-emerald-500" title="No contactado (Click para marcar)">
                                 <i class="fa-regular fa-circle mr-1"></i> Pendiente
                             </span>`}
                         </div>
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 truncate" title="${c.email}">${c.email}</td>
-                    <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200 truncate" title="${c.phone}">${c.phone}</td>
-                    <td class="py-3 px-3">
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100" title="${c.email}">${c.email}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200" title="${c.phone}">${c.phone}</td>
+                    <td class="py-3 px-3 w-24">
                         ${renderLanguageBadge(c.language)}
                     </td>
                     <td class="py-3 px-3">
                         ${renderStatusBadge(c.status)}
                     </td>
-                    <td class="py-3 px-3 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate" title="${c.notes}">
+                    <td class="py-3 px-3 text-xs text-slate-800 dark:text-slate-200 font-semibold" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
                     <td class="py-3 px-3 text-center">
@@ -974,7 +1004,7 @@
                 </tr>
             `}).join('');
 
-            updateHeaderCheckboxState(dataList);
+            updateHeaderCheckboxState(data);
         }
 
         window.openWhatsAppModal = function(docId) {
@@ -1067,7 +1097,7 @@
                         <i class="fa-solid fa-bookmark text-emerald-500"></i> ${t.title}
                     </span>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Enviar WhatsApp">
+                        <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Enviar WhatsApp Web">
                             <i class="fa-brands fa-whatsapp"></i> <span>Enviar</span>
                         </button>
                         <button onclick="viewWhatsAppTemplate('${t.id}')" class="bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Ver Mensaje">
@@ -1093,14 +1123,7 @@
             msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
 
             const phoneClean = cleanPhone(cand.phone);
-            
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-            let url;
-            if (isMobile) {
-                url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
-            } else {
-                url = `https://web.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
-            }
+            const url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
             
             try {
                 await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
@@ -1160,15 +1183,15 @@
             applyAllFilters();
         };
 
-        function updateHeaderCheckboxState(dataList) {
+        function updateHeaderCheckboxState(visibleData) {
             const headerCheck = document.getElementById('selectAllRowsCheck');
-            if (!headerCheck || dataList.length === 0) {
+            if (!headerCheck || visibleData.length === 0) {
                 if(headerCheck) headerCheck.checked = false;
                 return;
             }
 
-            const allSelected = dataList.every(c => selectedCandidateIds.has(c.docId));
-            headerCheck.checked = allSelected;
+            const allVisibleSelected = visibleData.every(c => selectedCandidateIds.has(c.docId));
+            headerCheck.checked = allVisibleSelected;
         }
 
         window.updateExportBtnVisibility = function() {
@@ -1413,14 +1436,9 @@
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
                 let targetStatus = 'New';
-                let rawStatus = String(row.status || '').toLowerCase().trim();
+                let rawStatus = row.status.toLowerCase();
                 
-                if (!rawStatus || rawStatus === '-') {
-                    targetStatus = 'New';
-                } else if (rawStatus === 'submitted') {
-                    targetStatus = 'New';
-                    forcedLang = 'EN';
-                } else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
+                if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
                     targetStatus = 'No Referred';
                 } else if (rawStatus.includes('cold')) {
                     targetStatus = 'Cold';
@@ -1454,9 +1472,8 @@
 
                 if (existing) {
                     const docRef = doc(db, "candidates", existing.docId);
-                    const finalStatus = (existing.status === 'New') ? 'New' : normalized.status;
                     batch.update(docRef, {
-                        status: finalStatus,
+                        status: normalized.status,
                         language: normalized.language,
                         name: normalized.name,
                         email: normalized.email,
@@ -1494,7 +1511,7 @@
             }
 
             pendingExcelData = null;
-            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado (respetando los estatus 'New' existentes).`, "success");
+            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado, manteniendo el orden de tu archivo al final.`, "success");
         };
 
         window.openAddModal = function() {
@@ -1550,10 +1567,9 @@
             });
 
             if (existingDuplicate) {
-                const dupStatus = (existingDuplicate.status && existingDuplicate.status !== '-') ? existingDuplicate.status : 'New';
                 showAlert(
                     "¡Candidato Ya Registrado!",
-                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente cuenta con estatus <span class="text-indigo-600 dark:text-indigo-400 font-bold">${dupStatus}</span>.`,
+                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente cuenta con estatus <span class="text-indigo-600 dark:text-indigo-400 font-bold">${existingDuplicate.status}</span>.`,
                     "danger"
                 );
                 return;
