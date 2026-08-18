@@ -201,7 +201,6 @@
         </div>
     </main>
 
-    <!-- Modal de Candidato (Nuevo / Editar) -->
     <div id="candidateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -257,7 +256,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Idioma al Subir Excel -->
     <div id="excelLangModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[90] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center mx-auto text-2xl border border-indigo-500/30">
@@ -276,7 +274,6 @@
         </div>
     </div>
 
-    <!-- Modal de WhatsApp -->
     <div id="whatsappModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -322,7 +319,6 @@
         </div>
     </div>
 
-    <!-- Modal de Visualización de Plantilla WhatsApp -->
     <div id="waViewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-3 sm:p-4">
         <div class="theme-card border rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -344,7 +340,6 @@
         </div>
     </div>
 
-    <!-- Modal de Exportación -->
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -409,7 +404,6 @@
         </div>
     </div>
 
-    <!-- Modal de Alerta -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -425,7 +419,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -863,7 +856,7 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-36">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
                         <span>Notas</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -1047,7 +1040,7 @@
                         <i class="fa-solid fa-bookmark text-emerald-500"></i> ${t.title}
                     </span>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Enviar WhatsApp Web">
+                        <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Enviar WhatsApp">
                             <i class="fa-brands fa-whatsapp"></i> <span>Enviar</span>
                         </button>
                         <button onclick="viewWhatsAppTemplate('${t.id}')" class="bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Ver Mensaje">
@@ -1073,7 +1066,15 @@
             msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
 
             const phoneClean = cleanPhone(cand.phone);
-            const url = `https://web.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            
+            // Detect if user is on mobile or desktop
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+            let url;
+            if (isMobile) {
+                url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            } else {
+                url = `https://web.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            }
             
             try {
                 await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
@@ -1273,7 +1274,7 @@
                     if (col === 'notes') {
                         columnStyles[index] = { cellWidth: isLandscape ? 120 : 85 };
                     } else if (col === 'language') {
-                        columnStyles[index] = { cellWidth: isLandscape ? 22 : 18 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 25 : 20 };
                     } else if (col === 'name') {
                         columnStyles[index] = { cellWidth: isLandscape ? 45 : 36 };
                     } else if (col === 'email') {
@@ -1422,8 +1423,10 @@
 
                 if (existing) {
                     const docRef = doc(db, "candidates", existing.docId);
+                    // Si el candidato ya está en estatus 'New', protegemos su estatus para que no se mueva por el Excel
+                    const finalStatus = (existing.status === 'New') ? 'New' : normalized.status;
                     batch.update(docRef, {
-                        status: normalized.status,
+                        status: finalStatus,
                         language: normalized.language,
                         name: normalized.name,
                         email: normalized.email,
@@ -1461,7 +1464,7 @@
             }
 
             pendingExcelData = null;
-            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado, manteniendo el orden de tu archivo al final.`, "success");
+            showAlert("¡Importación Exitosa!", `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos con idioma <strong>${forcedLang}</strong> confirmado (respetando los estatus 'New' existentes).`, "success");
         };
 
         window.openAddModal = function() {
