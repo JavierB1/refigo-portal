@@ -183,9 +183,9 @@
             </div>
         </div>
 
-        <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
-            <div class="overflow-x-auto min-h-[400px]">
-                <table class="w-full table-auto text-left border-collapse text-sm">
+        <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative w-full">
+            <div class="overflow-x-auto min-h-[400px] w-full">
+                <table class="w-full table-fixed text-left border-collapse text-sm">
                     <thead>
                         <tr id="unifiedTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
                         </tr>
@@ -559,10 +559,11 @@
             allCandidates = [];
             snapshot.forEach(docSnap => {
                 const raw = docSnap.data();
+                const st = (raw.status && raw.status !== '-' && raw.status.trim() !== '') ? raw.status : 'New';
                 allCandidates.push({
                     docId: docSnap.id,
                     language: raw.language === 'EN' ? 'EN' : 'ES',
-                    status: raw.status || 'New',
+                    status: st,
                     name: raw.name || 'Sin Nombre',
                     email: raw.email || '-',
                     phone: raw.phone || '-',
@@ -736,11 +737,11 @@
         }
 
         function renderStatusBadge(statusName) {
-            if (!statusName || statusName === '-') return '-';
-            const hexColor = statusColorsMap[statusName] || '#6366f1';
+            const st = (!statusName || statusName === '-') ? 'New' : statusName;
+            const hexColor = statusColorsMap[st] || '#6366f1';
             return `
                 <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg border shadow-sm" style="background-color: ${hexColor}20; color: ${hexColor}; border-color: ${hexColor}40;">
-                    ${statusName}
+                    ${st}
                 </span>
             `;
         }
@@ -829,9 +830,9 @@
                 <th class="py-3 px-3 w-12 text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer" title="Seleccionar filtrados visibles">
                 </th>
-                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
-                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
-                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 w-auto">Nombre Completo</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 w-auto">Correo Electrónico</th>
+                <th class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 w-36">Número Teléfono</th>
                 <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-24">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
                         <span>Idioma</span>
@@ -842,7 +843,7 @@
                         <button onclick="applyColumnFilter('language')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-36">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -856,7 +857,7 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-36">
+                <th class="py-3 px-3 relative font-bold text-slate-900 dark:text-slate-100 w-44">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
                         <span>Notas</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -866,7 +867,7 @@
                         <button onclick="applyColumnFilter('notes')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
+                <th class="py-3 px-3 text-center font-bold text-slate-900 dark:text-slate-100 w-24">Acciones</th>
             `;
 
             buildFilterMenus();
@@ -884,27 +885,27 @@
                     <td class="py-3 px-3 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white" title="${c.name}">
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white truncate" title="${c.name}">
                         <div class="flex items-center flex-wrap gap-1.5">
-                            <span>${c.name}</span>
+                            <span class="truncate">${c.name}</span>
                             ${c.contacted ? `
-                            <span onclick="toggleContacted('${c.docId}', true)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 shadow-sm transition hover:bg-emerald-500/30" title="Contactado por WhatsApp (Click para cambiar)">
+                            <span onclick="toggleContacted('${c.docId}', true)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 shadow-sm transition hover:bg-emerald-500/30 flex-shrink-0" title="Contactado por WhatsApp (Click para cambiar)">
                                 <i class="fa-solid fa-check mr-1"></i> Contactado
                             </span>` : `
-                            <span onclick="toggleContacted('${c.docId}', false)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20 shadow-sm transition hover:bg-emerald-500/20 hover:text-emerald-500" title="No contactado (Click para marcar)">
+                            <span onclick="toggleContacted('${c.docId}', false)" class="cursor-pointer inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-slate-500/10 text-slate-400 border border-slate-500/20 shadow-sm transition hover:bg-emerald-500/20 hover:text-emerald-500 flex-shrink-0" title="No contactado (Click para marcar)">
                                 <i class="fa-regular fa-circle mr-1"></i> Pendiente
                             </span>`}
                         </div>
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100" title="${c.email}">${c.email}</td>
-                    <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200" title="${c.phone}">${c.phone}</td>
-                    <td class="py-3 px-3 w-24">
+                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 truncate" title="${c.email}">${c.email}</td>
+                    <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200 truncate" title="${c.phone}">${c.phone}</td>
+                    <td class="py-3 px-3">
                         ${renderLanguageBadge(c.language)}
                     </td>
                     <td class="py-3 px-3">
                         ${renderStatusBadge(c.status)}
                     </td>
-                    <td class="py-3 px-3 text-xs text-slate-800 dark:text-slate-200 font-semibold" title="${c.notes}">
+                    <td class="py-3 px-3 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate" title="${c.notes}">
                         ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}${c.notes}
                     </td>
                     <td class="py-3 px-3 text-center">
@@ -1067,7 +1068,7 @@
 
             const phoneClean = cleanPhone(cand.phone);
             
-            // Detect if user is on mobile or desktop
+            // Automatic Device Detection: opens App on mobile, Web on computer
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
             let url;
             if (isMobile) {
@@ -1274,7 +1275,7 @@
                     if (col === 'notes') {
                         columnStyles[index] = { cellWidth: isLandscape ? 120 : 85 };
                     } else if (col === 'language') {
-                        columnStyles[index] = { cellWidth: isLandscape ? 25 : 20 };
+                        columnStyles[index] = { cellWidth: isLandscape ? 22 : 18 };
                     } else if (col === 'name') {
                         columnStyles[index] = { cellWidth: isLandscape ? 45 : 36 };
                     } else if (col === 'email') {
@@ -1387,9 +1388,11 @@
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
                 let targetStatus = 'New';
-                let rawStatus = row.status.toLowerCase();
+                let rawStatus = String(row.status || '').toLowerCase().trim();
                 
-                if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
+                if (!rawStatus || rawStatus === '-') {
+                    targetStatus = 'New';
+                } else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
                     targetStatus = 'No Referred';
                 } else if (rawStatus.includes('cold')) {
                     targetStatus = 'Cold';
@@ -1423,7 +1426,7 @@
 
                 if (existing) {
                     const docRef = doc(db, "candidates", existing.docId);
-                    // Si el candidato ya está en estatus 'New', protegemos su estatus para que no se mueva por el Excel
+                    // Protect 'New' status: if existing candidate is already 'New', do not overwrite status with Excel's status
                     const finalStatus = (existing.status === 'New') ? 'New' : normalized.status;
                     batch.update(docRef, {
                         status: finalStatus,
@@ -1520,9 +1523,10 @@
             });
 
             if (existingDuplicate) {
+                const dupStatus = (existingDuplicate.status && existingDuplicate.status !== '-') ? existingDuplicate.status : 'New';
                 showAlert(
                     "¡Candidato Ya Registrado!",
-                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente cuenta con estatus <span class="text-indigo-600 dark:text-indigo-400 font-bold">${existingDuplicate.status}</span>.`,
+                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente cuenta con estatus <span class="text-indigo-600 dark:text-indigo-400 font-bold">${dupStatus}</span>.`,
                     "danger"
                 );
                 return;
