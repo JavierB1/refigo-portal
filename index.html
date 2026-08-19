@@ -64,10 +64,10 @@
         .dropdown-menu { display: none; }
         .dropdown-menu.active { display: block; }
         
-        .overflow-x-auto, .overflow-y-auto {
+        .overflow-y-auto {
             scrollbar-width: none;
         }
-        .overflow-x-auto::-webkit-scrollbar, .overflow-y-auto::-webkit-scrollbar {
+        .overflow-y-auto::-webkit-scrollbar {
             display: none;
         }
 
@@ -84,14 +84,14 @@
         }
     </script>
 </head>
-<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col relative w-full">
     <script>
         if (localStorage.getItem('refigo_theme') === 'dark') {
             document.body.classList.add('dark');
         }
     </script>
 
-    <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur">
+    <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur w-full">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-indigo-600/35 overflow-hidden flex-shrink-0 relative">
@@ -185,8 +185,8 @@
             </div>
         </div>
 
-        <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative">
-            <div class="overflow-visible min-h-[400px]">
+        <div id="unifiedView" class="theme-card border rounded-2xl shadow-sm overflow-visible relative w-full">
+            <div class="overflow-visible min-h-[400px] w-full">
                 <table class="w-full table-fixed text-left border-collapse text-sm">
                     <thead>
                         <tr id="unifiedTableHead" class="bg-slate-200/80 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 font-bold border-b border-slate-300 dark:border-slate-700 text-xs uppercase">
@@ -197,7 +197,7 @@
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold">
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold w-full">
                 <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
             </div>
         </div>
@@ -574,11 +574,11 @@
                 targetLang = explicitLang;
             }
 
-            // Prioritize explicit status if it matches VALID_STATUSES
+            // Prioritize explicit saved status if valid
             const foundStatus = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus.toLowerCase());
             if (foundStatus) {
                 targetStatus = foundStatus;
-            } else if (rawStatus.toLowerCase() === 'submitted') {
+            } else if (rawStatus.toLowerCase() === 'submitted' || rawStatus.toLowerCase() === 'new') {
                 targetStatus = 'New';
                 targetLang = 'EN';
             } else if (rawSheet) {
@@ -1120,7 +1120,6 @@
             `).join('');
         }
 
-        // Automatic mobile vs desktop WhatsApp detection
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
         }
@@ -1283,7 +1282,7 @@
             }
 
             const rawCandidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
-            const candidatesToExport = sortCandidatesByLanguageAndCreation(rawCandidatesToExport);
+            const candidatesToExport = sortCandidatesByStatusAndLanguage(rawCandidatesToExport);
 
             const colLabels = {
                 name: 'Nombre Completo',
