@@ -774,8 +774,17 @@
             return clean !== '' && clean !== '-';
         }
 
-        function sortCandidatesByLanguageAndCreation(list) {
+        function sortCandidatesByStatusAndLanguage(list) {
             return list.sort((a, b) => {
+                const statusA = VALID_STATUSES.indexOf(a.status);
+                const statusB = VALID_STATUSES.indexOf(b.status);
+                const idxA = statusA === -1 ? 99 : statusA;
+                const idxB = statusB === -1 ? 99 : statusB;
+
+                if (idxA !== idxB) {
+                    return idxA - idxB;
+                }
+
                 const langA = (a.language || '').toUpperCase();
                 const langB = (b.language || '').toUpperCase();
                 if (langA !== langB) {
@@ -859,7 +868,7 @@
                 return matchesStatusCol && matchesLangCol && matchesNotesCol && matchesSearch && matchesDate;
             });
 
-            currentVisibleCandidates = sortCandidatesByLanguageAndCreation(filtered);
+            currentVisibleCandidates = sortCandidatesByStatusAndLanguage(filtered);
             renderUnifiedTable(currentVisibleCandidates);
         }
 
