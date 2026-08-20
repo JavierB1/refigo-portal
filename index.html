@@ -41,6 +41,7 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
 
         .theme-card {
@@ -574,7 +575,6 @@
                 targetLang = explicitLang;
             }
 
-            // Prioritize explicit saved status if valid
             const foundStatus = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus.toLowerCase());
             if (foundStatus) {
                 targetStatus = foundStatus;
@@ -774,8 +774,17 @@
             return clean !== '' && clean !== '-';
         }
 
+        // Updated sorting: Primary by Language (EN first, then ES), Secondary by Status sequence
         function sortCandidatesByStatusAndLanguage(list) {
             return list.sort((a, b) => {
+                const langA = (a.language || '').toUpperCase();
+                const langB = (b.language || '').toUpperCase();
+                if (langA !== langB) {
+                    if (langA === 'EN') return -1;
+                    if (langB === 'EN') return 1;
+                    return langA < langB ? -1 : 1;
+                }
+
                 const statusA = VALID_STATUSES.indexOf(a.status);
                 const statusB = VALID_STATUSES.indexOf(b.status);
                 const idxA = statusA === -1 ? 99 : statusA;
@@ -785,13 +794,6 @@
                     return idxA - idxB;
                 }
 
-                const langA = (a.language || '').toUpperCase();
-                const langB = (b.language || '').toUpperCase();
-                if (langA !== langB) {
-                    if (langA === 'EN') return -1;
-                    if (langB === 'EN') return 1;
-                    return langA < langB ? -1 : 1;
-                }
                 const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
                 const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
                 return timeA - timeB;
@@ -1487,7 +1489,6 @@
                 const rowTimestamp = new Date(baseTime + i).toISOString();
 
                 if (existing) {
-                    // Protect candidates already in 'New' status
                     if (existing.status === 'New') {
                         protectedNewCount++;
                         continue;
