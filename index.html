@@ -156,7 +156,7 @@
             </div>
             <div class="theme-card border rounded-2xl p-3.5 shadow-sm col-span-2 sm:col-span-1">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No</span>
-                <div id="metricNoStatus" class="text-xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
+                <div id="metricNo" class="text-xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
             </div>
         </div>
 
@@ -264,7 +264,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Idioma al Subir Excel -->
     <div id="excelLangModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[90] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-indigo-500/20 text-indigo-500 flex items-center justify-center mx-auto text-2xl border border-indigo-500/30">
@@ -283,7 +282,6 @@
         </div>
     </div>
 
-    <!-- Modal de WhatsApp -->
     <div id="whatsappModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[75] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -329,7 +327,6 @@
         </div>
     </div>
 
-    <!-- Modal de Visualización de Plantilla WhatsApp -->
     <div id="waViewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-3 sm:p-4">
         <div class="theme-card border rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -351,7 +348,6 @@
         </div>
     </div>
 
-    <!-- Modal de Exportación -->
     <div id="exportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[70] p-3 sm:p-4 overflow-y-auto">
         <div class="theme-card border rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
             <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
@@ -396,8 +392,16 @@
                 </div>
 
                 <div>
+                    <label class="block font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2">2. Orden Personalizado de Estatus (Idioma EN luego ES)</label>
+                    <div class="bg-slate-100 dark:bg-slate-900/60 p-3 border border-slate-300 dark:border-slate-700/80 rounded-xl space-y-2">
+                        <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">Usa las flechas para ordenar los estatus de tu selección:</span>
+                        <div id="customStatusList" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+
+                <div>
                     <div class="flex justify-between items-center mb-2">
-                        <label class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">2. Columnas a Incluir</label>
+                        <label class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">3. Columnas a Incluir</label>
                         <button onclick="toggleAllExportCols(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[11px] font-bold">Marcar Todas</button>
                     </div>
                     
@@ -416,7 +420,6 @@
         </div>
     </div>
 
-    <!-- Modal de Alerta -->
     <div id="alertModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[80] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div id="alertIconBox" class="w-14 h-14 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto text-2xl border border-amber-500/30">
@@ -432,7 +435,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación -->
     <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
         <div class="theme-card border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl text-center">
             <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-500 flex items-center justify-center mx-auto text-2xl border border-rose-500/30">
@@ -442,7 +444,7 @@
                 <h3 id="confirmTitle" class="font-bold text-base text-slate-900 dark:text-white">¿Confirmar Acción?</h3>
                 <p id="confirmMessage" class="text-xs text-slate-900 dark:text-slate-100 mt-2 leading-relaxed font-semibold"></p>
             </div>
-            <div class="grid grid-cols-2 gap-3 pt-2">
+            <div class="grid grid-cols-2 gap-2 pt-2">
                 <button onclick="closeConfirmModal(false)" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 font-bold text-xs py-3 rounded-xl transition">Cancelar</button>
                 <button onclick="closeConfirmModal(true)" class="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-md shadow-rose-600/30">Sí, Eliminar</button>
             </div>
@@ -479,6 +481,7 @@
         let selectedCandidateIds = new Set();
         let confirmCallback = null;
         let pendingExcelData = null;
+        let customExportStatusOrder = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
 
         const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
 
@@ -570,23 +573,41 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
-        function normalizeCandidateData(data) {
-            let explicitStatus = String(data.status || '').trim();
-            let rawSheet = String(data.sheet || '').toLowerCase().trim();
+        function normalizeCandidateData(raw) {
+            let explicitStatus = String(raw.status || '').trim();
+            let rawSheet = String(raw.sheet || '').toLowerCase().trim();
             let targetStatus = 'New';
             
-            let explicitLang = String(data.language || data.Idioma || '').toUpperCase().trim();
+            let explicitLang = String(raw.language || raw.Idioma || '').toUpperCase().trim();
             let targetLang = 'ES';
             if (explicitLang === 'ES' || explicitLang === 'EN') {
                 targetLang = explicitLang;
             }
 
-            const foundExplicitStatus = VALID_STATUSES.find(s => s.toLowerCase() === explicitStatus.toLowerCase());
-            if (foundExplicitStatus) {
-                targetStatus = foundExplicitStatus;
-            } else if (explicitStatus.toLowerCase() === 'submitted') {
-                targetStatus = 'New';
-                targetLang = 'EN';
+            if (explicitStatus) {
+                const foundExplicitStatus = VALID_STATUSES.find(s => s.toLowerCase() === explicitStatus.toLowerCase());
+                if (foundExplicitStatus) {
+                    targetStatus = foundExplicitStatus;
+                } else if (rawSheet) {
+                    if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') {
+                        targetStatus = 'New';
+                    } else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred' || rawSheet === 'no-referred') {
+                        targetStatus = 'No Referred';
+                    } else if (rawSheet === 'cold') {
+                        targetStatus = 'Cold';
+                    } else if (rawSheet === 'extinguished') {
+                        targetStatus = 'Extinguished';
+                    } else if (rawSheet === 'no') {
+                        targetStatus = 'No';
+                    } else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) {
+                        targetStatus = 'Rejected by CONCENTRIX';
+                    } else {
+                        const foundSheet = VALID_STATUSES.find(s => s.toLowerCase() === rawSheet);
+                        if (foundSheet) {
+                            targetStatus = foundSheet;
+                        }
+                    }
+                }
             } else if (rawSheet) {
                 if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') {
                     targetStatus = 'New';
@@ -611,10 +632,10 @@
             }
 
             return {
-                ...data,
+                ...raw,
                 status: targetStatus,
                 language: targetLang === 'EN' ? 'EN' : 'ES',
-                contacted: !!data.contacted
+                contacted: !!raw.contacted
             };
         }
 
@@ -623,16 +644,10 @@
             snapshot.forEach(docSnap => {
                 const raw = docSnap.data();
                 const data = normalizeCandidateData(raw);
-                let finalStatus = data.status;
-                let finalLang = data.language;
-                if (raw.status && raw.status.toLowerCase() === 'submitted') {
-                    finalStatus = 'New';
-                    finalLang = 'EN';
-                }
                 allCandidates.push({
                     docId: docSnap.id,
-                    language: finalLang,
-                    status: finalStatus,
+                    language: data.language,
+                    status: data.status,
                     name: data.name || 'Sin Nombre',
                     email: data.email || '-',
                     phone: data.phone || '-',
@@ -1234,6 +1249,22 @@
                 return;
             }
 
+            const candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
+            const presentStatuses = [...new Set(candidatesToExport.map(c => c.status))];
+            
+            customExportStatusOrder = VALID_STATUSES.filter(s => presentStatuses.includes(s));
+            presentStatuses.forEach(s => {
+                if (!customExportStatusOrder.includes(s)) {
+                    customExportStatusOrder.push(s);
+                }
+            });
+
+            if (customExportStatusOrder.length === 0) {
+                customExportStatusOrder = VALID_STATUSES.slice();
+            }
+
+            renderCustomStatusList();
+
             const container = document.getElementById('exportColumnsCheckboxContainer');
             container.innerHTML = `
                 <label class="flex items-center gap-2 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-bold">
@@ -1269,6 +1300,36 @@
             document.getElementById('exportModal').classList.remove('hidden');
         };
 
+        window.renderCustomStatusList = function() {
+            const listContainer = document.getElementById('customStatusList');
+            if (!listContainer) return;
+            listContainer.innerHTML = customExportStatusOrder.map((status, index) => `
+                <div class="theme-card border rounded-lg p-2 flex items-center justify-between text-xs font-bold shadow-sm">
+                    <span class="flex items-center gap-2 truncate">
+                        <span class="text-slate-500 font-mono">${index + 1}.</span>
+                        <span class="truncate">${status}</span>
+                    </span>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="moveCustomStatus(${index}, -1)" class="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center" title="Subir">
+                            <i class="fa-solid fa-arrow-up text-[10px]"></i>
+                        </button>
+                        <button onclick="moveCustomStatus(${index}, 1)" class="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center" title="Bajar">
+                            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.moveCustomStatus = function(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= customExportStatusOrder.length) return;
+            const temp = customExportStatusOrder[index];
+            customExportStatusOrder[index] = customExportStatusOrder[newIndex];
+            customExportStatusOrder[newIndex] = temp;
+            renderCustomStatusList();
+        };
+
         window.closeExportModal = function() {
             document.getElementById('exportModal').classList.add('hidden');
         };
@@ -1287,8 +1348,22 @@
                 return;
             }
 
-            const rawCandidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
-            const candidatesToExport = sortCandidatesByLanguageAndStatus(rawCandidatesToExport);
+            let candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
+
+            // Sorting export data: Primary by Language (EN then ES), Secondary by Custom Status Order
+            candidatesToExport.sort((a, b) => {
+                const langA = (a.language || 'ES').toUpperCase();
+                const langB = (b.language || 'ES').toUpperCase();
+                if (langA !== langB) {
+                    if (langA === 'EN') return -1;
+                    if (langB === 'EN') return 1;
+                    return langA < langB ? -1 : 1;
+                }
+
+                const idxA = customExportStatusOrder.indexOf(a.status);
+                const idxB = customExportStatusOrder.indexOf(b.status);
+                return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+            });
 
             const colLabels = {
                 name: 'Nombre Completo',
@@ -1385,7 +1460,7 @@
             const extinguishedCount = allCandidates.filter(c => c.status === 'Extinguished').length;
             const noReferredCount = allCandidates.filter(c => c.status === 'No Referred').length;
             const rejectedCount = allCandidates.filter(c => c.status === 'Rejected by CONCENTRIX').length;
-            const noStatusCount = allCandidates.filter(c => c.status === 'No').length;
+            const noCount = allCandidates.filter(c => c.status === 'No').length;
 
             document.getElementById('metricTotal').textContent = total;
             document.getElementById('metricNew').textContent = newCount;
@@ -1394,7 +1469,7 @@
             document.getElementById('metricExtinguished').textContent = extinguishedCount;
             document.getElementById('metricNoReferred').textContent = noReferredCount;
             document.getElementById('metricRejected').textContent = rejectedCount;
-            document.getElementById('metricNoStatus').textContent = noStatusCount;
+            document.getElementById('metricNo').textContent = noCount;
         }
 
         function cleanPhone(phone) {
