@@ -6,7 +6,7 @@
     <title>RefiGo Portal - Sistema de Gestión</title>
     <link rel="icon" href="https://lh3.googleusercontent.com/d/1OQYupc95-FhH2LhTM6tcI21xn9K-fT7u">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></link>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -125,7 +125,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
             <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
                 <div id="metricTotal" class="text-xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
@@ -150,9 +150,13 @@
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No Referred</span>
                 <div id="metricNoReferred" class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm col-span-2 sm:col-span-1">
+            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Rejected Conc.</span>
                 <div id="metricRejected" class="text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
+            </div>
+            <div class="theme-card border rounded-2xl p-3.5 shadow-sm col-span-2 sm:col-span-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No</span>
+                <div id="metricNoStatus" class="text-xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
             </div>
         </div>
 
@@ -235,6 +239,7 @@
                             <option value="Extinguished">Extinguished</option>
                             <option value="No Referred">No Referred</option>
                             <option value="Rejected by CONCENTRIX">Rejected by CONCENTRIX</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                     <div>
@@ -475,7 +480,7 @@
         let confirmCallback = null;
         let pendingExcelData = null;
 
-        const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX'];
+        const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
 
         let statusColorsMap = {
             'New': '#10b981',
@@ -484,6 +489,7 @@
             'Extinguished': '#64748b',
             'No Referred': '#6366f1',
             'Rejected by CONCENTRIX': '#f43f5e',
+            'No': '#475569',
             'ES': '#3b82f6',
             'EN': '#8b5cf6'
         };
@@ -565,7 +571,7 @@
         });
 
         function normalizeCandidateData(data) {
-            let rawStatus = String(data.status || '').trim();
+            let explicitStatus = String(data.status || '').trim();
             let rawSheet = String(data.sheet || '').toLowerCase().trim();
             let targetStatus = 'New';
             
@@ -575,10 +581,10 @@
                 targetLang = explicitLang;
             }
 
-            const foundStatus = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus.toLowerCase());
-            if (foundStatus) {
-                targetStatus = foundStatus;
-            } else if (rawStatus.toLowerCase() === 'submitted' || rawStatus.toLowerCase() === 'new') {
+            const foundExplicitStatus = VALID_STATUSES.find(s => s.toLowerCase() === explicitStatus.toLowerCase());
+            if (foundExplicitStatus) {
+                targetStatus = foundExplicitStatus;
+            } else if (explicitStatus.toLowerCase() === 'submitted') {
                 targetStatus = 'New';
                 targetLang = 'EN';
             } else if (rawSheet) {
@@ -590,6 +596,8 @@
                     targetStatus = 'Cold';
                 } else if (rawSheet === 'extinguished') {
                     targetStatus = 'Extinguished';
+                } else if (rawSheet === 'no') {
+                    targetStatus = 'No';
                 } else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) {
                     targetStatus = 'Rejected by CONCENTRIX';
                 } else {
@@ -615,10 +623,16 @@
             snapshot.forEach(docSnap => {
                 const raw = docSnap.data();
                 const data = normalizeCandidateData(raw);
+                let finalStatus = data.status;
+                let finalLang = data.language;
+                if (raw.status && raw.status.toLowerCase() === 'submitted') {
+                    finalStatus = 'New';
+                    finalLang = 'EN';
+                }
                 allCandidates.push({
                     docId: docSnap.id,
-                    language: data.language,
-                    status: data.status,
+                    language: finalLang,
+                    status: finalStatus,
                     name: data.name || 'Sin Nombre',
                     email: data.email || '-',
                     phone: data.phone || '-',
@@ -774,11 +788,10 @@
             return clean !== '' && clean !== '-';
         }
 
-        // Updated sorting: Primary by Language (EN first, then ES), Secondary by Status sequence
-        function sortCandidatesByStatusAndLanguage(list) {
+        function sortCandidatesByLanguageAndStatus(list) {
             return list.sort((a, b) => {
-                const langA = (a.language || '').toUpperCase();
-                const langB = (b.language || '').toUpperCase();
+                const langA = (a.language || 'ES').toUpperCase();
+                const langB = (b.language || 'ES').toUpperCase();
                 if (langA !== langB) {
                     if (langA === 'EN') return -1;
                     if (langB === 'EN') return 1;
@@ -870,7 +883,7 @@
                 return matchesStatusCol && matchesLangCol && matchesNotesCol && matchesSearch && matchesDate;
             });
 
-            currentVisibleCandidates = sortCandidatesByStatusAndLanguage(filtered);
+            currentVisibleCandidates = sortCandidatesByLanguageAndStatus(filtered);
             renderUnifiedTable(currentVisibleCandidates);
         }
 
@@ -1122,10 +1135,6 @@
             `).join('');
         }
 
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
-        }
-
         window.sendTemplateDirect = async function(templateId) {
             const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
             const template = whatsappTemplates.find(t => t.id === templateId);
@@ -1135,12 +1144,7 @@
             msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
 
             const phoneClean = cleanPhone(cand.phone);
-            let url = '';
-            if (isMobileDevice()) {
-                url = `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
-            } else {
-                url = `https://api.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
-            }
+            const url = `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
             
             try {
                 await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
@@ -1284,7 +1288,7 @@
             }
 
             const rawCandidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
-            const candidatesToExport = sortCandidatesByStatusAndLanguage(rawCandidatesToExport);
+            const candidatesToExport = sortCandidatesByLanguageAndStatus(rawCandidatesToExport);
 
             const colLabels = {
                 name: 'Nombre Completo',
@@ -1381,6 +1385,7 @@
             const extinguishedCount = allCandidates.filter(c => c.status === 'Extinguished').length;
             const noReferredCount = allCandidates.filter(c => c.status === 'No Referred').length;
             const rejectedCount = allCandidates.filter(c => c.status === 'Rejected by CONCENTRIX').length;
+            const noStatusCount = allCandidates.filter(c => c.status === 'No').length;
 
             document.getElementById('metricTotal').textContent = total;
             document.getElementById('metricNew').textContent = newCount;
@@ -1389,6 +1394,7 @@
             document.getElementById('metricExtinguished').textContent = extinguishedCount;
             document.getElementById('metricNoReferred').textContent = noReferredCount;
             document.getElementById('metricRejected').textContent = rejectedCount;
+            document.getElementById('metricNoStatus').textContent = noStatusCount;
         }
 
         function cleanPhone(phone) {
@@ -1464,6 +1470,8 @@
                     targetStatus = 'Extinguished';
                 } else if (rawStatus.includes('warn')) {
                     targetStatus = 'Warn';
+                } else if (rawStatus === 'no') {
+                    targetStatus = 'No';
                 } else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) {
                     targetStatus = 'Rejected by CONCENTRIX';
                 } else {
