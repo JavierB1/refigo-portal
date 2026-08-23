@@ -293,25 +293,41 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
+                <!-- Direct Message Section -->
                 <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
-                    <span id="waFormTitleLabel" class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
-                    <input type="hidden" id="waEditingTemplateId" value="">
+                    <span class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-paper-plane mr-1"></i> Envío de Mensaje Directo (Sin Plantilla)</span>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Título de Plantilla (para buscar)</label>
-                        <input type="text" id="waTemplateTitleInput" placeholder="Ej. Invitación a Entrevista, Recordatorio..." class="theme-input border rounded-xl p-3 text-xs w-full font-semibold">
+                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Escribe tu mensaje personalizado</label>
+                        <textarea id="waCustomMessageInput" rows="3" placeholder="Hola, te escribimos de RefiGo..." class="theme-input border rounded-xl p-3 text-xs w-full font-semibold"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="sendCustomWhatsAppMessage()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm text-xs flex items-center gap-1.5">
+                            <i class="fa-brands fa-whatsapp text-sm"></i> Enviar Mensaje Directo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Template Creation / Editing Form -->
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
+                    <span id="waFormTitleLabel" class="font-bold uppercase text-indigo-600 dark:text-indigo-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
+                    <input type="hidden" id="waEditingTemplateId">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Título de Plantilla</label>
+                        <input type="text" id="waTemplateTitleInput" placeholder="Ej. Invitación a entrevista" class="theme-input border rounded-xl p-2.5 text-xs w-full font-semibold">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Mensaje Predefinido (Puedes usar [Nombre] y [Correo])</label>
-                        <textarea id="waTemplateMessageInput" rows="3" placeholder="Hola [Nombre], te contactamos de RefiGo..." class="theme-input border rounded-xl p-3 text-xs w-full font-semibold"></textarea>
+                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Mensaje (Usa [Nombre] y [Correo] como variables)</label>
+                        <textarea id="waTemplateMessageInput" rows="2" placeholder="Hola [Nombre], te contactamos..." class="theme-input border rounded-xl p-2.5 text-xs w-full font-semibold"></textarea>
                     </div>
                     <div class="flex justify-end gap-2">
-                        <button id="waCancelEditBtn" onclick="cancelWhatsAppEdit()" class="hidden bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold px-4 py-2.5 rounded-xl transition shadow-sm text-xs">Cancelar</button>
-                        <button onclick="saveWhatsAppTemplate()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm text-xs flex items-center gap-1.5">
+                        <button id="waCancelEditBtn" onclick="cancelWhatsAppEdit()" class="hidden bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-3 py-2 rounded-xl font-bold">Cancelar</button>
+                        <button onclick="saveWhatsAppTemplate()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
                             <i class="fa-solid fa-floppy-disk"></i> <span id="waSaveBtnText">Guardar Plantilla</span>
                         </button>
                     </div>
                 </div>
 
+                <!-- Templates List -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Plantillas Guardadas</span>
@@ -1048,6 +1064,8 @@
             if (!cand) return;
             activeWhatsAppCandidateId = docId;
             document.getElementById('waCandidateName').textContent = cand.name;
+            const customInput = document.getElementById('waCustomMessageInput');
+            if (customInput) customInput.value = '';
             cancelWhatsAppEdit();
             renderWhatsAppTemplatesList(whatsappTemplates);
             document.getElementById('whatsappModal').classList.remove('hidden');
@@ -1056,6 +1074,32 @@
         window.closeWhatsAppModal = function() {
             document.getElementById('whatsappModal').classList.add('hidden');
             activeWhatsAppCandidateId = null;
+        };
+
+        window.sendCustomWhatsAppMessage = async function() {
+            const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
+            if (!cand) return;
+
+            const msg = document.getElementById('waCustomMessageInput').value.trim();
+            if (!msg) {
+                showAlert("Mensaje Vacío", "Por favor escribe un mensaje antes de enviar.", "warning");
+                return;
+            }
+
+            const phoneClean = cleanPhone(cand.phone);
+            const url = `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
+            
+            try {
+                await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
+                    contacted: true,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (err) {
+                console.error("Error setting contacted status:", err);
+            }
+
+            window.open(url, '_blank');
+            closeWhatsAppModal();
         };
 
         window.saveWhatsAppTemplate = async function() {
@@ -1083,21 +1127,33 @@
             const template = whatsappTemplates.find(t => t.id === templateId);
             if (!template) return;
 
-            document.getElementById('waEditingTemplateId').value = template.id;
-            document.getElementById('waTemplateTitleInput').value = template.title;
-            document.getElementById('waTemplateMessageInput').value = template.message;
-            document.getElementById('waFormTitleLabel').innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Editando Plantilla: ${template.title}`;
-            document.getElementById('waSaveBtnText').textContent = 'Actualizar Plantilla';
-            document.getElementById('waCancelEditBtn').classList.remove('hidden');
+            const idEl = document.getElementById('waEditingTemplateId');
+            if (idEl) idEl.value = template.id;
+            const titleEl = document.getElementById('waTemplateTitleInput');
+            if (titleEl) titleEl.value = template.title;
+            const msgEl = document.getElementById('waTemplateMessageInput');
+            if (msgEl) msgEl.value = template.message;
+            const labelEl = document.getElementById('waFormTitleLabel');
+            if (labelEl) labelEl.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Editando Plantilla: ${template.title}`;
+            const btnTextEl = document.getElementById('waSaveBtnText');
+            if (btnTextEl) btnTextEl.textContent = 'Actualizar Plantilla';
+            const cancelBtnEl = document.getElementById('waCancelEditBtn');
+            if (cancelBtnEl) cancelBtnEl.classList.remove('hidden');
         };
 
         window.cancelWhatsAppEdit = function() {
-            document.getElementById('waEditingTemplateId').value = '';
-            document.getElementById('waTemplateTitleInput').value = '';
-            document.getElementById('waTemplateMessageInput').value = '';
-            document.getElementById('waFormTitleLabel').innerHTML = `<i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje`;
-            document.getElementById('waSaveBtnText').textContent = 'Guardar Plantilla';
-            document.getElementById('waCancelEditBtn').classList.add('hidden');
+            const idEl = document.getElementById('waEditingTemplateId');
+            if (idEl) idEl.value = '';
+            const titleEl = document.getElementById('waTemplateTitleInput');
+            if (titleEl) titleEl.value = '';
+            const msgEl = document.getElementById('waTemplateMessageInput');
+            if (msgEl) msgEl.value = '';
+            const labelEl = document.getElementById('waFormTitleLabel');
+            if (labelEl) labelEl.innerHTML = `<i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje`;
+            const btnTextEl = document.getElementById('waSaveBtnText');
+            if (btnTextEl) btnTextEl.textContent = 'Guardar Plantilla';
+            const cancelBtnEl = document.getElementById('waCancelEditBtn');
+            if (cancelBtnEl) cancelBtnEl.classList.add('hidden');
         };
 
         window.confirmDeleteWhatsAppTemplate = function(templateId, templateTitle) {
@@ -1350,7 +1406,7 @@
 
             let candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
 
-            // Sorting export data: Primary by Language (EN then ES), Secondary by Custom Status Order
+            // Sorting export data: Primary Language (EN then ES), Secondary Custom Status Order
             candidatesToExport.sort((a, b) => {
                 const langA = (a.language || 'ES').toUpperCase();
                 const langB = (b.language || 'ES').toUpperCase();
