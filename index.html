@@ -589,6 +589,16 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
+        function getWhatsAppUrl(phone, msg) {
+            const phoneClean = cleanPhone(phone);
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            if (isMobile) {
+                return `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
+            } else {
+                return `https://web.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+            }
+        }
+
         function normalizeCandidateData(raw) {
             let explicitStatus = String(raw.status || '').trim();
             let rawSheet = String(raw.sheet || '').toLowerCase().trim();
@@ -1086,8 +1096,7 @@
                 return;
             }
 
-            const phoneClean = cleanPhone(cand.phone);
-            const url = `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
+            const url = getWhatsAppUrl(cand.phone, msg);
             
             try {
                 await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
@@ -1214,8 +1223,7 @@
             let msg = template.message;
             msg = msg.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
 
-            const phoneClean = cleanPhone(cand.phone);
-            const url = `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
+            const url = getWhatsAppUrl(cand.phone, msg);
             
             try {
                 await updateDoc(doc(db, "candidates", activeWhatsAppCandidateId), {
