@@ -120,6 +120,12 @@
                     <span class="hidden md:inline">Excel</span>
                     <input type="file" id="excelInput" accept=".xlsx, .xls" class="hidden">
                 </label>
+
+                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-bold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-amber-600/20" title="Actualizar Estatus y Notas">
+                    <i class="fa-solid fa-rotate text-sm"></i>
+                    <span>Update</span>
+                    <input type="file" id="updateExcelInput" accept=".xlsx, .xls" class="hidden">
+                </label>
             </div>
         </div>
     </header>
@@ -293,7 +299,6 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
-                <!-- Direct Message Section -->
                 <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
                     <span class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-paper-plane mr-1"></i> Envío de Mensaje Directo (Sin Plantilla)</span>
                     <div>
@@ -307,7 +312,6 @@
                     </div>
                 </div>
 
-                <!-- Template Creation / Editing Form -->
                 <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
                     <span id="waFormTitleLabel" class="font-bold uppercase text-indigo-600 dark:text-indigo-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
                     <input type="hidden" id="waEditingTemplateId">
@@ -327,7 +331,6 @@
                     </div>
                 </div>
 
-                <!-- Templates List -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Plantillas Guardadas</span>
@@ -589,14 +592,50 @@
             renderWhatsAppTemplatesList(whatsappTemplates);
         });
 
+        function cleanPhone(phone) {
+            if (!phone) return '';
+            let s = String(phone).replace(/[^0-9]/g, '');
+            if (s.startsWith('503') && s.length > 8) {
+                s = s.substring(3);
+            }
+            if (s.length > 8) {
+                s = s.slice(-8);
+            }
+            return s;
+        }
+
+        function cleanEmail(email) {
+            if (!email) return '';
+            return String(email).replace(/[\r\n\s]+/g, '').trim().toLowerCase();
+        }
+
         function getWhatsAppUrl(phone, msg) {
             const phoneClean = cleanPhone(phone);
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
             if (isMobile) {
-                return `https://wa.me/${phoneClean}?text=${encodeURIComponent(msg)}`;
+                return `https://wa.me/503${phoneClean}?text=${encodeURIComponent(msg)}`;
             } else {
-                return `https://web.whatsapp.com/send?phone=${phoneClean}&text=${encodeURIComponent(msg)}`;
+                return `https://web.whatsapp.com/send?phone=503${phoneClean}&text=${encodeURIComponent(msg)}`;
             }
+        }
+
+        function normalizeKey(key) {
+            return String(key || '')
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        function getRowVal(row, possibleKeys) {
+            for (const k of Object.keys(row)) {
+                const nk = normalizeKey(k);
+                for (const pk of possibleKeys) {
+                    if (nk === normalizeKey(pk)) {
+                        return row[k];
+                    }
+                }
+            }
+            return '';
         }
 
         function normalizeCandidateData(raw) {
@@ -1414,7 +1453,6 @@
 
             let candidatesToExport = allCandidates.filter(c => selectedCandidateIds.has(c.docId));
 
-            // Sorting export data: Primary Language (EN then ES), Secondary Custom Status Order
             candidatesToExport.sort((a, b) => {
                 const langA = (a.language || 'ES').toUpperCase();
                 const langB = (b.language || 'ES').toUpperCase();
@@ -1536,10 +1574,6 @@
             document.getElementById('metricNo').textContent = noCount;
         }
 
-        function cleanPhone(phone) {
-            return phone.replace(/[^0-9]/g, '');
-        }
-
         document.getElementById('excelInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1555,11 +1589,11 @@
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
                     for (const row of jsonData) {
-                        const name = row['<'] || row['Referidos'] || row['Nombre'] || row['Nombre Completo'] || 'Sin Nombre';
-                        const email = String(row['Correo'] || row['Email'] || '-').trim();
-                        const rawPhone = String(row['Número'] || row['Numero'] || row['Telefono'] || '-').trim();
-                        const statusCol = String(row['Estatus'] || sheetName).trim();
-                        const notes = String(row['Nota'] || row['Notas'] || '-').trim();
+                        const name = getRowVal(row, ['Referido', 'Referidos', 'Nombre', 'Nombre Completo', '<']) || 'Sin Nombre';
+                        const email = cleanEmail(getRowVal(row, ['Correo', 'Email']));
+                        const rawPhone = String(getRowVal(row, ['Numero', 'Número', 'Telefono'])).trim();
+                        const statusCol = String(getRowVal(row, ['Estatus', 'Estado']) || sheetName).trim();
+                        const notes = String(getRowVal(row, ['Nota', 'Notas']) || '-').trim();
                         
                         parsedRows.push({
                             sheet: sheetName,
@@ -1594,7 +1628,6 @@
             let batchCount = 0;
             let updatedCount = 0;
             let addedCount = 0;
-            let protectedNewCount = 0;
 
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
@@ -1628,19 +1661,14 @@
                 };
 
                 const existing = allCandidates.find(c => {
-                    const matchEmail = row.email && row.email !== '-' && c.email && c.email.toLowerCase() === row.email.toLowerCase();
-                    const matchPhone = cleanPhone(row.phone) && cleanPhone(row.phone) !== '503' && c.phone && cleanPhone(c.phone) === cleanPhone(row.phone);
+                    const matchEmail = row.email && row.email !== '-' && c.email && cleanEmail(c.email) === cleanEmail(row.email);
+                    const matchPhone = cleanPhone(row.phone) && cleanPhone(row.phone) !== '' && c.phone && cleanPhone(c.phone) === cleanPhone(row.phone);
                     return matchEmail || matchPhone;
                 });
 
                 const rowTimestamp = new Date(baseTime + i).toISOString();
 
                 if (existing) {
-                    if (existing.status === 'New') {
-                        protectedNewCount++;
-                        continue;
-                    }
-
                     const docRef = doc(db, "candidates", existing.docId);
                     batch.update(docRef, {
                         status: normalized.status,
@@ -1683,10 +1711,126 @@
             pendingExcelData = null;
             showAlert(
                 "¡Importación Exitosa!", 
-                `Se actualizaron ${updatedCount} candidatos, se agregaron ${addedCount} nuevos y se protegieron <strong>${protectedNewCount}</strong> candidatos que ya se encontraban en estatus <strong>'New'</strong>.`, 
+                `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos.`, 
                 "success"
             );
         };
+
+        // Dedicated UPDATE button handler (reads first sheet only, updates status and notes for existing records without protection)
+        document.getElementById('updateExcelInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                let parsedRows = [];
+                for (const row of jsonData) {
+                    const name = getRowVal(row, ['Referido', 'Referidos', 'Nombre', 'Nombre Completo', '<']) || '';
+                    const email = cleanEmail(getRowVal(row, ['Correo', 'Email']));
+                    const rawPhone = String(getRowVal(row, ['Numero', 'Número', 'Telefono'])).trim();
+                    const statusCol = String(getRowVal(row, ['Estatus', 'Estado']) || firstSheetName).trim();
+                    const notes = String(getRowVal(row, ['Nota', 'Notas']) || '-').trim();
+                    
+                    parsedRows.push({
+                        status: statusCol,
+                        name: String(name).trim(),
+                        email: email,
+                        phone: rawPhone,
+                        notes: notes
+                    });
+                }
+
+                if (parsedRows.length === 0) {
+                    showAlert("Archivo Vacío", "No se encontraron registros en la primera hoja del Excel.", "warning");
+                    e.target.value = '';
+                    return;
+                }
+
+                const baseTime = Date.now();
+                let batch = writeBatch(db);
+                let batchCount = 0;
+                let updatedCount = 0;
+                let skippedCount = 0;
+
+                for (let i = 0; i < parsedRows.length; i++) {
+                    const row = parsedRows[i];
+                    let targetStatus = 'New';
+                    let rawStatus = row.status.toLowerCase();
+                    
+                    if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
+                        targetStatus = 'No Referred';
+                    } else if (rawStatus.includes('cold')) {
+                        targetStatus = 'Cold';
+                    } else if (rawStatus.includes('extinguish')) {
+                        targetStatus = 'Extinguished';
+                    } else if (rawStatus.includes('warn')) {
+                        targetStatus = 'Warn';
+                    } else if (rawStatus === 'no') {
+                        targetStatus = 'No';
+                    } else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) {
+                        targetStatus = 'Rejected by CONCENTRIX';
+                    } else {
+                        const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus);
+                        if (found) targetStatus = found;
+                    }
+
+                    const existing = allCandidates.find(c => {
+                        const matchEmail = row.email && row.email !== '-' && c.email && cleanEmail(c.email) === row.email;
+                        const matchPhone = cleanPhone(row.phone) && cleanPhone(row.phone) !== '' && c.phone && cleanPhone(c.phone) === cleanPhone(row.phone);
+                        return matchEmail || matchPhone;
+                    });
+
+                    if (existing) {
+                        const hasStatusChanged = existing.status !== targetStatus;
+                        const hasNotesChanged = (existing.notes || '-') !== (row.notes || '-');
+                        const hasNameChanged = row.name && row.name !== '' && existing.name !== row.name;
+
+                        if (hasStatusChanged || hasNotesChanged || hasNameChanged) {
+                            const docRef = doc(db, "candidates", existing.docId);
+                            const updatePayload = {
+                                status: targetStatus,
+                                notes: row.notes,
+                                updatedAt: new Date(baseTime + i).toISOString()
+                            };
+                            if (hasNameChanged) updatePayload.name = row.name;
+
+                            batch.update(docRef, updatePayload);
+                            updatedCount++;
+                            batchCount++;
+                        } else {
+                            skippedCount++;
+                        }
+                    } else {
+                        skippedCount++;
+                    }
+
+                    if (batchCount >= 450) {
+                        await batch.commit();
+                        batch = writeBatch(db);
+                        batchCount = 0;
+                    }
+                }
+
+                if (batchCount > 0) {
+                    await batch.commit();
+                }
+
+                e.target.value = '';
+                showAlert(
+                    "¡Actualización Completada!", 
+                    `Se actualizaron <strong>${updatedCount}</strong> registros.<br>Se omitieron <strong>${skippedCount}</strong> registros (sin cambios o no encontrados).`, 
+                    "success"
+                );
+            };
+            reader.readAsArrayBuffer(file);
+        });
 
         window.openAddModal = function() {
             currentEditingDocId = null;
