@@ -611,8 +611,9 @@
 
         function getWhatsAppUrl(phone, msg) {
             const phoneClean = cleanPhone(phone);
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            if (isMobile) {
+            // Detección automática: Dispositivo móvil abre la App de WhatsApp, Computadora abre WhatsApp Web
+            const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            if (isMobileDevice) {
                 return `https://wa.me/503${phoneClean}?text=${encodeURIComponent(msg)}`;
             } else {
                 return `https://web.whatsapp.com/send?phone=503${phoneClean}&text=${encodeURIComponent(msg)}`;
