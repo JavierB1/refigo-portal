@@ -86,12 +86,6 @@
     </script>
 </head>
 <body class="min-h-screen flex flex-col relative w-full">
-    <script>
-        if (localStorage.getItem('refigo_theme') === 'dark') {
-            document.body.classList.add('dark');
-        }
-    </script>
-
     <header class="theme-header border-b sticky top-0 z-30 shadow-sm backdrop-blur w-full">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <div class="flex items-center space-x-3 min-w-0">
@@ -131,38 +125,42 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
-                <div id="metricTotal" class="text-xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
+        <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 sm:gap-3">
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
+                <div id="metricTotal" class="text-lg sm:text-xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">New</span>
-                <div id="metricNew" class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Hired</span>
+                <div id="metricHired" class="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Warn</span>
-                <div id="metricWarn" class="text-xl font-bold text-amber-500 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">New</span>
+                <div id="metricNew" class="text-lg sm:text-xl font-bold text-teal-600 dark:text-teal-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Cold</span>
-                <div id="metricCold" class="text-xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Warn</span>
+                <div id="metricWarn" class="text-lg sm:text-xl font-bold text-amber-500 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Extinguished</span>
-                <div id="metricExtinguished" class="text-xl font-bold text-slate-500 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Cold</span>
+                <div id="metricCold" class="text-lg sm:text-xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No Referred</span>
-                <div id="metricNoReferred" class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Extinguished</span>
+                <div id="metricExtinguished" class="text-lg sm:text-xl font-bold text-slate-500 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Rejected Conc.</span>
-                <div id="metricRejected" class="text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No Referred</span>
+                <div id="metricNoReferred" class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
             </div>
-            <div class="theme-card border rounded-2xl p-3.5 shadow-sm col-span-2 sm:col-span-1">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No</span>
-                <div id="metricNo" class="text-xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Rejected Conc.</span>
+                <div id="metricRejected" class="text-lg sm:text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
+            </div>
+            <div class="theme-card border rounded-2xl p-3 shadow-sm col-span-3 sm:col-span-1">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No</span>
+                <div id="metricNo" class="text-lg sm:text-xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
             </div>
         </div>
 
@@ -208,8 +206,13 @@
                 </table>
             </div>
 
-            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex justify-between items-center rounded-b-2xl font-bold w-full">
-                <span>Mostrando <strong id="visibleCount" class="text-indigo-700 dark:text-indigo-300">0</strong> registros de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
+            <div class="px-4 py-3 bg-slate-100 dark:bg-slate-900/40 border-t border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 rounded-b-2xl font-bold w-full">
+                <span>Mostrando registros <strong id="visiblePaginationRange" class="text-indigo-700 dark:text-indigo-300">0</strong> de <strong id="totalCandidateCount" class="text-indigo-700 dark:text-indigo-300">0</strong></span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="changePage(-1)" id="prevPageBtn" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed">Anterior</button>
+                    <span id="pageIndicator" class="px-2">Página 1 de 1</span>
+                    <button onclick="changePage(1)" id="nextPageBtn" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed">Siguiente</button>
+                </div>
             </div>
         </div>
     </main>
@@ -239,6 +242,7 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus <span class="text-rose-500">*</span></label>
                         <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
+                            <option value="Hired">Hired</option>
                             <option value="New">New</option>
                             <option value="Warn">Warn</option>
                             <option value="Cold">Cold</option>
@@ -266,6 +270,23 @@
                     <i class="fa-solid fa-floppy-disk text-sm"></i>
                     <span>Guardar en Nube</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notesModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-4">
+        <div class="theme-card border rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h4 class="font-bold text-sm text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
+                    <i class="fa-solid fa-note-sticky text-amber-500"></i> <span>Detalle de Nota</span>
+                </h4>
+                <button onclick="closeNotesModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div>
+                <div id="fullNotesContent" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap bg-slate-100 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold leading-relaxed max-h-64 overflow-y-auto"></div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeNotesModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-bold shadow-md">Cerrar</button>
             </div>
         </div>
     </div>
@@ -299,6 +320,10 @@
             </div>
 
             <div class="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
+                <input type="hidden" id="waEditingTemplateId">
+                <input type="hidden" id="waTemplateTitleInput">
+                <input type="hidden" id="waTemplateMessageInput">
+                
                 <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
                     <span class="font-bold uppercase text-emerald-600 dark:text-emerald-400 block tracking-wider"><i class="fa-solid fa-paper-plane mr-1"></i> Envío de Mensaje Directo (Sin Plantilla)</span>
                     <div>
@@ -308,25 +333,6 @@
                     <div class="flex justify-end">
                         <button onclick="sendCustomWhatsAppMessage()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-sm text-xs flex items-center gap-1.5">
                             <i class="fa-brands fa-whatsapp text-sm"></i> Enviar Mensaje Directo
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-300 dark:border-slate-700/80 space-y-3">
-                    <span id="waFormTitleLabel" class="font-bold uppercase text-indigo-600 dark:text-indigo-400 block tracking-wider"><i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje</span>
-                    <input type="hidden" id="waEditingTemplateId">
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Título de Plantilla</label>
-                        <input type="text" id="waTemplateTitleInput" placeholder="Ej. Invitación a entrevista" class="theme-input border rounded-xl p-2.5 text-xs w-full font-semibold">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Mensaje (Usa [Nombre] y [Correo] como variables)</label>
-                        <textarea id="waTemplateMessageInput" rows="2" placeholder="Hola [Nombre], te contactamos..." class="theme-input border rounded-xl p-2.5 text-xs w-full font-semibold"></textarea>
-                    </div>
-                    <div class="flex justify-end gap-2">
-                        <button id="waCancelEditBtn" onclick="cancelWhatsAppEdit()" class="hidden bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-3 py-2 rounded-xl font-bold">Cancelar</button>
-                        <button onclick="saveWhatsAppTemplate()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i> <span id="waSaveBtnText">Guardar Plantilla</span>
                         </button>
                     </div>
                 </div>
@@ -342,27 +348,6 @@
 
             <div class="flex justify-end pt-3 border-t border-slate-300 dark:border-slate-700">
                 <button onclick="closeWhatsAppModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 text-xs px-4 py-2.5 rounded-xl transition font-bold">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="waViewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[85] p-3 sm:p-4">
-        <div class="theme-card border rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
-                <h4 id="waViewTitle" class="font-bold text-sm text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
-                    <i class="fa-solid fa-bookmark text-emerald-500"></i> <span></span>
-                </h4>
-                <button onclick="closeWaViewModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div>
-                <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Mensaje Configurado:</label>
-                <div id="waViewMessageContent" class="text-xs text-slate-900 dark:text-slate-100 whitespace-pre-wrap bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold leading-relaxed"></div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeWaViewModal()" class="bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs px-4 py-2.5 rounded-xl font-bold">Cerrar</button>
-                <button id="waViewSendBtn" onclick="" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-xl font-bold flex items-center gap-1.5 shadow-md">
-                    <i class="fa-brands fa-whatsapp"></i> Enviar a Candidato
-                </button>
             </div>
         </div>
     </div>
@@ -411,9 +396,9 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2">2. Orden Personalizado de Estatus (Idioma EN luego ES)</label>
+                    <label class="block font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2">2. Orden Personalizado de Estatus</label>
                     <div class="bg-slate-100 dark:bg-slate-900/60 p-3 border border-slate-300 dark:border-slate-700/80 rounded-xl space-y-2">
-                        <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">Usa las flechas para ordenar los estatus de tu selección:</span>
+                        <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">Usa las flechas para ordenar los estatus:</span>
                         <div id="customStatusList" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
                     </div>
                 </div>
@@ -500,12 +485,16 @@
         let selectedCandidateIds = new Set();
         let confirmCallback = null;
         let pendingExcelData = null;
-        let customExportStatusOrder = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
+        let customExportStatusOrder = ['Hired', 'New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
 
-        const VALID_STATUSES = ['New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
+        let currentPage = 1;
+        const rowsPerPage = 100;
+
+        const VALID_STATUSES = ['Hired', 'New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
 
         let statusColorsMap = {
-            'New': '#10b981',
+            'Hired': '#059669',
+            'New': '#0d9488',
             'Warn': '#f59e0b',
             'Cold': '#0ea5e9',
             'Extinguished': '#64748b',
@@ -611,7 +600,6 @@
 
         function getWhatsAppUrl(phone, msg) {
             const phoneClean = cleanPhone(phone);
-            // Detección automática: Dispositivo móvil abre la App de WhatsApp, Computadora abre WhatsApp Web
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
             if (isMobileDevice) {
                 return `https://wa.me/503${phoneClean}?text=${encodeURIComponent(msg)}`;
@@ -655,43 +643,29 @@
                 if (foundExplicitStatus) {
                     targetStatus = foundExplicitStatus;
                 } else if (rawSheet) {
-                    if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') {
-                        targetStatus = 'New';
-                    } else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred' || rawSheet === 'no-referred') {
-                        targetStatus = 'No Referred';
-                    } else if (rawSheet === 'cold') {
-                        targetStatus = 'Cold';
-                    } else if (rawSheet === 'extinguished') {
-                        targetStatus = 'Extinguished';
-                    } else if (rawSheet === 'no') {
-                        targetStatus = 'No';
-                    } else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) {
-                        targetStatus = 'Rejected by CONCENTRIX';
-                    } else {
+                    if (rawSheet === 'hired') targetStatus = 'Hired';
+                    else if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') targetStatus = 'New';
+                    else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred') targetStatus = 'No Referred';
+                    else if (rawSheet === 'cold') targetStatus = 'Cold';
+                    else if (rawSheet === 'extinguished') targetStatus = 'Extinguished';
+                    else if (rawSheet === 'no') targetStatus = 'No';
+                    else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
+                    else {
                         const foundSheet = VALID_STATUSES.find(s => s.toLowerCase() === rawSheet);
-                        if (foundSheet) {
-                            targetStatus = foundSheet;
-                        }
+                        if (foundSheet) targetStatus = foundSheet;
                     }
                 }
             } else if (rawSheet) {
-                if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') {
-                    targetStatus = 'New';
-                } else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred' || rawSheet === 'no-referred') {
-                    targetStatus = 'No Referred';
-                } else if (rawSheet === 'cold') {
-                    targetStatus = 'Cold';
-                } else if (rawSheet === 'extinguished') {
-                    targetStatus = 'Extinguished';
-                } else if (rawSheet === 'no') {
-                    targetStatus = 'No';
-                } else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) {
-                    targetStatus = 'Rejected by CONCENTRIX';
-                } else {
+                if (rawSheet === 'hired') targetStatus = 'Hired';
+                else if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') targetStatus = 'New';
+                else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred') targetStatus = 'No Referred';
+                else if (rawSheet === 'cold') targetStatus = 'Cold';
+                else if (rawSheet === 'extinguished') targetStatus = 'Extinguished';
+                else if (rawSheet === 'no') targetStatus = 'No';
+                else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
+                else {
                     const foundSheet = VALID_STATUSES.find(s => s.toLowerCase() === rawSheet);
-                    if (foundSheet) {
-                        targetStatus = foundSheet;
-                    }
+                    if (foundSheet) targetStatus = foundSheet;
                 }
             } else {
                 targetStatus = 'New';
@@ -821,6 +795,7 @@
             const checkboxes = document.querySelectorAll(`.col-check-${colKey}:checked`);
             columnFilters[colKey] = Array.from(checkboxes).map(cb => cb.value);
             document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            currentPage = 1;
             applyAllFilters();
         };
 
@@ -833,15 +808,20 @@
                 return 0;
             });
             document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            currentPage = 1;
             applyAllFilters();
         };
 
-        document.getElementById('globalSearch').addEventListener('input', applyAllFilters);
+        document.getElementById('globalSearch').addEventListener('input', () => {
+            currentPage = 1;
+            applyAllFilters();
+        });
 
         function checkDateRangeVisibility() {
             const fromVal = document.getElementById('dateFromInput').value;
             const toVal = document.getElementById('dateToInput').value;
             document.getElementById('clearDateBtn').classList.toggle('hidden', !fromVal && !toVal);
+            currentPage = 1;
             applyAllFilters();
         }
 
@@ -852,6 +832,7 @@
             document.getElementById('dateFromInput').value = '';
             document.getElementById('dateToInput').value = '';
             document.getElementById('clearDateBtn').classList.add('hidden');
+            currentPage = 1;
             applyAllFilters();
         };
 
@@ -860,6 +841,7 @@
             clearDateRangeFilter();
             document.querySelectorAll('.dropdown-menu input[type="checkbox"]').forEach(cb => cb.checked = true);
             columnFilters = { status: VALID_STATUSES.slice(), language: ['ES', 'EN'], notes: ['with_notes', 'without_notes'] };
+            currentPage = 1;
             applyAllFilters();
         });
 
@@ -924,6 +906,15 @@
             }
         };
 
+        window.openNotesModal = function(notesText) {
+            document.getElementById('fullNotesContent').textContent = notesText && notesText.trim() !== '' ? notesText : 'Sin notas registradas.';
+            document.getElementById('notesModal').classList.remove('hidden');
+        };
+
+        window.closeNotesModal = function() {
+            document.getElementById('notesModal').classList.add('hidden');
+        };
+
         function applyAllFilters() {
             const search = document.getElementById('globalSearch').value.toLowerCase();
             const dateFrom = document.getElementById('dateFromInput').value;
@@ -965,8 +956,16 @@
             });
 
             currentVisibleCandidates = sortCandidatesByLanguageAndStatus(filtered);
-            renderUnifiedTable(currentVisibleCandidates);
+            renderUnifiedTable();
         }
+
+        window.changePage = function(direction) {
+            const totalPages = Math.ceil(currentVisibleCandidates.length / rowsPerPage) || 1;
+            currentPage += direction;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            renderUnifiedTable();
+        };
 
         function formatDate(isoString) {
             if (!isoString) return 'Sin registro';
@@ -977,21 +976,32 @@
             });
         }
 
-        function renderUnifiedTable(data) {
+        function renderUnifiedTable() {
             const thead = document.getElementById('unifiedTableHead');
             const tbody = document.getElementById('unifiedTableBody');
 
-            document.getElementById('visibleCount').textContent = data.length;
+            const totalFiltered = currentVisibleCandidates.length;
+            const totalPages = Math.ceil(totalFiltered / rowsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, totalFiltered);
+            const paginatedData = currentVisibleCandidates.slice(startIndex, endIndex);
+
             document.getElementById('totalCandidateCount').textContent = allCandidates.length;
+            document.getElementById('visiblePaginationRange').textContent = totalFiltered > 0 ? `${startIndex + 1} a ${endIndex} de ${totalFiltered}` : '0 de 0';
+            document.getElementById('pageIndicator').textContent = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
 
             thead.innerHTML = `
-                <th class="py-3 px-3 w-[5%] text-center">
+                <th class="py-3 px-2 w-[4%] text-center">
                     <input type="checkbox" id="selectAllRowsCheck" onchange="toggleSelectAllRows(this.checked)" class="rounded theme-input cursor-pointer" title="Seleccionar filtrados visibles">
                 </th>
-                <th class="py-3 px-3 w-[20%] font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
-                <th class="py-3 px-3 w-[22%] font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
-                <th class="py-3 px-3 w-[15%] font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
-                <th class="py-3 px-3 w-[8%] relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-2 w-[18%] font-bold text-slate-900 dark:text-slate-100">Nombre Completo</th>
+                <th class="py-3 px-2 w-[22%] font-bold text-slate-900 dark:text-slate-100">Correo Electrónico</th>
+                <th class="py-3 px-2 w-[14%] font-bold text-slate-900 dark:text-slate-100">Número Teléfono</th>
+                <th class="py-3 px-2 w-[7%] relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('langFilter')">
                         <span>Idioma</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -1001,7 +1011,7 @@
                         <button onclick="applyColumnFilter('language')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 w-[15%] relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-2 w-[14%] relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('statusFilter')">
                         <span>Estatus</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -1015,7 +1025,7 @@
                         <button onclick="applyColumnFilter('status')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 w-[10%] relative font-bold text-slate-900 dark:text-slate-100">
+                <th class="py-3 px-2 w-[10%] relative font-bold text-slate-900 dark:text-slate-100">
                     <div class="flex items-center justify-between cursor-pointer" onclick="toggleDropdown('notesFilter')">
                         <span>Notas</span>
                         <i class="fa-solid fa-filter text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400"></i>
@@ -1025,25 +1035,26 @@
                         <button onclick="applyColumnFilter('notes')" class="mt-2 w-full bg-indigo-600 text-white text-xs py-2 rounded-lg font-bold">OK</button>
                     </div>
                 </th>
-                <th class="py-3 px-3 w-[5%] text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
+                <th class="py-3 px-2 w-[11%] text-center font-bold text-slate-900 dark:text-slate-100">Acciones</th>
             `;
 
             buildFilterMenus();
 
-            if (data.length === 0) {
+            if (paginatedData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-700 dark:text-slate-300 font-bold">No hay candidatos registrados con los filtros actuales.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = data.map(c => {
+            tbody.innerHTML = paginatedData.map(c => {
                 const isChecked = selectedCandidateIds.has(c.docId);
                 const candHasNotes = hasNotes(c);
+                const escapedNotes = (c.notes || '').replace(/'/g, "&apos;").replace(/"/g, "&quot;");
                 return `
                 <tr class="hover:bg-slate-200/60 dark:hover:bg-slate-700/35 transition border-b border-slate-300 dark:border-slate-700/40 ${isChecked ? 'bg-indigo-100/70 dark:bg-indigo-900/30' : ''}">
-                    <td class="py-3 px-3 text-center">
+                    <td class="py-3 px-2 text-center">
                         <input type="checkbox" onchange="toggleRowSelection('${c.docId}', this.checked)" ${isChecked ? 'checked' : ''} class="row-select-check rounded theme-input cursor-pointer">
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-white truncate" title="${c.name}">
+                    <td class="py-3 px-2 font-bold text-slate-900 dark:text-white truncate" title="${c.name}">
                         <div class="flex items-center flex-wrap gap-1.5 truncate">
                             <span class="truncate">${c.name}</span>
                             ${c.contacted ? `
@@ -1055,24 +1066,28 @@
                             </span>`}
                         </div>
                     </td>
-                    <td class="py-3 px-3 font-bold text-slate-900 dark:text-slate-100 truncate" title="${c.email}">${c.email}</td>
-                    <td class="py-3 px-3 font-semibold text-slate-800 dark:text-slate-200 truncate" title="${c.phone}">${c.phone}</td>
-                    <td class="py-3 px-3 truncate">
+                    <td class="py-3 px-2 font-bold text-slate-900 dark:text-slate-100 truncate" title="${c.email}">${c.email}</td>
+                    <td class="py-3 px-2 font-semibold text-slate-800 dark:text-slate-200 truncate" title="${c.phone}">${c.phone}</td>
+                    <td class="py-3 px-2 truncate">
                         ${renderLanguageBadge(c.language)}
                     </td>
-                    <td class="py-3 px-3 truncate">
+                    <td class="py-3 px-2 truncate">
                         ${renderStatusBadge(c.status)}
                     </td>
-                    <td class="py-3 px-3 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate" title="${c.notes}">
-                        ${candHasNotes ? `<span class="inline-block mr-1 text-amber-500 font-bold">📝</span>` : ''}<span class="truncate">${c.notes}</span>
+                    <td class="py-3 px-2 text-xs text-slate-800 dark:text-slate-200 font-semibold truncate">
+                        ${candHasNotes ? `
+                        <button onclick="openNotesModal('${escapedNotes}')" class="inline-flex items-center gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-600 hover:text-white px-2 py-1 rounded-lg transition shadow-sm font-bold truncate max-w-full" title="Ver nota completa">
+                            <i class="fa-solid fa-note-sticky text-amber-500 flex-shrink-0"></i>
+                            <span class="truncate">${c.notes}</span>
+                        </button>` : `<span class="text-slate-400">-</span>`}
                     </td>
-                    <td class="py-3 px-3 text-center">
+                    <td class="py-3 px-2 text-center">
                         <div class="inline-flex items-center justify-center space-x-1.5">
-                            <button onclick="openWhatsAppModal('${c.docId}')" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white transition shadow-sm" title="Enviar WhatsApp">
+                            <button onclick="openWhatsAppModal('${c.docId}')" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600 hover:text-white transition shadow-sm flex-shrink-0" title="Enviar WhatsApp">
                                 <i class="fa-brands fa-whatsapp text-sm"></i>
                             </button>
 
-                            <div class="relative">
+                            <div class="relative flex-shrink-0">
                                 <button onclick="toggleDropdown('actionMenu_${c.docId}')" class="action-dots-btn inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700/60 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-900 dark:hover:text-white transition shadow-sm" title="Opciones">
                                     <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
                                 </button>
@@ -1106,7 +1121,7 @@
                 </tr>
             `}).join('');
 
-            updateHeaderCheckboxState(data);
+            updateHeaderCheckboxState(paginatedData);
         }
 
         window.openWhatsAppModal = function(docId) {
@@ -1116,7 +1131,6 @@
             document.getElementById('waCandidateName').textContent = cand.name;
             const customInput = document.getElementById('waCustomMessageInput');
             if (customInput) customInput.value = '';
-            cancelWhatsAppEdit();
             renderWhatsAppTemplatesList(whatsappTemplates);
             document.getElementById('whatsappModal').classList.remove('hidden');
         };
@@ -1151,73 +1165,6 @@
             closeWhatsAppModal();
         };
 
-        window.saveWhatsAppTemplate = async function() {
-            const editingId = document.getElementById('waEditingTemplateId').value;
-            const title = document.getElementById('waTemplateTitleInput').value.trim();
-            const message = document.getElementById('waTemplateMessageInput').value.trim();
-
-            if (!title || !message) {
-                showAlert("Campos Requeridos", "Debes ingresar un <strong>título</strong> y el <strong>mensaje predefinido</strong> para guardar la plantilla.", "warning");
-                return;
-            }
-
-            if (editingId) {
-                await updateDoc(doc(db, "whatsapp_templates", editingId), { title, message });
-                showAlert("Plantilla Actualizada", "La plantilla se ha actualizado correctamente.", "success");
-            } else {
-                await addDoc(templatesCol, { title, message });
-                showAlert("Plantilla Guardada", "La plantilla de WhatsApp se ha guardado correctamente.", "success");
-            }
-
-            cancelWhatsAppEdit();
-        };
-
-        window.editWhatsAppTemplate = function(templateId) {
-            const template = whatsappTemplates.find(t => t.id === templateId);
-            if (!template) return;
-
-            const idEl = document.getElementById('waEditingTemplateId');
-            if (idEl) idEl.value = template.id;
-            const titleEl = document.getElementById('waTemplateTitleInput');
-            if (titleEl) titleEl.value = template.title;
-            const msgEl = document.getElementById('waTemplateMessageInput');
-            if (msgEl) msgEl.value = template.message;
-            const labelEl = document.getElementById('waFormTitleLabel');
-            if (labelEl) labelEl.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Editando Plantilla: ${template.title}`;
-            const btnTextEl = document.getElementById('waSaveBtnText');
-            if (btnTextEl) btnTextEl.textContent = 'Actualizar Plantilla';
-            const cancelBtnEl = document.getElementById('waCancelEditBtn');
-            if (cancelBtnEl) cancelBtnEl.classList.remove('hidden');
-        };
-
-        window.cancelWhatsAppEdit = function() {
-            const idEl = document.getElementById('waEditingTemplateId');
-            if (idEl) idEl.value = '';
-            const titleEl = document.getElementById('waTemplateTitleInput');
-            if (titleEl) titleEl.value = '';
-            const msgEl = document.getElementById('waTemplateMessageInput');
-            if (msgEl) msgEl.value = '';
-            const labelEl = document.getElementById('waFormTitleLabel');
-            if (labelEl) labelEl.innerHTML = `<i class="fa-solid fa-plus-circle mr-1"></i> Crear Nueva Plantilla de Mensaje`;
-            const btnTextEl = document.getElementById('waSaveBtnText');
-            if (btnTextEl) btnTextEl.textContent = 'Guardar Plantilla';
-            const cancelBtnEl = document.getElementById('waCancelEditBtn');
-            if (cancelBtnEl) cancelBtnEl.classList.add('hidden');
-        };
-
-        window.confirmDeleteWhatsAppTemplate = function(templateId, templateTitle) {
-            showConfirm(
-                "Eliminar Plantilla",
-                `¿Estás seguro de que deseas eliminar la plantilla <strong>"${templateTitle}"</strong>? Esta acción no se puede deshacer.`,
-                async (confirmed) => {
-                    if (confirmed) {
-                        await deleteDoc(doc(db, "whatsapp_templates", templateId));
-                        showAlert("Plantilla Eliminada", "La plantilla ha sido eliminada.", "success");
-                    }
-                }
-            );
-        };
-
         window.filterWhatsAppTemplates = function(query) {
             const filtered = whatsappTemplates.filter(t => t.title.toLowerCase().includes(query.toLowerCase()) || t.message.toLowerCase().includes(query.toLowerCase()));
             renderWhatsAppTemplatesList(filtered);
@@ -1228,7 +1175,7 @@
             if (!container) return;
 
             if (templates.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-700 dark:text-slate-300 font-semibold text-xs">No hay plantillas guardadas. Crea una arriba.</div>`;
+                container.innerHTML = `<div class="text-center py-6 text-slate-700 dark:text-slate-300 font-semibold text-xs">No hay plantillas guardadas.</div>`;
                 return;
             }
 
@@ -1237,20 +1184,9 @@
                     <span class="font-bold text-indigo-700 dark:text-indigo-300 text-xs truncate flex items-center gap-2">
                         <i class="fa-solid fa-bookmark text-emerald-500"></i> ${t.title}
                     </span>
-                    <div class="flex items-center gap-1.5 flex-shrink-0">
-                        <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Enviar WhatsApp Web">
-                            <i class="fa-brands fa-whatsapp"></i> <span>Enviar</span>
-                        </button>
-                        <button onclick="viewWhatsAppTemplate('${t.id}')" class="bg-sky-500/15 text-sky-700 dark:text-sky-300 hover:bg-sky-600 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Ver Mensaje">
-                            <i class="fa-solid fa-eye"></i> <span>Ver</span>
-                        </button>
-                        <button onclick="editWhatsAppTemplate('${t.id}')" class="bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-600 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Editar">
-                            <i class="fa-solid fa-pen"></i> <span>Editar</span>
-                        </button>
-                        <button onclick="confirmDeleteWhatsAppTemplate('${t.id}', '${t.title.replace(/'/g, "\\'")}')" class="bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1" title="Eliminar">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
+                    <button onclick="sendTemplateDirect('${t.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm flex-shrink-0" title="Enviar WhatsApp">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> <span>Enviar Plantilla</span>
+                    </button>
                 </div>
             `).join('');
         }
@@ -1278,29 +1214,6 @@
             closeWhatsAppModal();
         };
 
-        window.viewWhatsAppTemplate = function(templateId) {
-            const template = whatsappTemplates.find(t => t.id === templateId);
-            const cand = allCandidates.find(c => c.docId === activeWhatsAppCandidateId);
-            if (!template || !cand) return;
-
-            document.getElementById('waViewTitle').innerHTML = `<i class="fa-solid fa-bookmark text-emerald-500"></i> <span>${template.title}</span>`;
-            
-            let previewMsg = template.message.replace(/\[Nombre\]/gi, cand.name).replace(/\[Correo\]/gi, cand.email);
-            document.getElementById('waViewMessageContent').textContent = previewMsg;
-            document.getElementById('waViewSendBtn').setAttribute('onclick', `sendWhatsAppTemplate('${template.id}')`);
-
-            document.getElementById('waViewModal').classList.remove('hidden');
-        };
-
-        window.closeWaViewModal = function() {
-            document.getElementById('waViewModal').classList.add('hidden');
-        };
-
-        window.sendWhatsAppTemplate = function(templateId) {
-            sendTemplateDirect(templateId);
-            closeWaViewModal();
-        };
-
         window.toggleRowSelection = function(docId, isChecked) {
             if (isChecked) {
                 selectedCandidateIds.add(docId);
@@ -1308,7 +1221,7 @@
                 selectedCandidateIds.delete(docId);
             }
             updateExportBtnVisibility();
-            applyAllFilters();
+            renderUnifiedTable();
         };
 
         window.toggleSelectAllRows = function(isChecked) {
@@ -1320,17 +1233,17 @@
                 }
             });
             updateExportBtnVisibility();
-            applyAllFilters();
+            renderUnifiedTable();
         };
 
-        function updateHeaderCheckboxState(visibleData) {
+        function updateHeaderCheckboxState(visiblePaginatedData) {
             const headerCheck = document.getElementById('selectAllRowsCheck');
-            if (!headerCheck || visibleData.length === 0) {
+            if (!headerCheck || visiblePaginatedData.length === 0) {
                 if(headerCheck) headerCheck.checked = false;
                 return;
             }
 
-            const allVisibleSelected = visibleData.every(c => selectedCandidateIds.has(c.docId));
+            const allVisibleSelected = visiblePaginatedData.every(c => selectedCandidateIds.has(c.docId));
             headerCheck.checked = allVisibleSelected;
         }
 
@@ -1557,6 +1470,7 @@
 
         function updateMetrics() {
             const total = allCandidates.length;
+            const hiredCount = allCandidates.filter(c => c.status === 'Hired').length;
             const newCount = allCandidates.filter(c => c.status === 'New').length;
             const warnCount = allCandidates.filter(c => c.status === 'Warn').length;
             const coldCount = allCandidates.filter(c => c.status === 'Cold').length;
@@ -1566,6 +1480,7 @@
             const noCount = allCandidates.filter(c => c.status === 'No').length;
 
             document.getElementById('metricTotal').textContent = total;
+            document.getElementById('metricHired').textContent = hiredCount;
             document.getElementById('metricNew').textContent = newCount;
             document.getElementById('metricWarn').textContent = warnCount;
             document.getElementById('metricCold').textContent = coldCount;
@@ -1635,19 +1550,14 @@
                 let targetStatus = 'New';
                 let rawStatus = row.status.toLowerCase();
                 
-                if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
-                    targetStatus = 'No Referred';
-                } else if (rawStatus.includes('cold')) {
-                    targetStatus = 'Cold';
-                } else if (rawStatus.includes('extinguish')) {
-                    targetStatus = 'Extinguished';
-                } else if (rawStatus.includes('warn')) {
-                    targetStatus = 'Warn';
-                } else if (rawStatus === 'no') {
-                    targetStatus = 'No';
-                } else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) {
-                    targetStatus = 'Rejected by CONCENTRIX';
-                } else {
+                if (rawStatus.includes('hired')) targetStatus = 'Hired';
+                else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) targetStatus = 'No Referred';
+                else if (rawStatus.includes('cold')) targetStatus = 'Cold';
+                else if (rawStatus.includes('extinguish')) targetStatus = 'Extinguished';
+                else if (rawStatus.includes('warn')) targetStatus = 'Warn';
+                else if (rawStatus === 'no') targetStatus = 'No';
+                else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
+                else {
                     const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus);
                     if (found) targetStatus = found;
                 }
@@ -1717,7 +1627,6 @@
             );
         };
 
-        // Dedicated UPDATE button handler (reads first sheet only, updates status and notes for existing records without protection)
         document.getElementById('updateExcelInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -1765,19 +1674,14 @@
                     let targetStatus = 'New';
                     let rawStatus = row.status.toLowerCase();
                     
-                    if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) {
-                        targetStatus = 'No Referred';
-                    } else if (rawStatus.includes('cold')) {
-                        targetStatus = 'Cold';
-                    } else if (rawStatus.includes('extinguish')) {
-                        targetStatus = 'Extinguished';
-                    } else if (rawStatus.includes('warn')) {
-                        targetStatus = 'Warn';
-                    } else if (rawStatus === 'no') {
-                        targetStatus = 'No';
-                    } else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) {
-                        targetStatus = 'Rejected by CONCENTRIX';
-                    } else {
+                    if (rawStatus.includes('hired')) targetStatus = 'Hired';
+                    else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) targetStatus = 'No Referred';
+                    else if (rawStatus.includes('cold')) targetStatus = 'Cold';
+                    else if (rawStatus.includes('extinguish')) targetStatus = 'Extinguished';
+                    else if (rawStatus.includes('warn')) targetStatus = 'Warn';
+                    else if (rawStatus === 'no') targetStatus = 'No';
+                    else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
+                    else {
                         const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus);
                         if (found) targetStatus = found;
                     }
