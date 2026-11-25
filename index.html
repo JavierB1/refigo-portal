@@ -650,9 +650,10 @@
                     color: colorVal
                 });
 
-                // Si cambió el nombre, actualizar candidatos existentes con ese estatus
-                if (oldCat && oldCat.name !== nameVal) {
-                    const affected = allCandidates.filter(c => c.status === oldCat.name);
+                // Si cambió el nombre, migrar todos los candidatos asociados (comparación flexible insensible a mayúsculas/espacios)
+                if (oldCat && oldCat.name.trim().toLowerCase() !== nameVal.trim().toLowerCase()) {
+                    const oldNormalized = oldCat.name.trim().toLowerCase();
+                    const affected = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === oldNormalized);
                     if (affected.length > 0) {
                         let batch = writeBatch(db);
                         let count = 0;
@@ -669,7 +670,7 @@
                     }
                 }
                 resetCategoryForm();
-                showAlert("Categoría Actualizada", "Los cambios en la categoría se guardaron correctamente.", "success");
+                showAlert("Categoría Actualizada", "Los cambios en la categoría y sus candidatos se guardaron correctamente.", "success");
             } else {
                 const nextOrder = dynamicCategories.length > 0 ? Math.max(...dynamicCategories.map(c => c.order)) + 1 : 0;
                 await addDoc(categoriesCol, {
