@@ -457,7 +457,7 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center text-xs">
                     <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Categorías Activas (<span id="catCountBadge">0</span>)</span>
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Ordenar o editar</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Ordenar, limpiar o editar</span>
                 </div>
                 <div id="categoriesListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
                 </div>
@@ -709,6 +709,38 @@
             );
         };
 
+        window.clearCategoryCandidates = function(catName) {
+            const matches = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === catName.trim().toLowerCase());
+        window.clearCategoryRecords = function(catName) {
+            const matching = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === catName.trim().toLowerCase());
+            if (matching.length === 0) {
+                showAlert("Categoría Vacía", `No hay registros en la categoría <strong>${catName}</strong> para eliminar.`, "warning");
+                return;
+            }
+
+            showConfirm(
+                `Vaciar "${catName}"`,
+                `¿Estás seguro de eliminar los <strong>${matching.length}</strong> registros que están en <strong>${catName}</strong>? La categoría se mantendrá activa.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        let batch = writeBatch(db);
+                        let count = 0;
+                        for (const cand of matching) {
+                            batch.delete(doc(db, "candidates", cand.docId));
+                            count++;
+                            if (count >= 450) {
+                                await batch.commit();
+                                batch = writeBatch(db);
+                                count = 0;
+                            }
+                        }
+                        if (count > 0) await batch.commit();
+                        showAlert("Registros Eliminados", `Se eliminaron <strong>${matching.length}</strong> registros de <strong>${catName}</strong>.`, "success");
+                    }
+                }
+            );
+        };
+
         window.moveCategoryOrder = async function(index, direction) {
             const newIndex = index + direction;
             if (newIndex < 0 || newIndex >= dynamicCategories.length) return;
@@ -720,6 +752,36 @@
             batch.update(doc(db, "categories", currentCat.id), { order: newIndex });
             batch.update(doc(db, "categories", targetCat.id), { order: index });
             await batch.commit();
+        };
+
+        window.deleteAllWarnO = function() {
+            const warnOCandidates = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === 'warn o');
+            if (warnOCandidates.length === 0) {
+                showAlert("Sin Registros", "No hay candidatos actualmente en la categoría <strong>Warn O</strong>.", "warning");
+                return;
+            }
+
+            showConfirm(
+                "Eliminar Registros de Warn O",
+                `¿Estás seguro de eliminar los <strong>${warnOCandidates.length}</strong> registros que están en <strong>Warn O</strong>? Esta acción no se puede deshacer.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        let batch = writeBatch(db);
+                        let count = 0;
+                        for (const cand of warnOCandidates) {
+                            batch.delete(doc(db, "candidates", cand.docId));
+                            count++;
+                            if (count >= 450) {
+                                await batch.commit();
+                                batch = writeBatch(db);
+                                count = 0;
+                            }
+                        }
+                        if (count > 0) await batch.commit();
+                        showAlert("¡Eliminados!", `Se eliminaron <strong>${warnOCandidates.length}</strong> registros de Warn O exitosamente.`, "success");
+                    }
+                }
+            );
         };
 
         function renderCategoriesList() {
@@ -736,6 +798,7 @@
 
             container.innerHTML = dynamicCategories.map((cat, index) => {
                 const count = allCandidates.filter(c => c.status === cat.name).length;
+                const safeName = cat.name.replace(/'/g, "\\'");
                 return `
                 <div class="theme-card border rounded-xl p-2.5 flex items-center justify-between gap-2 shadow-sm hover:border-indigo-500/60 transition">
                     <div class="flex items-center gap-2.5 min-w-0">
@@ -750,10 +813,13 @@
                         <button onclick="moveCategoryOrder(${index}, 1)" ${index === dynamicCategories.length - 1 ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-300 transition flex items-center justify-center disabled:opacity-30" title="Bajar orden">
                             <i class="fa-solid fa-arrow-down text-[10px]"></i>
                         </button>
-                        <button onclick="editCategory('${cat.id}')" class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center ml-1" title="Editar">
+                        <button onclick="clearCategoryRecords('${cat.name.replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-600 hover:text-white transition flex items-center justify-center ml-1" title="Vaciar registros de ${cat.name}">
+                            <i class="fa-solid fa-broom text-[10px]"></i>
+                        </button>
+                        <button onclick="editCategory('${cat.id}')" class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center" title="Editar">
                             <i class="fa-solid fa-pen text-[10px]"></i>
                         </button>
-                        <button onclick="deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition flex items-center justify-center" title="Eliminar">
+                        <button onclick="deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition flex items-center justify-center" title="Eliminar categoría">
                             <i class="fa-solid fa-trash text-[10px]"></i>
                         </button>
                     </div>
@@ -1818,6 +1884,15 @@
             let updatedCount = 0;
             let addedCount = 0;
 
+            const emailIndex = new Map();
+            const phoneIndex = new Map();
+            allCandidates.forEach(c => {
+                const ce = cleanEmail(c.email);
+                const cp = cleanPhone(c.phone);
+                if (ce && ce !== '-') emailIndex.set(ce, c);
+                if (cp && cp.length === 8) phoneIndex.set(cp, c);
+            });
+
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
                 let targetStatus = resolveTargetStatus(row.status);
@@ -1831,29 +1906,36 @@
                     notes: row.notes
                 };
 
-                const existing = allCandidates.find(c => {
-                    const matchEmail = row.email && row.email !== '-' && c.email && cleanEmail(c.email) === cleanEmail(row.email);
-                    const matchPhone = cleanPhone(row.phone) && cleanPhone(row.phone) !== '' && c.phone && cleanPhone(c.phone) === cleanPhone(row.phone);
-                    return matchEmail || matchPhone;
-                });
+                const rowEmailClean = cleanEmail(row.email);
+                const rowPhoneClean = cleanPhone(row.phone);
+
+                let existing = null;
+                if (rowEmailClean && rowEmailClean !== '-' && emailIndex.has(rowEmailClean)) {
+                    existing = emailIndex.get(rowEmailClean);
+                } else if (rowPhoneClean && rowPhoneClean.length === 8 && phoneIndex.has(rowPhoneClean)) {
+                    existing = phoneIndex.get(rowPhoneClean);
+                }
 
                 const rowTimestamp = new Date(baseTime + i).toISOString();
 
                 if (existing) {
-                    const docRef = doc(db, "candidates", existing.docId);
-                    batch.update(docRef, {
-                        status: normalized.status,
-                        language: normalized.language,
-                        name: normalized.name,
-                        email: normalized.email,
-                        phone: normalized.phone,
-                        notes: normalized.notes,
-                        updatedAt: rowTimestamp
-                    });
+                    if (existing.docId) {
+                        const docRef = doc(db, "candidates", existing.docId);
+                        batch.update(docRef, {
+                            status: normalized.status,
+                            language: normalized.language,
+                            name: normalized.name,
+                            email: normalized.email,
+                            phone: normalized.phone,
+                            notes: normalized.notes,
+                            updatedAt: rowTimestamp
+                        });
+                    }
                     updatedCount++;
                 } else {
                     const newRef = doc(candidatesCol);
-                    batch.set(newRef, {
+                    const newDocObj = {
+                        docId: newRef.id,
                         status: normalized.status,
                         language: normalized.language,
                         name: normalized.name,
@@ -1863,7 +1945,10 @@
                         contacted: false,
                         createdAt: rowTimestamp,
                         updatedAt: rowTimestamp
-                    });
+                    };
+                    batch.set(newRef, newDocObj);
+                    if (rowEmailClean && rowEmailClean !== '-') emailIndex.set(rowEmailClean, newDocObj);
+                    if (rowPhoneClean && rowPhoneClean.length === 8) phoneIndex.set(rowPhoneClean, newDocObj);
                     addedCount++;
                 }
 
@@ -1887,195 +1972,55 @@
             );
         };
 
-        document.getElementById('updateExcelInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+        window.cleanDuplicateCandidates = function() {
+            const seenEmails = new Set();
+            const seenPhones = new Set();
+            const duplicatesToDelete = [];
 
-            const reader = new FileReader();
-            reader.onload = async function(evt) {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-                let parsedRows = [];
-                for (const row of jsonData) {
-                    const name = getRowVal(row, ['Referido', 'Referidos', 'Nombre', 'Nombre Completo', '<']) || '';
-                    const email = cleanEmail(getRowVal(row, ['Correo', 'Email']));
-                    const rawPhone = String(getRowVal(row, ['Numero', 'Número', 'Telefono'])).trim();
-                    const statusCol = String(getRowVal(row, ['Estatus', 'Estado']) || firstSheetName).trim();
-                    const notes = String(getRowVal(row, ['Nota', 'Notas']) || '-').trim();
-                    
-                    parsedRows.push({
-                        status: statusCol,
-                        name: String(name).trim(),
-                        email: email,
-                        phone: rawPhone,
-                        notes: notes
-                    });
-                }
-
-                if (parsedRows.length === 0) {
-                    showAlert("Archivo Vacío", "No se encontraron registros en la primera hoja del Excel.", "warning");
-                    e.target.value = '';
-                    return;
-                }
-
-                const baseTime = Date.now();
-                let batch = writeBatch(db);
-                let batchCount = 0;
-                let updatedCount = 0;
-                let skippedCount = 0;
-
-                for (let i = 0; i < parsedRows.length; i++) {
-                    const row = parsedRows[i];
-                    let targetStatus = resolveTargetStatus(row.status);
-
-                    const existing = allCandidates.find(c => {
-                        const matchEmail = row.email && row.email !== '-' && c.email && cleanEmail(c.email) === row.email;
-                        const matchPhone = cleanPhone(row.phone) && cleanPhone(row.phone) !== '' && c.phone && cleanPhone(c.phone) === cleanPhone(row.phone);
-                        return matchEmail || matchPhone;
-                    });
-
-                    if (existing) {
-                        const hasStatusChanged = existing.status !== targetStatus;
-                        const hasNotesChanged = (existing.notes || '-') !== (row.notes || '-');
-                        const hasNameChanged = row.name && row.name !== '' && existing.name !== row.name;
-
-                        if (hasStatusChanged || hasNotesChanged || hasNameChanged) {
-                            const docRef = doc(db, "candidates", existing.docId);
-                            const updatePayload = {
-                                status: targetStatus,
-                                notes: row.notes,
-                                updatedAt: new Date(baseTime + i).toISOString()
-                            };
-                            if (hasNameChanged) updatePayload.name = row.name;
-
-                            batch.update(docRef, updatePayload);
-                            updatedCount++;
-                            batchCount++;
-                        } else {
-                            skippedCount++;
-                        }
-                    } else {
-                        skippedCount++;
-                    }
-
-                    if (batchCount >= 450) {
-                        await batch.commit();
-                        batch = writeBatch(db);
-                        batchCount = 0;
-                    }
-                }
-
-                if (batchCount > 0) {
-                    await batch.commit();
-                }
-
-                e.target.value = '';
-                showAlert(
-                    "¡Actualización Completada!", 
-                    `Se actualizaron <strong>${updatedCount}</strong> registros.<br>Se omitieron <strong>${skippedCount}</strong> registros (sin cambios o no encontrados).`, 
-                    "success"
-                );
-            };
-            reader.readAsArrayBuffer(file);
-        });
-
-        window.openAddModal = function() {
-            currentEditingDocId = null;
-            document.getElementById('modalTitle').textContent = 'Nuevo Candidato';
-            document.getElementById('inputName').value = '';
-            document.getElementById('inputEmail').value = '';
-            document.getElementById('inputPhone').value = '+503 ';
-            document.getElementById('inputStatus').value = 'New';
-            document.getElementById('inputLanguage').value = 'ES';
-            document.getElementById('inputNotes').value = '';
-
-            document.getElementById('candidateModal').classList.remove('hidden');
-        };
-
-        window.openEditModal = function(docId) {
-            const cand = allCandidates.find(c => c.docId === docId);
-            if (!cand) return;
-            currentEditingDocId = docId;
-            document.getElementById('modalTitle').textContent = 'Editar Candidato';
-            document.getElementById('inputName').value = cand.name;
-            document.getElementById('inputEmail').value = cand.email;
-            document.getElementById('inputPhone').value = cand.phone;
-            document.getElementById('inputStatus').value = cand.status || 'New';
-            document.getElementById('inputLanguage').value = cand.language || 'ES';
-            document.getElementById('inputNotes').value = cand.notes;
-
-            document.getElementById('candidateModal').classList.remove('hidden');
-        };
-
-        window.closeModal = function() {
-            document.getElementById('candidateModal').classList.add('hidden');
-        };
-
-        window.saveCandidate = async function() {
-            const nameVal = document.getElementById('inputName').value.trim();
-            const emailVal = document.getElementById('inputEmail').value.trim().toLowerCase();
-            const rawPhone = document.getElementById('inputPhone').value.trim();
-            const phoneVal = cleanPhone(rawPhone);
-            const statusVal = document.getElementById('inputStatus').value;
-            const langVal = document.getElementById('inputLanguage').value;
-
-            if (!emailVal || !rawPhone || rawPhone === '+503') {
-                showAlert("Campos Obligatorios", "Es obligatorio ingresar el <strong>correo electrónico</strong> y el <strong>número de teléfono</strong> para guardar el registro.", "warning");
-                return;
-            }
-
-            const existingDuplicate = allCandidates.find(c => {
-                if (currentEditingDocId && c.docId === currentEditingDocId) return false;
-                const matchEmail = emailVal !== '' && c.email.trim().toLowerCase() === emailVal;
-                const matchPhone = phoneVal !== '' && cleanPhone(c.phone) === phoneVal && phoneVal !== '503';
-                return matchEmail || matchPhone;
+            // Ordenar por fecha de creación más antigua primero para conservar el original
+            const sortedByOldest = [...allCandidates].sort((a, b) => {
+                const tA = new Date(a.createdAt || 0).getTime();
+                const tB = new Date(b.createdAt || 0).getTime();
+                return tA - tB;
             });
 
-            if (existingDuplicate) {
-                showAlert(
-                    "¡Candidato Ya Registrado!",
-                    `El correo o número ingresado ya pertenece a <strong>${existingDuplicate.name}</strong>.<br><br>Actualmente cuenta con estatus <span class="text-indigo-600 dark:text-indigo-400 font-bold">${existingDuplicate.status}</span>.`,
-                    "danger"
-                );
+            for (const c of sortedByOldest) {
+                const em = cleanEmail(c.email);
+                const ph = cleanPhone(c.phone);
+                const hasValidEmail = em && em !== '-' && em.includes('@');
+                const hasValidPhone = ph && ph.length >= 8;
+
+                if ((hasValidEmail && seenEmails.has(em)) || (hasValidPhone && seenPhones.has(ph))) {
+                    duplicatesToDelete.push(c);
+                } else {
+                    if (hasValidEmail) seenEmails.add(em);
+                    if (hasValidPhone) seenPhones.add(ph);
+                }
+            }
+
+            if (duplicatesToDelete.length === 0) {
+                showAlert("Base Limpia", "No se encontraron candidatos duplicados en tu base de datos.", "success");
                 return;
             }
 
-            const nowIso = new Date().toISOString();
-            const dataPayload = {
-                name: nameVal || 'Sin Nombre',
-                email: document.getElementById('inputEmail').value.trim(),
-                phone: rawPhone,
-                status: statusVal,
-                language: langVal,
-                notes: document.getElementById('inputNotes').value.trim(),
-                updatedAt: nowIso
-            };
-
-            if (currentEditingDocId) {
-                await updateDoc(doc(db, "candidates", currentEditingDocId), dataPayload);
-            } else {
-                dataPayload.contacted = false;
-                dataPayload.createdAt = nowIso;
-                await addDoc(candidatesCol, dataPayload);
-            }
-
-            closeModal();
-            showAlert("¡Guardado!", "Candidato registrado exitosamente.", "success");
-        };
-
-        window.deleteCandidate = function(docId, name) {
             showConfirm(
-                "Eliminar Candidato", 
-                `¿Estás seguro de que deseas eliminar a <strong>${name}</strong>? Esta acción no se puede deshacer.`, 
+                "Limpiar Duplicados",
+                `Se detectaron <strong>${duplicatesToDelete.length}</strong> registros duplicados (mismo correo o teléfono). ¿Deseas eliminar las copias extra y conservar los originales?`,
                 async (confirmed) => {
                     if (confirmed) {
-                        await deleteDoc(doc(db, "candidates", docId));
-                        showAlert("Eliminado", "Candidato eliminado de la base.", "success");
+                        let batch = writeBatch(db);
+                        let count = 0;
+                        for (const dup of duplicatesToDelete) {
+                            batch.delete(doc(db, "candidates", dup.docId));
+                            count++;
+                            if (count >= 450) {
+                                await batch.commit();
+                                batch = writeBatch(db);
+                                count = 0;
+                            }
+                        }
+                        if (count > 0) await batch.commit();
+                        showAlert("¡Limpieza Exitosa!", `Se eliminaron <strong>${duplicatesToDelete.length}</strong> registros duplicados.`, "success");
                     }
                 }
             );
