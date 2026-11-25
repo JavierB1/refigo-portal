@@ -457,9 +457,6 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center text-xs">
                     <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Categorías Activas (<span id="catCountBadge">0</span>)</span>
-                    <button onclick="deleteAllWarnO()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] transition flex items-center gap-1 shadow-sm" title="Eliminar todos los registros en Warn O">
-                        <i class="fa-solid fa-trash-can"></i> Eliminar todos "Warn O"
-                    </button>
                 </div>
                 <div id="categoriesListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
                 </div>
@@ -576,7 +573,8 @@
             if (prevAllSelected || columnFilters.status.length === 0) {
                 columnFilters.status = VALID_STATUSES.slice();
             } else {
-                columnFilters.status = columnFilters.status.filter(s => VALID_STATUSES.includes(s));
+                const newCats = VALID_STATUSES.filter(s => !columnFilters.status.includes(s));
+                columnFilters.status = [...columnFilters.status.filter(s => VALID_STATUSES.includes(s)), ...newCats];
                 if (columnFilters.status.length === 0) columnFilters.status = VALID_STATUSES.slice();
             }
 
@@ -754,36 +752,6 @@
             batch.update(doc(db, "categories", currentCat.id), { order: newIndex });
             batch.update(doc(db, "categories", targetCat.id), { order: index });
             await batch.commit();
-        };
-
-        window.deleteAllWarnO = function() {
-            const warnOCandidates = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === 'warn o');
-            if (warnOCandidates.length === 0) {
-                showAlert("Sin Registros", "No hay candidatos actualmente en la categoría <strong>Warn O</strong>.", "warning");
-                return;
-            }
-
-            showConfirm(
-                "Eliminar Registros de Warn O",
-                `¿Estás seguro de eliminar los <strong>${warnOCandidates.length}</strong> registros que están en <strong>Warn O</strong>? Esta acción no se puede deshacer.`,
-                async (confirmed) => {
-                    if (confirmed) {
-                        let batch = writeBatch(db);
-                        let count = 0;
-                        for (const cand of warnOCandidates) {
-                            batch.delete(doc(db, "candidates", cand.docId));
-                            count++;
-                            if (count >= 450) {
-                                await batch.commit();
-                                batch = writeBatch(db);
-                                count = 0;
-                            }
-                        }
-                        if (count > 0) await batch.commit();
-                        showAlert("¡Eliminados!", `Se eliminaron <strong>${warnOCandidates.length}</strong> registros de Warn O exitosamente.`, "success");
-                    }
-                }
-            );
         };
 
         function renderCategoriesList() {
@@ -1240,8 +1208,9 @@
             const dateFrom = document.getElementById('dateFromInput').value;
             const dateTo = document.getElementById('dateToInput').value;
 
+            const allKnownStatuses = [...new Set([...VALID_STATUSES, ...allCandidates.map(c => c.status).filter(Boolean)])];
             if (!Array.isArray(columnFilters.status) || columnFilters.status.length === 0) {
-                columnFilters.status = VALID_STATUSES.slice();
+                columnFilters.status = allKnownStatuses;
             }
             if (!Array.isArray(columnFilters.language) || columnFilters.language.length === 0) {
                 columnFilters.language = ['ES', 'EN'];
@@ -1251,7 +1220,7 @@
             }
 
             const filtered = allCandidates.filter(c => {
-                const matchesStatusCol = columnFilters.status.includes(c.status);
+                const matchesStatusCol = columnFilters.status.includes(c.status) || !VALID_STATUSES.includes(c.status);
                 const matchesLangCol = columnFilters.language.includes(c.language);
                 
                 const candHasNotes = hasNotes(c);
@@ -1974,6 +1943,226 @@
                 "¡Importación Exitosa!", 
                 `Se actualizaron ${updatedCount} candidatos y se agregaron ${addedCount} nuevos.`, 
                 "success"
+            );
+        };
+
+        // Botón "Update": Actualiza únicamente estatus y notas de candidatos existentes desde la primera hoja del Excel
+        document.getElementById('updateExcelInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                if (!firstSheetName) {
+                    e.target.value = '';
+                    return;
+                }
+
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                if (jsonData.length === 0) {
+                    showAlert("Archivo Vacío", "No se encontraron filas en la primera hoja del archivo Excel.", "warning");
+                    e.target.value = '';
+                    return;
+                }
+
+                const emailMap = new Map();
+                const phoneMap = new Map();
+                allCandidates.forEach(c => {
+                    const em = cleanEmail(c.email);
+                    const ph = cleanPhone(c.phone);
+                    if (em && em !== '-') emailMap.set(em, c);
+                    if (ph && ph.length >= 8) phoneMap.set(ph, c);
+                });
+
+                let batch = writeBatch(db);
+                let batchCount = 0;
+                let updatedCount = 0;
+                let skippedCount = 0;
+                let notFoundCount = 0;
+                const processedIds = new Set();
+
+                for (const row of jsonData) {
+                    const normEmail = cleanEmail(getRowVal(row, ['Correo', 'Email']));
+                    const normPhone = cleanPhone(getRowVal(row, ['Numero', 'Número', 'Telefono']));
+                    const rawStatus = String(getRowVal(row, ['Estatus', 'Estado']) || '').trim();
+                    const rawNotes = String(getRowVal(row, ['Nota', 'Notas']) || '').trim();
+
+                    let existing = null;
+                    if (normEmail && normEmail !== '-' && emailMap.has(normEmail)) {
+                        existing = emailMap.get(normEmail);
+                    } else if (normPhone && normPhone.length >= 8 && phoneMap.has(normPhone)) {
+                        existing = phoneMap.get(normPhone);
+                    }
+
+                    if (!existing) {
+                        notFoundCount++;
+                        continue;
+                    }
+
+                    if (processedIds.has(existing.docId)) {
+                        skippedCount++;
+                        continue;
+                    }
+                    processedIds.add(existing.docId);
+
+                    const newStatus = rawStatus ? resolveTargetStatus(rawStatus) : existing.status;
+                    const newNotes = rawNotes !== '' ? rawNotes : existing.notes;
+
+                    if (newStatus !== existing.status || newNotes !== existing.notes) {
+                        batch.update(doc(db, "candidates", existing.docId), {
+                            status: newStatus,
+                            notes: newNotes,
+                            updatedAt: new Date().toISOString()
+                        });
+                        batchCount++;
+                        updatedCount++;
+
+                        if (batchCount >= 450) {
+                            await batch.commit();
+                            batch = writeBatch(db);
+                            batchCount = 0;
+                        }
+                    } else {
+                        skippedCount++;
+                    }
+                }
+
+                if (batchCount > 0) {
+                    await batch.commit();
+                }
+
+                e.target.value = '';
+                showAlert(
+                    "Actualización Completada",
+                    `Se actualizaron <strong>${updatedCount}</strong> registros, se omitieron <strong>${skippedCount}</strong> sin cambios y <strong>${notFoundCount}</strong> no coincidieron.`,
+                    "success"
+                );
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        window.openAddModal = function() {
+            currentEditingDocId = null;
+            document.getElementById('modalTitle').textContent = 'Nuevo Candidato';
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputEmail').value = '';
+            document.getElementById('inputPhone').value = '+503 ';
+            populateCandidateStatusDropdown();
+            document.getElementById('inputLanguage').value = 'ES';
+            document.getElementById('inputNotes').value = '';
+            document.getElementById('candidateModal').classList.remove('hidden');
+        };
+
+        window.openEditModal = function(docId) {
+            const cand = allCandidates.find(c => c.docId === docId);
+            if (!cand) return;
+            currentEditingDocId = docId;
+            document.getElementById('modalTitle').textContent = 'Editar Candidato';
+            document.getElementById('inputName').value = cand.name === 'Sin Nombre' ? '' : cand.name;
+            document.getElementById('inputEmail').value = cand.email === '-' ? '' : cand.email;
+            document.getElementById('inputPhone').value = cand.phone === '-' ? '+503 ' : cand.phone;
+            populateCandidateStatusDropdown();
+            document.getElementById('inputStatus').value = cand.status;
+            document.getElementById('inputLanguage').value = cand.language || 'ES';
+            document.getElementById('inputNotes').value = cand.notes === '-' ? '' : cand.notes;
+            document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            document.getElementById('candidateModal').classList.remove('hidden');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('candidateModal').classList.add('hidden');
+            currentEditingDocId = null;
+        };
+
+        window.saveCandidate = async function() {
+            const name = document.getElementById('inputName').value.trim() || 'Sin Nombre';
+            const emailRaw = document.getElementById('inputEmail').value.trim();
+            const phoneRaw = document.getElementById('inputPhone').value.trim();
+            const status = document.getElementById('inputStatus').value;
+            const language = document.getElementById('inputLanguage').value;
+            const notes = document.getElementById('inputNotes').value.trim() || '-';
+
+            const normEmail = cleanEmail(emailRaw);
+            const normPhone = cleanPhone(phoneRaw);
+
+            if ((!normEmail || normEmail === '-') && (!normPhone || normPhone.length < 8)) {
+                showAlert("Datos Incompletos", "Por favor ingresa un correo electrónico válido o un número de teléfono de al menos 8 dígitos.", "warning");
+                return;
+            }
+
+            // Verificar duplicados en la base de datos
+            const duplicate = allCandidates.find(c => {
+                if (currentEditingDocId && c.docId === currentEditingDocId) return false;
+                const cEmail = cleanEmail(c.email);
+                const cPhone = cleanPhone(c.phone);
+                const emailMatch = normEmail && normEmail !== '-' && cEmail === normEmail;
+                const phoneMatch = normPhone && normPhone.length >= 8 && cPhone === normPhone;
+                return emailMatch || phoneMatch;
+            });
+
+            if (duplicate) {
+                showAlert(
+                    "Candidato Duplicado",
+                    `Ya existe un registro con ese correo o teléfono:<br><strong>${duplicate.name}</strong> (Estatus: <strong>${duplicate.status}</strong>).`,
+                    "danger"
+                );
+                return;
+            }
+
+            const nowIso = new Date().toISOString();
+
+            try {
+                if (currentEditingDocId) {
+                    await updateDoc(doc(db, "candidates", currentEditingDocId), {
+                        name,
+                        email: emailRaw || '-',
+                        phone: phoneRaw || '-',
+                        status,
+                        language,
+                        notes,
+                        updatedAt: nowIso
+                    });
+                    closeModal();
+                    showAlert("¡Actualizado!", "Los datos del candidato se actualizaron correctamente.", "success");
+                } else {
+                    await addDoc(candidatesCol, {
+                        name,
+                        email: emailRaw || '-',
+                        phone: phoneRaw || '-',
+                        status,
+                        language,
+                        notes,
+                        contacted: false,
+                        createdAt: nowIso,
+                        updatedAt: nowIso
+                    });
+                    closeModal();
+                    showAlert("¡Guardado!", "El nuevo candidato fue registrado en la nube.", "success");
+                }
+            } catch (err) {
+                console.error("Error guardando candidato:", err);
+                showAlert("Error", "No se pudo guardar el candidato. Revisa tu conexión.", "danger");
+            }
+        };
+
+        window.deleteCandidate = function(docId, name) {
+            document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('active'));
+            showConfirm(
+                "Eliminar Candidato",
+                `¿Estás seguro de que deseas eliminar permanentemente a <strong>${name}</strong>?`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        await deleteDoc(doc(db, "candidates", docId));
+                        selectedCandidateIds.delete(docId);
+                        updateExportBtnVisibility();
+                        showAlert("Eliminado", `El registro de <strong>${name}</strong> fue eliminado.`, "success");
+                    }
+                }
             );
         };
 
