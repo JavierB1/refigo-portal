@@ -457,7 +457,9 @@
             <div class="space-y-2">
                 <div class="flex justify-between items-center text-xs">
                     <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Categorías Activas (<span id="catCountBadge">0</span>)</span>
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Ordenar, limpiar o editar</span>
+                    <button onclick="deleteAllWarnO()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded-lg text-[11px] transition flex items-center gap-1 shadow-sm" title="Eliminar todos los registros en Warn O">
+                        <i class="fa-solid fa-trash-can"></i> Eliminar todos "Warn O"
+                    </button>
                 </div>
                 <div id="categoriesListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
                 </div>
@@ -711,22 +713,21 @@
 
         window.clearCategoryCandidates = function(catName) {
             const matches = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === catName.trim().toLowerCase());
-        window.clearCategoryRecords = function(catName) {
-            const matching = allCandidates.filter(c => (c.status || '').trim().toLowerCase() === catName.trim().toLowerCase());
-            if (matching.length === 0) {
+            if (matches.length === 0) {
                 showAlert("Categoría Vacía", `No hay registros en la categoría <strong>${catName}</strong> para eliminar.`, "warning");
                 return;
             }
 
             showConfirm(
                 `Vaciar "${catName}"`,
-                `¿Estás seguro de eliminar los <strong>${matching.length}</strong> registros que están en <strong>${catName}</strong>? La categoría se mantendrá activa.`,
+                `¿Estás seguro de que deseas eliminar permanentemente los <strong>${matches.length}</strong> candidatos que están en <strong>${catName}</strong>? La categoría se mantendrá activa.`,
                 async (confirmed) => {
                     if (confirmed) {
                         let batch = writeBatch(db);
                         let count = 0;
-                        for (const cand of matching) {
+                        for (const cand of matches) {
                             batch.delete(doc(db, "candidates", cand.docId));
+                            selectedCandidateIds.delete(cand.docId);
                             count++;
                             if (count >= 450) {
                                 await batch.commit();
@@ -735,7 +736,8 @@
                             }
                         }
                         if (count > 0) await batch.commit();
-                        showAlert("Registros Eliminados", `Se eliminaron <strong>${matching.length}</strong> registros de <strong>${catName}</strong>.`, "success");
+                        updateExportBtnVisibility();
+                        showAlert("¡Categoría Vaciada!", `Se eliminaron <strong>${matches.length}</strong> registros de <strong>${catName}</strong>.`, "success");
                     }
                 }
             );
@@ -813,13 +815,13 @@
                         <button onclick="moveCategoryOrder(${index}, 1)" ${index === dynamicCategories.length - 1 ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-300 transition flex items-center justify-center disabled:opacity-30" title="Bajar orden">
                             <i class="fa-solid fa-arrow-down text-[10px]"></i>
                         </button>
-                        <button onclick="clearCategoryRecords('${cat.name.replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-600 hover:text-white transition flex items-center justify-center ml-1" title="Vaciar registros de ${cat.name}">
+                        <button onclick="clearCategoryCandidates('${safeName}')" ${count === 0 ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-600 hover:text-white transition flex items-center justify-center ml-1 disabled:opacity-30" title="Eliminar todos los registros de esta categoría">
                             <i class="fa-solid fa-broom text-[10px]"></i>
                         </button>
-                        <button onclick="editCategory('${cat.id}')" class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center" title="Editar">
+                        <button onclick="editCategory('${cat.id}')" class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center" title="Editar categoría">
                             <i class="fa-solid fa-pen text-[10px]"></i>
                         </button>
-                        <button onclick="deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition flex items-center justify-center" title="Eliminar categoría">
+                        <button onclick="deleteCategory('${cat.id}', '${safeName}')" class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition flex items-center justify-center" title="Eliminar categoría">
                             <i class="fa-solid fa-trash text-[10px]"></i>
                         </button>
                     </div>
@@ -1884,71 +1886,74 @@
             let updatedCount = 0;
             let addedCount = 0;
 
-            const emailIndex = new Map();
-            const phoneIndex = new Map();
+            // Índice en memoria para evitar duplicados tanto con la BD como dentro del mismo Excel
+            const emailMap = new Map();
+            const phoneMap = new Map();
+
             allCandidates.forEach(c => {
-                const ce = cleanEmail(c.email);
-                const cp = cleanPhone(c.phone);
-                if (ce && ce !== '-') emailIndex.set(ce, c);
-                if (cp && cp.length === 8) phoneIndex.set(cp, c);
+                const em = cleanEmail(c.email);
+                const ph = cleanPhone(c.phone);
+                if (em && em !== '-') emailMap.set(em, c);
+                if (ph && ph.length >= 8) phoneMap.set(ph, c);
             });
 
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
                 let targetStatus = resolveTargetStatus(row.status);
+                const normEmail = cleanEmail(row.email);
+                const normPhone = cleanPhone(row.phone);
 
                 const normalized = {
                     status: targetStatus,
                     language: forcedLang,
                     name: row.name,
-                    email: row.email,
-                    phone: row.phone,
-                    notes: row.notes
+                    email: row.email || '-',
+                    phone: row.phone || '-',
+                    notes: row.notes || '-'
                 };
 
-                const rowEmailClean = cleanEmail(row.email);
-                const rowPhoneClean = cleanPhone(row.phone);
-
                 let existing = null;
-                if (rowEmailClean && rowEmailClean !== '-' && emailIndex.has(rowEmailClean)) {
-                    existing = emailIndex.get(rowEmailClean);
-                } else if (rowPhoneClean && rowPhoneClean.length === 8 && phoneIndex.has(rowPhoneClean)) {
-                    existing = phoneIndex.get(rowPhoneClean);
+                if (normEmail && normEmail !== '-' && emailMap.has(normEmail)) {
+                    existing = emailMap.get(normEmail);
+                } else if (normPhone && normPhone.length >= 8 && phoneMap.has(normPhone)) {
+                    existing = phoneMap.get(normPhone);
                 }
 
                 const rowTimestamp = new Date(baseTime + i).toISOString();
 
                 if (existing) {
-                    if (existing.docId) {
-                        const docRef = doc(db, "candidates", existing.docId);
-                        batch.update(docRef, {
-                            status: normalized.status,
-                            language: normalized.language,
-                            name: normalized.name,
-                            email: normalized.email,
-                            phone: normalized.phone,
-                            notes: normalized.notes,
-                            updatedAt: rowTimestamp
-                        });
-                    }
-                    updatedCount++;
-                } else {
-                    const newRef = doc(candidatesCol);
-                    const newDocObj = {
-                        docId: newRef.id,
+                    const docRef = doc(db, "candidates", existing.docId);
+                    batch.update(docRef, {
                         status: normalized.status,
                         language: normalized.language,
                         name: normalized.name,
                         email: normalized.email,
                         phone: normalized.phone,
                         notes: normalized.notes,
+                        updatedAt: rowTimestamp
+                    });
+                    if (normEmail && normEmail !== '-') emailMap.set(normEmail, existing);
+                    if (normPhone && normPhone.length >= 8) phoneMap.set(normPhone, existing);
+                    updatedCount++;
+                } else {
+                    const newRef = doc(candidatesCol);
+                    const newEntry = {
+                        docId: newRef.id,
+                        status: normalized.status,
+                        language: normalized.language,
+                        name: normalized.name,
+                        email: normalized.email,
+                        phone: normalized.phone,
+                        notes: normalized.notes
+                    };
+                    batch.set(newRef, {
+                        ...newEntry,
                         contacted: false,
                         createdAt: rowTimestamp,
                         updatedAt: rowTimestamp
-                    };
-                    batch.set(newRef, newDocObj);
-                    if (rowEmailClean && rowEmailClean !== '-') emailIndex.set(rowEmailClean, newDocObj);
-                    if (rowPhoneClean && rowPhoneClean.length === 8) phoneIndex.set(rowPhoneClean, newDocObj);
+                    });
+                    if (normEmail && normEmail !== '-') emailMap.set(normEmail, newEntry);
+                    if (normPhone && normPhone.length >= 8) phoneMap.set(normPhone, newEntry);
                     addedCount++;
                 }
 
