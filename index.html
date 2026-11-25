@@ -104,6 +104,11 @@
                     <span id="themeLabel" class="hidden lg:inline">Modo Oscuro</span>
                 </button>
 
+                <button onclick="openCategoriesModal()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 text-xs sm:text-sm font-bold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 border border-slate-300 dark:border-slate-600 shadow-sm" title="Gestionar Categorías / Estatus">
+                    <i class="fa-solid fa-tags text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                    <span class="hidden md:inline">Categorías</span>
+                </button>
+
                 <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold p-2.5 sm:px-3 sm:py-2 rounded-xl transition duration-200 flex items-center space-x-1.5 shadow-md shadow-emerald-600/20" title="Nuevo Candidato">
                     <i class="fa-solid fa-user-plus text-sm"></i>
                     <span class="hidden sm:inline">Nuevo</span>
@@ -125,43 +130,8 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
-        <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 sm:gap-3">
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
-                <div id="metricTotal" class="text-lg sm:text-xl font-bold mt-1 text-slate-900 dark:text-white">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Hired</span>
-                <div id="metricHired" class="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">New</span>
-                <div id="metricNew" class="text-lg sm:text-xl font-bold text-teal-600 dark:text-teal-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Warn</span>
-                <div id="metricWarn" class="text-lg sm:text-xl font-bold text-amber-500 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Cold</span>
-                <div id="metricCold" class="text-lg sm:text-xl font-bold text-sky-600 dark:text-sky-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Extinguished</span>
-                <div id="metricExtinguished" class="text-lg sm:text-xl font-bold text-slate-500 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No Referred</span>
-                <div id="metricNoReferred" class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Rejected Conc.</span>
-                <div id="metricRejected" class="text-lg sm:text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">0</div>
-            </div>
-            <div class="theme-card border rounded-2xl p-3 shadow-sm col-span-3 sm:col-span-1">
-                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">No</span>
-                <div id="metricNo" class="text-lg sm:text-xl font-bold text-slate-600 dark:text-slate-400 mt-1">0</div>
-            </div>
+        <div id="metricsGridContainer" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+            <!-- Dinámicamente generado desde Firestore -->
         </div>
 
         <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
@@ -242,14 +212,6 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">Estatus <span class="text-rose-500">*</span></label>
                         <select id="inputStatus" class="w-full theme-input border rounded-xl p-3 text-xs focus:outline-none focus:border-indigo-500 font-semibold">
-                            <option value="Hired">Hired</option>
-                            <option value="New">New</option>
-                            <option value="Warn">Warn</option>
-                            <option value="Cold">Cold</option>
-                            <option value="Extinguished">Extinguished</option>
-                            <option value="No Referred">No Referred</option>
-                            <option value="Rejected by CONCENTRIX">Rejected by CONCENTRIX</option>
-                            <option value="No">No</option>
                         </select>
                     </div>
                     <div>
@@ -455,6 +417,58 @@
         </div>
     </div>
 
+    <!-- Modal Gestión de Categorías / Estatus -->
+    <div id="categoriesModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-[78] p-3 sm:p-4 overflow-y-auto">
+        <div class="theme-card border rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl my-auto">
+            <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700 pb-3">
+                <h3 class="font-bold text-base flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i class="fa-solid fa-tags text-indigo-600 dark:text-indigo-400"></i>
+                    <span>Gestión de Categorías y Estatus</span>
+                </h3>
+                <button onclick="closeCategoriesModal()" class="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-1 font-bold"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="bg-slate-100 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 space-y-3 text-xs">
+                <span class="font-bold uppercase text-indigo-600 dark:text-indigo-400 block tracking-wider" id="catFormTitle">Agregar Nueva Categoría</span>
+                <input type="hidden" id="catEditingId">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end">
+                    <div class="sm:col-span-6">
+                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Nombre del Estatus</label>
+                        <input type="text" id="catNameInput" placeholder="Ej: Interview, Follow Up..." class="w-full theme-input border rounded-xl p-2.5 text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="block text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1">Color Distintivo</label>
+                        <div class="flex items-center gap-2 theme-input border rounded-xl p-1.5">
+                            <input type="color" id="catColorInput" value="#4f46e5" class="w-8 h-6 rounded cursor-pointer border-0 bg-transparent">
+                            <span id="catColorHex" class="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300">#4F46E5</span>
+                        </div>
+                    </div>
+                    <div class="sm:col-span-3 flex gap-1.5">
+                        <button onclick="saveCategory()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-3 rounded-xl transition shadow-sm flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-floppy-disk"></i> <span id="catSaveBtnText">Guardar</span>
+                        </button>
+                        <button onclick="resetCategoryForm()" id="catCancelEditBtn" class="hidden bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 text-slate-900 dark:text-white font-bold py-2.5 px-2.5 rounded-xl transition" title="Cancelar edición">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Categorías Activas (<span id="catCountBadge">0</span>)</span>
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">Ordenar o editar</span>
+                </div>
+                <div id="categoriesListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t border-slate-300 dark:border-slate-700">
+                <button onclick="closeCategoriesModal()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-900 dark:text-slate-100 text-xs px-4 py-2.5 rounded-xl transition font-bold">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -475,9 +489,12 @@
         const db = getFirestore(app);
         const candidatesCol = collection(db, "candidates");
         const templatesCol = collection(db, "whatsapp_templates");
+        const categoriesCol = collection(db, "categories");
 
         let allCandidates = [];
         let whatsappTemplates = [];
+        let dynamicCategories = [];
+        let isInitialCategoriesSeeded = false;
         let currentVisibleCandidates = []; 
         let activeWhatsAppCandidateId = null;
         let currentEditingDocId = null;
@@ -485,12 +502,23 @@
         let selectedCandidateIds = new Set();
         let confirmCallback = null;
         let pendingExcelData = null;
-        let customExportStatusOrder = ['Hired', 'New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
+        let customExportStatusOrder = [];
 
         let currentPage = 1;
         const rowsPerPage = 100;
 
-        const VALID_STATUSES = ['Hired', 'New', 'Warn', 'Cold', 'Extinguished', 'No Referred', 'Rejected by CONCENTRIX', 'No'];
+        const DEFAULT_CATEGORIES = [
+            { name: 'Hired', color: '#059669', order: 0 },
+            { name: 'New', color: '#0d9488', order: 1 },
+            { name: 'Warn', color: '#f59e0b', order: 2 },
+            { name: 'Cold', color: '#0ea5e9', order: 3 },
+            { name: 'Extinguished', color: '#64748b', order: 4 },
+            { name: 'No Referred', color: '#6366f1', order: 5 },
+            { name: 'Rejected by CONCENTRIX', color: '#f43f5e', order: 6 },
+            { name: 'No', color: '#475569', order: 7 }
+        ];
+
+        let VALID_STATUSES = DEFAULT_CATEGORIES.map(c => c.name);
 
         let statusColorsMap = {
             'Hired': '#059669',
@@ -504,6 +532,233 @@
             'ES': '#3b82f6',
             'EN': '#8b5cf6'
         };
+
+        document.getElementById('catColorInput').addEventListener('input', (e) => {
+            document.getElementById('catColorHex').textContent = e.target.value.toUpperCase();
+        });
+
+        onSnapshot(categoriesCol, async (snapshot) => {
+            if (snapshot.empty && !isInitialCategoriesSeeded) {
+                isInitialCategoriesSeeded = true;
+                const batch = writeBatch(db);
+                DEFAULT_CATEGORIES.forEach((cat) => {
+                    const newRef = doc(categoriesCol);
+                    batch.set(newRef, cat);
+                });
+                await batch.commit();
+                return;
+            }
+
+            const prevValidCount = VALID_STATUSES.length;
+            const prevAllSelected = columnFilters.status.length === prevValidCount;
+
+            dynamicCategories = [];
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                dynamicCategories.push({
+                    id: docSnap.id,
+                    name: data.name || 'Sin Nombre',
+                    color: data.color || '#6366f1',
+                    order: typeof data.order === 'number' ? data.order : 99
+                });
+            });
+
+            dynamicCategories.sort((a, b) => a.order - b.order);
+
+            VALID_STATUSES = dynamicCategories.map(c => c.name);
+            statusColorsMap = { 'ES': '#3b82f6', 'EN': '#8b5cf6' };
+            dynamicCategories.forEach(c => {
+                statusColorsMap[c.name] = c.color;
+            });
+
+            if (prevAllSelected || columnFilters.status.length === 0) {
+                columnFilters.status = VALID_STATUSES.slice();
+            } else {
+                columnFilters.status = columnFilters.status.filter(s => VALID_STATUSES.includes(s));
+                if (columnFilters.status.length === 0) columnFilters.status = VALID_STATUSES.slice();
+            }
+
+            populateCandidateStatusDropdown();
+            renderCategoriesList();
+            updateMetrics();
+            buildFilterMenus();
+            applyAllFilters();
+        });
+
+        function populateCandidateStatusDropdown() {
+            const selectEl = document.getElementById('inputStatus');
+            if (!selectEl) return;
+            const currentVal = selectEl.value;
+            selectEl.innerHTML = VALID_STATUSES.map(st => `<option value="${st}">${st}</option>`).join('');
+            if (VALID_STATUSES.includes(currentVal)) {
+                selectEl.value = currentVal;
+            }
+        }
+
+        window.openCategoriesModal = function() {
+            resetCategoryForm();
+            renderCategoriesList();
+            document.getElementById('categoriesModal').classList.remove('hidden');
+        };
+
+        window.closeCategoriesModal = function() {
+            document.getElementById('categoriesModal').classList.add('hidden');
+        };
+
+        window.resetCategoryForm = function() {
+            document.getElementById('catEditingId').value = '';
+            document.getElementById('catNameInput').value = '';
+            document.getElementById('catColorInput').value = '#4f46e5';
+            document.getElementById('catColorHex').textContent = '#4F46E5';
+            document.getElementById('catFormTitle').textContent = 'Agregar Nueva Categoría';
+            document.getElementById('catSaveBtnText').textContent = 'Guardar';
+            document.getElementById('catCancelEditBtn').classList.add('hidden');
+        };
+
+        window.editCategory = function(catId) {
+            const cat = dynamicCategories.find(c => c.id === catId);
+            if (!cat) return;
+            document.getElementById('catEditingId').value = cat.id;
+            document.getElementById('catNameInput').value = cat.name;
+            document.getElementById('catColorInput').value = cat.color;
+            document.getElementById('catColorHex').textContent = cat.color.toUpperCase();
+            document.getElementById('catFormTitle').textContent = `Editando: ${cat.name}`;
+            document.getElementById('catSaveBtnText').textContent = 'Actualizar';
+            document.getElementById('catCancelEditBtn').classList.remove('hidden');
+        };
+
+        window.saveCategory = async function() {
+            const editId = document.getElementById('catEditingId').value;
+            const nameVal = document.getElementById('catNameInput').value.trim();
+            const colorVal = document.getElementById('catColorInput').value;
+
+            if (!nameVal) {
+                showAlert("Nombre Requerido", "Por favor ingresa un nombre para la categoría o estatus.", "warning");
+                return;
+            }
+
+            const duplicate = dynamicCategories.find(c => c.name.toLowerCase() === nameVal.toLowerCase() && c.id !== editId);
+            if (duplicate) {
+                showAlert("Categoría Duplicada", `Ya existe una categoría llamada <strong>${duplicate.name}</strong>.`, "danger");
+                return;
+            }
+
+            if (editId) {
+                const oldCat = dynamicCategories.find(c => c.id === editId);
+                await updateDoc(doc(db, "categories", editId), {
+                    name: nameVal,
+                    color: colorVal
+                });
+
+                // Si cambió el nombre, actualizar candidatos existentes con ese estatus
+                if (oldCat && oldCat.name !== nameVal) {
+                    const affected = allCandidates.filter(c => c.status === oldCat.name);
+                    if (affected.length > 0) {
+                        let batch = writeBatch(db);
+                        let count = 0;
+                        for (const cand of affected) {
+                            batch.update(doc(db, "candidates", cand.docId), { status: nameVal });
+                            count++;
+                            if (count >= 450) {
+                                await batch.commit();
+                                batch = writeBatch(db);
+                                count = 0;
+                            }
+                        }
+                        if (count > 0) await batch.commit();
+                    }
+                }
+                resetCategoryForm();
+                showAlert("Categoría Actualizada", "Los cambios en la categoría se guardaron correctamente.", "success");
+            } else {
+                const nextOrder = dynamicCategories.length > 0 ? Math.max(...dynamicCategories.map(c => c.order)) + 1 : 0;
+                await addDoc(categoriesCol, {
+                    name: nameVal,
+                    color: colorVal,
+                    order: nextOrder
+                });
+                resetCategoryForm();
+                showAlert("Categoría Creada", `Se agregó la nueva categoría <strong>${nameVal}</strong>.`, "success");
+            }
+        };
+
+        window.deleteCategory = function(catId, catName) {
+            if (dynamicCategories.length <= 1) {
+                showAlert("Acción No Permitida", "Debe existir al menos una categoría activa en el sistema.", "warning");
+                return;
+            }
+
+            const usageCount = allCandidates.filter(c => c.status === catName).length;
+            const warningExtra = usageCount > 0 
+                ? `<br><br><span class="text-amber-500">Nota: Hay <strong>${usageCount}</strong> candidatos actualmente con este estatus.</span>` 
+                : '';
+
+            showConfirm(
+                "Eliminar Categoría",
+                `¿Estás seguro de eliminar el estatus <strong>${catName}</strong>?${warningExtra}`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        await deleteDoc(doc(db, "categories", catId));
+                        if (document.getElementById('catEditingId').value === catId) {
+                            resetCategoryForm();
+                        }
+                        showAlert("Eliminado", `La categoría <strong>${catName}</strong> fue eliminada.`, "success");
+                    }
+                }
+            );
+        };
+
+        window.moveCategoryOrder = async function(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= dynamicCategories.length) return;
+
+            const currentCat = dynamicCategories[index];
+            const targetCat = dynamicCategories[newIndex];
+
+            const batch = writeBatch(db);
+            batch.update(doc(db, "categories", currentCat.id), { order: newIndex });
+            batch.update(doc(db, "categories", targetCat.id), { order: index });
+            await batch.commit();
+        };
+
+        function renderCategoriesList() {
+            const container = document.getElementById('categoriesListContainer');
+            const badge = document.getElementById('catCountBadge');
+            if (!container) return;
+
+            if (badge) badge.textContent = dynamicCategories.length;
+
+            if (dynamicCategories.length === 0) {
+                container.innerHTML = `<div class="text-center py-4 text-slate-500 text-xs font-semibold">Cargando categorías...</div>`;
+                return;
+            }
+
+            container.innerHTML = dynamicCategories.map((cat, index) => {
+                const count = allCandidates.filter(c => c.status === cat.name).length;
+                return `
+                <div class="theme-card border rounded-xl p-2.5 flex items-center justify-between gap-2 shadow-sm hover:border-indigo-500/60 transition">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-4 h-4 rounded-full flex-shrink-0 border border-black/10 shadow-inner" style="background-color: ${cat.color};"></span>
+                        <span class="font-bold text-xs text-slate-900 dark:text-white truncate">${cat.name}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex-shrink-0">${count} reg.</span>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="moveCategoryOrder(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-300 transition flex items-center justify-center disabled:opacity-30" title="Subir orden">
+                            <i class="fa-solid fa-arrow-up text-[10px]"></i>
+                        </button>
+                        <button onclick="moveCategoryOrder(${index}, 1)" ${index === dynamicCategories.length - 1 ? 'disabled' : ''} class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-300 transition flex items-center justify-center disabled:opacity-30" title="Bajar orden">
+                            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </button>
+                        <button onclick="editCategory('${cat.id}')" class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition flex items-center justify-center ml-1" title="Editar">
+                            <i class="fa-solid fa-pen text-[10px]"></i>
+                        </button>
+                        <button onclick="deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')" class="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white transition flex items-center justify-center" title="Eliminar">
+                            <i class="fa-solid fa-trash text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
 
         const savedTheme = localStorage.getItem('refigo_theme') || 'light';
         if (savedTheme === 'dark') {
@@ -630,7 +885,8 @@
         function normalizeCandidateData(raw) {
             let explicitStatus = String(raw.status || '').trim();
             let rawSheet = String(raw.sheet || '').toLowerCase().trim();
-            let targetStatus = 'New';
+            let defaultFallback = VALID_STATUSES.includes('New') ? 'New' : (VALID_STATUSES[0] || 'New');
+            let targetStatus = defaultFallback;
             
             let explicitLang = String(raw.language || raw.Idioma || '').toUpperCase().trim();
             let targetLang = 'ES';
@@ -643,32 +899,24 @@
                 if (foundExplicitStatus) {
                     targetStatus = foundExplicitStatus;
                 } else if (rawSheet) {
-                    if (rawSheet === 'hired') targetStatus = 'Hired';
-                    else if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') targetStatus = 'New';
-                    else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred') targetStatus = 'No Referred';
-                    else if (rawSheet === 'cold') targetStatus = 'Cold';
-                    else if (rawSheet === 'extinguished') targetStatus = 'Extinguished';
-                    else if (rawSheet === 'no') targetStatus = 'No';
-                    else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
+                    if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') targetStatus = defaultFallback;
+                    else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred') targetStatus = VALID_STATUSES.find(s => s.toLowerCase() === 'no referred') || explicitStatus;
+                    else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) targetStatus = VALID_STATUSES.find(s => s.toLowerCase().includes('rejected')) || explicitStatus;
                     else {
                         const foundSheet = VALID_STATUSES.find(s => s.toLowerCase() === rawSheet);
-                        if (foundSheet) targetStatus = foundSheet;
+                        targetStatus = foundSheet || explicitStatus;
                     }
+                } else {
+                    targetStatus = explicitStatus;
                 }
             } else if (rawSheet) {
-                if (rawSheet === 'hired') targetStatus = 'Hired';
-                else if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') targetStatus = 'New';
-                else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred') targetStatus = 'No Referred';
-                else if (rawSheet === 'cold') targetStatus = 'Cold';
-                else if (rawSheet === 'extinguished') targetStatus = 'Extinguished';
-                else if (rawSheet === 'no') targetStatus = 'No';
-                else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
+                if (rawSheet === 'referidos' || rawSheet === 'referido' || rawSheet === 'referred') targetStatus = defaultFallback;
+                else if (rawSheet === 'no referidos' || rawSheet === 'no referido' || rawSheet === 'no referred') targetStatus = VALID_STATUSES.find(s => s.toLowerCase() === 'no referred') || defaultFallback;
+                else if (rawSheet.includes('rejected') || rawSheet.includes('concentrix')) targetStatus = VALID_STATUSES.find(s => s.toLowerCase().includes('rejected')) || defaultFallback;
                 else {
                     const foundSheet = VALID_STATUSES.find(s => s.toLowerCase() === rawSheet);
                     if (foundSheet) targetStatus = foundSheet;
                 }
-            } else {
-                targetStatus = 'New';
             }
 
             return {
@@ -698,6 +946,7 @@
                 });
             });
 
+            renderCategoriesList();
             updateMetrics();
             buildFilterMenus();
             applyAllFilters();
@@ -730,12 +979,14 @@
             const notesCont = document.getElementById('notesOptions');
             if (!statusCont) return;
 
+            const allStatusOptions = [...new Set([...VALID_STATUSES, ...allCandidates.map(c => c.status).filter(Boolean)])];
+
             statusCont.innerHTML = `
                 <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
                     <input type="checkbox" checked onchange="toggleSelectAllFilter('status', this.checked)" class="rounded theme-input">
                     <strong>(Select All)</strong>
                 </label>
-            ` + VALID_STATUSES.map(val => `
+            ` + allStatusOptions.map(val => `
                 <label class="flex items-center gap-2 option-item cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 py-1 font-semibold text-slate-900 dark:text-slate-100">
                     <input type="checkbox" value="${val}" class="col-check-status rounded theme-input" ${columnFilters.status.includes(val) ? 'checked' : ''}>
                     <span>${val}</span>
@@ -1469,25 +1720,46 @@
         };
 
         function updateMetrics() {
-            const total = allCandidates.length;
-            const hiredCount = allCandidates.filter(c => c.status === 'Hired').length;
-            const newCount = allCandidates.filter(c => c.status === 'New').length;
-            const warnCount = allCandidates.filter(c => c.status === 'Warn').length;
-            const coldCount = allCandidates.filter(c => c.status === 'Cold').length;
-            const extinguishedCount = allCandidates.filter(c => c.status === 'Extinguished').length;
-            const noReferredCount = allCandidates.filter(c => c.status === 'No Referred').length;
-            const rejectedCount = allCandidates.filter(c => c.status === 'Rejected by CONCENTRIX').length;
-            const noCount = allCandidates.filter(c => c.status === 'No').length;
+            const grid = document.getElementById('metricsGridContainer');
+            if (!grid) return;
 
-            document.getElementById('metricTotal').textContent = total;
-            document.getElementById('metricHired').textContent = hiredCount;
-            document.getElementById('metricNew').textContent = newCount;
-            document.getElementById('metricWarn').textContent = warnCount;
-            document.getElementById('metricCold').textContent = coldCount;
-            document.getElementById('metricExtinguished').textContent = extinguishedCount;
-            document.getElementById('metricNoReferred').textContent = noReferredCount;
-            document.getElementById('metricRejected').textContent = rejectedCount;
-            document.getElementById('metricNo').textContent = noCount;
+            const total = allCandidates.length;
+            let cardsHtml = `
+                <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate">Total</span>
+                    <div class="text-lg sm:text-xl font-bold mt-1 text-slate-900 dark:text-white">${total}</div>
+                </div>
+            `;
+
+            const categoriesToRender = dynamicCategories.length > 0 ? dynamicCategories : DEFAULT_CATEGORIES;
+            cardsHtml += categoriesToRender.map(cat => {
+                const count = allCandidates.filter(c => c.status === cat.name).length;
+                return `
+                    <div class="theme-card border rounded-2xl p-3 shadow-sm">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block truncate" title="${cat.name}">${cat.name}</span>
+                        <div class="text-lg sm:text-xl font-bold mt-1" style="color: ${cat.color};">${count}</div>
+                    </div>
+                `;
+            }).join('');
+
+            grid.innerHTML = cardsHtml;
+        }
+
+        function resolveTargetStatus(rawStatusStr) {
+            let rawStatus = String(rawStatusStr || '').trim();
+            let lower = rawStatus.toLowerCase();
+            let defaultFallback = VALID_STATUSES.includes('New') ? 'New' : (VALID_STATUSES[0] || 'New');
+
+            const exactMatch = VALID_STATUSES.find(s => s.toLowerCase() === lower);
+            if (exactMatch) return exactMatch;
+
+            if (lower.includes('no referred') || lower.includes('no referido')) {
+                return VALID_STATUSES.find(s => s.toLowerCase().includes('no referred')) || rawStatus || defaultFallback;
+            }
+            if (lower.includes('reject') || lower.includes('concentrix')) {
+                return VALID_STATUSES.find(s => s.toLowerCase().includes('reject')) || rawStatus || defaultFallback;
+            }
+            return rawStatus || defaultFallback;
         }
 
         document.getElementById('excelInput').addEventListener('change', async (e) => {
@@ -1547,20 +1819,7 @@
 
             for (let i = 0; i < pendingExcelData.length; i++) {
                 const row = pendingExcelData[i];
-                let targetStatus = 'New';
-                let rawStatus = row.status.toLowerCase();
-                
-                if (rawStatus.includes('hired')) targetStatus = 'Hired';
-                else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) targetStatus = 'No Referred';
-                else if (rawStatus.includes('cold')) targetStatus = 'Cold';
-                else if (rawStatus.includes('extinguish')) targetStatus = 'Extinguished';
-                else if (rawStatus.includes('warn')) targetStatus = 'Warn';
-                else if (rawStatus === 'no') targetStatus = 'No';
-                else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
-                else {
-                    const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus);
-                    if (found) targetStatus = found;
-                }
+                let targetStatus = resolveTargetStatus(row.status);
 
                 const normalized = {
                     status: targetStatus,
@@ -1671,20 +1930,7 @@
 
                 for (let i = 0; i < parsedRows.length; i++) {
                     const row = parsedRows[i];
-                    let targetStatus = 'New';
-                    let rawStatus = row.status.toLowerCase();
-                    
-                    if (rawStatus.includes('hired')) targetStatus = 'Hired';
-                    else if (rawStatus.includes('no referred') || rawStatus.includes('no referido')) targetStatus = 'No Referred';
-                    else if (rawStatus.includes('cold')) targetStatus = 'Cold';
-                    else if (rawStatus.includes('extinguish')) targetStatus = 'Extinguished';
-                    else if (rawStatus.includes('warn')) targetStatus = 'Warn';
-                    else if (rawStatus === 'no') targetStatus = 'No';
-                    else if (rawStatus.includes('reject') || rawStatus.includes('concentrix')) targetStatus = 'Rejected by CONCENTRIX';
-                    else {
-                        const found = VALID_STATUSES.find(s => s.toLowerCase() === rawStatus);
-                        if (found) targetStatus = found;
-                    }
+                    let targetStatus = resolveTargetStatus(row.status);
 
                     const existing = allCandidates.find(c => {
                         const matchEmail = row.email && row.email !== '-' && c.email && cleanEmail(c.email) === row.email;
